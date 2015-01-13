@@ -31,27 +31,27 @@ The slots configuration is:
 3. Run `NestorMSX.exe`, optionally passing the appropriate arguments (more on that below).
 
 
-## NestorMSX.exe arguments ##
+## NestorMSX execution arguments ##
 
 You can run `NestorMSX.exe` as follows:
 
-### NestorMSX ###
+#### NestorMSX ####
 
 Start the emulator using `NestorMSX.config` for configuration and leaving slot 2 empty.
 
-### NestorMSX keytest ###
+#### NestorMSX keytest ####
 
 Run the key test mode. A window will open in which you can see the names of the keys that you press. This is very useful if you want to create your own key mappings file.
 
-### NestorMSX config=<filename> ###
+#### NestorMSX config=<filename> ####
 
 Start the emulator using the specified configuration file and leaving slot 2 empty.
 
-### NestorMSX slot2=<filename> ###
+#### NestorMSX slot2=<filename> ####
 
 Start the emulator using `NestorMSX.config` for configuration and inserting the specified filename as a ROM in slot 2. It overrides the file specified in the configuration file, if any. The maximum file size is 48KBytes.
 
-### NestorMSX config=<filename> slot2=<filename> ###
+#### NestorMSX config=<filename> slot2=<filename> ####
 
 A combination of the two above.
 
