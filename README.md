@@ -37,7 +37,7 @@ You can run `NestorMSX.exe` as follows:
 
 #### NestorMSX ####
 
-Start the emulator using `NestorMSX.config` for configuration and leaving slot 2 empty.
+Start the emulator using `NestorMSX.config` for configuration.
 
 #### NestorMSX keytest ####
 
