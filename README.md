@@ -43,15 +43,15 @@ Start the emulator using `NestorMSX.config` for configuration and leaving slot 2
 
 Run the key test mode. A window will open in which you can see the names of the keys that you press. This is very useful if you want to create your own key mappings file.
 
-### NestorMSX config=&lt;filename&gt; ###
+### NestorMSX config=<filename> ###
 
 Start the emulator using the specified configuration file and leaving slot 2 empty.
 
-### NestorMSX slot2=&lt;filename&gt; ###
+### NestorMSX slot2=<filename> ###
 
 Start the emulator using `NestorMSX.config` for configuration and inserting the specified filename as a ROM in slot 2. It overrides the file specified in the configuration file, if any. The maximum file size is 48KBytes.
 
-### NestorMSX config=&lt;filename&gt; slot2=&lt;filename&gt; ###
+### NestorMSX config=<filename> slot2=<filename> ###
 
 A combination of the two above.
 
