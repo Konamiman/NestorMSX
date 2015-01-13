@@ -139,10 +139,7 @@ namespace Konamiman.NestorMSX.Host
             }
 
             var filename = Encoding.ASCII.GetString(stringBytes.ToArray());
-            if(!Path.IsPathRooted(filename))
-                filename = Path.Combine(filesystemBase, filename);
-
-            return filename;
+            return filename.AsAbsolutePath(filesystemBase);
         }
 
         private void Create()

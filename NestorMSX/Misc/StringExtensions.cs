@@ -8,10 +8,10 @@ namespace Konamiman.NestorMSX.Misc
 {
     public static class StringExtensions
     {
-        public static string AsAbsolutePath(this string path)
+        public static string AsAbsolutePath(this string path, string basePath = null)
         {
-            if(Path.IsPathRooted(path))
-                return path;
+            if(basePath == null)
+                basePath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
 
             var specialFolderNames = Enum.GetNames(typeof(Environment.SpecialFolder));
             foreach(var name in specialFolderNames) {
@@ -22,7 +22,10 @@ namespace Konamiman.NestorMSX.Misc
                 }
             }
 
-            path = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), path);
+            if(Path.IsPathRooted(path))
+                return path;
+
+            path = Path.Combine(basePath, path);
 
             return path;
         }
