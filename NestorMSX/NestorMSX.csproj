@@ -119,9 +119,6 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
-    <None Include="ComicBakery.rom">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="DiskBasic\codes.mac" />
     <None Include="DiskBasic\compile.bat" />
     <None Include="DiskBasic\dskbasic.mac" />
