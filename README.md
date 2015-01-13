@@ -80,6 +80,7 @@ The default keys are `F11` for Copy and `F12` for Paste, but you can change this
 
 - Poor performance
 - Inexact timing
+- Uber ugly application icon
 
 
 ## Future plans ##
