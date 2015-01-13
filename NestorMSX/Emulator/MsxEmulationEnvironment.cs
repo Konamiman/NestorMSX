@@ -111,7 +111,7 @@ namespace Konamiman.NestorMSX.Emulator
         public void Run()
         {
             keyboardEventSource.StartGeneratingKeyEvents();
-            Task.Run(() => emulator.Run());
+            new Task(() => emulator.Run()).Start();
             Application.Run(form);
         }
     }

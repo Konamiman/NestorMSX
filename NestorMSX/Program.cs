@@ -104,10 +104,10 @@ namespace Konamiman.NestorMSX
         {
             var mandatoryStringProperties =
                 config.GetType().GetProperties()
-                    .Where(p => p.GetCustomAttribute<MandatoryAttribute>() != null);
+                    .Where(p => p.GetCustomAttributes(typeof(MandatoryAttribute), false).Any());
 
             foreach(var property in mandatoryStringProperties) {
-                var value = (string)property.GetValue(config);
+                var value = (string)property.GetValue(config, null);
                 if(string.IsNullOrWhiteSpace(value))
                     throw new ConfigurationException("Key '{0}' must have a value.".FormatWith(property.Name));
             }

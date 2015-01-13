@@ -97,7 +97,7 @@ namespace Konamiman.NestorMSX.Hardware
             throw new EmulationEnvironmentCreationException(
  @"I couldn't parse the key mappings file. Please verify that:
 
-- It is a text file consisting of exactly 16 text lines.
+- It is a text file consisting of exactly 11 text lines.
 - Each line consists of exactly 8 key names separated by spaces.
 - Each key name is a member of the .NET's System.Windows.Forms enumeration.",
             exception);

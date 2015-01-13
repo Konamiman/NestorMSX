@@ -139,7 +139,7 @@ namespace Konamiman.NestorMSX.Misc
 				{
 					if(DeserializeField.PropertyType==typeof(string))
 					{
-						DeserializeField.SetValue(graph,items[key]);
+						DeserializeField.SetValue(graph,items[key], null);
 						continue;
 					}
 
@@ -148,18 +148,19 @@ namespace Konamiman.NestorMSX.Misc
 						string Val=items[key].ToLower();
 						if(Array.IndexOf(TrueValues,Val)!=-1)
 						{
-							DeserializeField.SetValue(graph,true);
+							DeserializeField.SetValue(graph,true,null);
 							continue;
 						}
 						if(Array.IndexOf(FalseValues,Val)!=-1)
 						{
-							DeserializeField.SetValue(graph,false);
+							DeserializeField.SetValue(graph,false,null);
 							continue;
 						}
 						if(ParseBooleanMethod!=null && ParseBooleanMethod.ReturnType==typeof(bool))
 						{
 							DeserializeField.SetValue(graph,
-								(bool)ParseBooleanMethod.Invoke(graph,new string[] {key,items[key]}));
+								(bool)ParseBooleanMethod.Invoke(graph,new string[] {key,items[key]})
+                                ,null);
 							continue;
 						}
 					}
@@ -186,7 +187,7 @@ namespace Konamiman.NestorMSX.Misc
 									key,items[key],ex.InnerException);
 						}
 						
-						DeserializeField.SetValue(graph,ParsedObject);
+						DeserializeField.SetValue(graph, ParsedObject, null);
 						continue;
 					}
 				}
