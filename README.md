@@ -20,7 +20,7 @@ The slots configuration is:
 
 - Slot 0 contains the MSX BIOS and BASIC interpreter
 - Slot 1 contains a special DiskBASIC ROM (more on that below)
-- Slot 2 is empty by default, but you can attach an ROM file (more on that below)
+- Slot 2 is empty by default, but you can attach a ROM file (more on that below)
 - Slot 3 contains 64K RAM
 
 
