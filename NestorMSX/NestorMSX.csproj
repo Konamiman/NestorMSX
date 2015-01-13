@@ -37,6 +37,9 @@
   <PropertyGroup>
     <StartupObject />
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>NestorMSX.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -152,6 +155,7 @@
     <Content Include="KeyMappings.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="NestorMSX.ico" />
     <Content Include="SpanishMsx1Bios.rom">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

@@ -19,6 +19,8 @@ namespace Konamiman.NestorMSX
         [STAThread]
         static void Main(string[] args)
         {
+            Application.EnableVisualStyles();
+
             if (args.Length > 0 && args[0].ToLower() == "keytest") {
                 Application.Run(new KeyTestForm());
                 return;
