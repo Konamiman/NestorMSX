@@ -45,7 +45,7 @@ Run the key test mode. A window will open in which you can see the names of the 
 
 #### NestorMSX config=<filename> ####
 
-Start the emulator using the specified configuration file and leaving slot 2 empty.
+Start the emulator using the specified configuration file.
 
 #### NestorMSX slot2=<filename> ####
 
