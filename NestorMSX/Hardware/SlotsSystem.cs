@@ -22,7 +22,7 @@ namespace Konamiman.NestorMSX.Hardware
         private byte slotSelectionRegisterValue;
         private bool slotVisibleInPage3IsExpanded = false;
         private Dictionary<TwinBit, TwinBit[]> secondarySlotsSelectedForEachPrimarySlot;
-        private TwinBit[] secondarySlotSelectionRegisterForEachPrimarySlot = new TwinBit[] {0,0,0,0};
+        private byte[] secondarySlotSelectionRegisterForEachPrimarySlot = new byte[] {0,0,0,0};
 
         public SlotsSystem() : this(new Dictionary<SlotNumber, IMemory>(), new TwinBit[0])
         {
@@ -150,13 +150,14 @@ namespace Konamiman.NestorMSX.Hardware
             var primarySlotNumber = visibleSlotNumbers[3].PrimarySlotNumber;
             secondarySlotSelectionRegisterForEachPrimarySlot[primarySlotNumber] = value;
 
-            for(TwinBit page = 0; page < 4; page++)
+            for (int p = 0; p < 4; p++)
             {
+                TwinBit page = p;
                 TwinBit subslotNumber = value & 3;
                 secondarySlotsSelectedForEachPrimarySlot[primarySlotNumber][page] = subslotNumber;
                 page >>= 2;
 
-                if(visibleSlotNumbers[page].PrimarySlotNumber == primarySlotNumber)
+                if (visibleSlotNumbers[page].PrimarySlotNumber == primarySlotNumber)
                 {
                     var newSlotNumber = new SlotNumber(primarySlotNumber, subslotNumber);
                     SetVisibleSlot((int)page, newSlotNumber);

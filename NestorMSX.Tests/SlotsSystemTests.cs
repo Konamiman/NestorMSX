@@ -408,6 +408,38 @@ namespace Konamiman.NestorMSX.Tests
 
         #endregion
 
+        #region Subslots
+
+        [Test]
+        public void Address_FFFF_is_read_complemented_for_expanded_slots()
+        {
+            var contents = new Dictionary<SlotNumber, IMemory>
+            {
+                { new SlotNumber(1,0), Ram() },
+                { new SlotNumber(1,1), Ram() },
+                { new SlotNumber(1,2), Ram() },
+                { new SlotNumber(1,3), Ram() },
+                { new SlotNumber(2), Ram() }
+            };
+
+            var sut = new SlotsSystem(contents);
+            var value = Fixture.Create<byte>();
+
+            sut.WriteToSlotSelectionRegister(0x40);
+            sut[0xFFFF] = value;
+            byte expected = (byte)~value;
+            byte actual = sut[0xFFFF];
+            Assert.AreEqual(expected, actual);
+
+            sut.WriteToSlotSelectionRegister(0x80);
+            sut[0xFFFF] = value;
+            expected = (byte)value;
+            actual = sut[0xFFFF];
+            Assert.AreEqual(expected, actual);
+        }
+
+        #endregion
+
         private byte[] RepeatByte(byte value, int count)
         {
             return Enumerable.Repeat(value, count).ToArray();
