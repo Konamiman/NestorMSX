@@ -328,7 +328,7 @@ namespace Konamiman.NestorMSX.Tests
             var sut = EmptySlotsSystem();
             for(int i = 0; i < 4; i++) {
                 slotContents[i][i*0x4000] = testData[i*2];
-                slotContents[i][(i*0x4000)+0x3FFF] = testData[(i*2)+1];
+                slotContents[i][(i*0x4000)+0x3FFE] = testData[(i*2)+1];
                 sut.SetSlotContents((byte)i, slotContents[i]);
                 sut.EnableSlot(i, (byte)i);
             }
@@ -336,7 +336,7 @@ namespace Konamiman.NestorMSX.Tests
             for (int i = 0; i < 4; i++) {
                 var address = i*0x4000;
                 Assert.AreEqual(testData[i*2], sut[address]);
-                Assert.AreEqual(testData[(i*2)+1], sut[address + 0x3FFF]);
+                Assert.AreEqual(testData[(i*2)+1], sut[address + 0x3FFE]);
             }
         }
 
@@ -352,13 +352,13 @@ namespace Konamiman.NestorMSX.Tests
                 sut.EnableSlot(i, (byte)i);
                 var address = i*0x4000;
                 sut[address] = testData[i*2];
-                sut[address + 0x3FFF] = testData[(i*2)+1];
+                sut[address + 0x3FFE] = testData[(i*2)+1];
             }
 
             for (int i = 0; i < 4; i++) {
                 var address = i*0x4000;
                 Assert.AreEqual(testData[i*2], slotContents[i][address]);
-                Assert.AreEqual(testData[(i*2)+1], slotContents[i][address+0x3FFF]);
+                Assert.AreEqual(testData[(i*2)+1], slotContents[i][address+0x3FFE]);
             }
         }
 

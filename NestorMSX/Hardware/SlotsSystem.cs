@@ -132,11 +132,35 @@ namespace Konamiman.NestorMSX.Hardware
         {
             get
             {
-                return visibleSlotContents[(ushort)(address & 0xC000)][address];
+                return address == 0xFFFF && slotVisibleInPage3IsExpanded ?
+                    (byte)~secondarySlotSelectionRegisterForEachPrimarySlot[visibleSlotNumbers[3].PrimarySlotNumber]
+                    : visibleSlotContents[(ushort)(address & 0xC000)][address];
             }
             set
             {
-                visibleSlotContents[(ushort)(address & 0xC000)][address] = value;
+                if(address == 0xFFFF && slotVisibleInPage3IsExpanded)
+                    WriteToSecondarySlotRegister(value);
+                else
+                    visibleSlotContents[(ushort)(address & 0xC000)][address] = value;
+            }
+        }
+
+        private void WriteToSecondarySlotRegister(byte value)
+        {
+            var primarySlotNumber = visibleSlotNumbers[3].PrimarySlotNumber;
+            secondarySlotSelectionRegisterForEachPrimarySlot[primarySlotNumber] = value;
+
+            for(TwinBit page = 0; page < 4; page++)
+            {
+                TwinBit subslotNumber = value & 3;
+                secondarySlotsSelectedForEachPrimarySlot[primarySlotNumber][page] = subslotNumber;
+                page >>= 2;
+
+                if(visibleSlotNumbers[page].PrimarySlotNumber == primarySlotNumber)
+                {
+                    var newSlotNumber = new SlotNumber(primarySlotNumber, subslotNumber);
+                    SetVisibleSlot((int)page, newSlotNumber);
+                }
             }
         }
 
@@ -164,7 +188,17 @@ namespace Konamiman.NestorMSX.Hardware
             for(int p = 0; p <4; p++) {
                 Z80Page page = p;
                 var primarySlotNumber = value & 3;
-                var slotNumber = slotContents.Keys.First(s => s.PrimarySlotNumber == primarySlotNumber); //TODO: Handle subslots
+                SlotNumber slotNumber;
+                if(isExpanded[primarySlotNumber])
+                {
+                    var subslotNumber = secondarySlotsSelectedForEachPrimarySlot[primarySlotNumber][page];
+                    slotNumber = new SlotNumber(primarySlotNumber, subslotNumber);
+                }
+                else
+                {
+                    slotNumber = new SlotNumber(primarySlotNumber, 0);
+                }
+
                 SetVisibleSlot(page, slotNumber);
                 value >>= 2;
             }
