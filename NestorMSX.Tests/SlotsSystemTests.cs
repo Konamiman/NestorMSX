@@ -42,7 +42,8 @@ namespace Konamiman.NestorMSX.Tests
         [Test]
         public void Cannot_pass_null_to_constructor()
         {
-            Assert.Throws<ArgumentNullException>(() => new SlotsSystem(null));
+            Assert.Throws<ArgumentNullException>(() => new SlotsSystem((Dictionary<SlotNumber, IMemory>)null));
+            Assert.Throws<ArgumentNullException>(() => new SlotsSystem((TwinBit[])null));
         }
 
         [Test]
@@ -90,6 +91,31 @@ namespace Konamiman.NestorMSX.Tests
             Assert.True(sut.IsExpanded(slotNumber.PrimarySlotNumber));
         }
 
+        [Test]
+        public void Slot_are_expanded_as_array_of_expanded_slot_numbers_passed()
+        {
+            var expandedSlots = new TwinBit[] {1, 3};
+            var sut = new SlotsSystem(expandedSlots);
+
+            Assert.False(sut.IsExpanded(0));
+            Assert.True(sut.IsExpanded(1));
+            Assert.False(sut.IsExpanded(2));
+            Assert.True(sut.IsExpanded(3));
+        }
+
+        [Test]
+        public void Exception_is_thrown_if_content_for_non_existing_expanded_slot_is_passed()
+        {
+            var expandedSlots = new TwinBit[] { 1, 3 };
+
+            var contents = new Dictionary<SlotNumber, IMemory>
+            {
+                { new SlotNumber(0, 1), AnyMemory() }
+            };
+
+            Assert.Throws<ArgumentException>(() => new SlotsSystem(contents, expandedSlots));
+        }
+        
         [Test]
         public void Specified_slot_contain_its_contents_and_all_others_ends_up_containing_NotConnectedMemory()
         {

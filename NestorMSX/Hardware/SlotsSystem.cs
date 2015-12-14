@@ -22,22 +22,50 @@ namespace Konamiman.NestorMSX.Hardware
         private byte slotSelectionRegisterValue;
         private bool slotVisibleInPage3IsExpanded = false;
         private Dictionary<TwinBit, TwinBit[]> secondarySlotsSelectedForEachPrimarySlot;
+        private TwinBit[] secondarySlotSelectionRegisterForEachPrimarySlot = new TwinBit[] {0,0,0,0};
 
-        public SlotsSystem() : this(new Dictionary<SlotNumber, IMemory>())
+        public SlotsSystem() : this(new Dictionary<SlotNumber, IMemory>(), new TwinBit[0])
+        {
+        }
+
+        public SlotsSystem(TwinBit[] expandedSlots) : this(new Dictionary<SlotNumber, IMemory>(), expandedSlots)
         {
         }
 
         public SlotsSystem(IDictionary<SlotNumber, IMemory> slotContents)
+            : this(slotContents, ExpandedSlotsFromContents(slotContents))
+        {
+        }
+
+        private static TwinBit[] ExpandedSlotsFromContents(IDictionary<SlotNumber, IMemory> slotContents)
+        {
+            if (slotContents == null)
+                throw new ArgumentNullException("slotContents");
+
+            return Enumerable.Range(0, 4)
+                .Select(n => (TwinBit)n)
+                .Where(n => slotContents.Keys.Any(sn => sn.PrimarySlotNumber == n && sn.IsExpandedSlot))
+                .Distinct()
+                .ToArray();
+        }
+
+        public SlotsSystem(IDictionary<SlotNumber, IMemory> slotContents, TwinBit[] expandedSlots)
         {
             if(slotContents == null)
                 throw new ArgumentNullException("slotContents");
 
+            if(expandedSlots == null)
+                throw new ArgumentNullException("expandedSlots");
+
             if(slotContents.Any(c => c.Value != null && c.Value.Size != Size))
                 throw new ArgumentException("Size of slot contents must be 65536 bytes");
 
-            for(int i = MinSlotPartNumber; i <= MaxSlotPartNumber; i++) {
-                isExpanded[i] = slotContents.Keys.Where(s => s.PrimarySlotNumber == i).Any(s => s.IsExpandedSlot);
+            foreach(var slot in expandedSlots) {
+                isExpanded[slot] = true;
             }
+
+            if(slotContents.Any(c => c.Key.IsExpandedSlot && !IsExpanded(c.Key.PrimarySlotNumber)))
+                throw new ArgumentException("Can't specify content for a subslot if the slot is not expanded");
 
             this.slotContents = new Dictionary<SlotNumber, IMemory>(slotContents);
             FillMissingSlotContentsWithNotConnectedMemory();
