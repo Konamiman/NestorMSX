@@ -149,20 +149,27 @@ namespace Konamiman.NestorMSX.Hardware
         {
             var primarySlotNumber = visibleSlotNumbers[3].PrimarySlotNumber;
             secondarySlotSelectionRegisterForEachPrimarySlot[primarySlotNumber] = value;
+            var tempValue = value;
 
             for (int p = 0; p < 4; p++)
             {
                 TwinBit page = p;
-                TwinBit subslotNumber = value & 3;
+                TwinBit subslotNumber = tempValue & 3;
                 secondarySlotsSelectedForEachPrimarySlot[primarySlotNumber][page] = subslotNumber;
-                page >>= 2;
 
-                if (visibleSlotNumbers[page].PrimarySlotNumber == primarySlotNumber)
+                if(visibleSlotNumbers[page].PrimarySlotNumber == primarySlotNumber)
                 {
                     var newSlotNumber = new SlotNumber(primarySlotNumber, subslotNumber);
                     SetVisibleSlot((int)page, newSlotNumber);
                 }
+
+                tempValue >>= 2;
             }
+
+            if(SecondarySlotSelectionRegisterWritten != null)
+                SecondarySlotSelectionRegisterWritten(
+                    this,
+                    new SecondarySlotSelectionRegisterWrittenEventArgs(value, primarySlotNumber));
         }
 
         public void SetContents(int startAddress, byte[] contents, int startIndex = 0, int? length = null)
@@ -197,7 +204,7 @@ namespace Konamiman.NestorMSX.Hardware
                 }
                 else
                 {
-                    slotNumber = new SlotNumber(primarySlotNumber, 0);
+                    slotNumber = new SlotNumber((byte)primarySlotNumber);
                 }
 
                 SetVisibleSlot(page, slotNumber);
@@ -227,6 +234,7 @@ namespace Konamiman.NestorMSX.Hardware
         }
 
         public event EventHandler<SlotSelectionRegisterWrittenEventArgs> SlotSelectionRegisterWritten;
+        public event EventHandler<SecondarySlotSelectionRegisterWrittenEventArgs> SecondarySlotSelectionRegisterWritten;
 
         public bool IsExpanded(TwinBit primarySlotNumber)
         {

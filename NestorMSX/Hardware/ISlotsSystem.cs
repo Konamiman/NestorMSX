@@ -24,5 +24,10 @@ namespace Konamiman.NestorMSX.Hardware
         /// Event triggered whenever the slot selection register is written to.
         /// </summary>
         event EventHandler<SlotSelectionRegisterWrittenEventArgs> SlotSelectionRegisterWritten;
+
+        /// <summary>
+        /// Event triggered whenever the secondary slot selection register for a slot is written to.
+        /// </summary>
+        event EventHandler<SecondarySlotSelectionRegisterWrittenEventArgs> SecondarySlotSelectionRegisterWritten;
     }
 }

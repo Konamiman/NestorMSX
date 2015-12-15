@@ -438,7 +438,93 @@ namespace Konamiman.NestorMSX.Tests
             Assert.AreEqual(expected, actual);
         }
 
+        [Test]
+        public void Writing_to_subslot_selection_register_changes_visible_slot_in_connected_pages()
+        {
+            var sut = new SlotsSystem(new TwinBit[] {2,3});
+            sut.WriteToSlotSelectionRegister(SlotSelectionRegisterValue(0,2,3,2));
+
+            Assert.AreEqual(new SlotNumber(0), sut.GetCurrentSlot(0));
+            Assert.AreEqual(new SlotNumber(2, 0), sut.GetCurrentSlot(1));
+            Assert.AreEqual(new SlotNumber(3, 0), sut.GetCurrentSlot(2));
+            Assert.AreEqual(new SlotNumber(2, 0), sut.GetCurrentSlot(3));
+
+            sut[0xFFFF] = SlotSelectionRegisterValue(0, 1, 2, 3);
+
+            Assert.AreEqual(new SlotNumber(0), sut.GetCurrentSlot(0));
+            Assert.AreEqual(new SlotNumber(2, 1), sut.GetCurrentSlot(1));
+            Assert.AreEqual(new SlotNumber(3, 0), sut.GetCurrentSlot(2));
+            Assert.AreEqual(new SlotNumber(2, 3), sut.GetCurrentSlot(3));
+        }
+
+        [Test]
+        public void Writing_to_subslot_selection_register_takes_effect_when_pages_are_selected()
+        {
+            var sut = new SlotsSystem(new TwinBit[] { 2, 3 });
+            sut.WriteToSlotSelectionRegister(SlotSelectionRegisterValue(0, 1, 0, 2));
+
+            Assert.AreEqual(new SlotNumber(0), sut.GetCurrentSlot(0));
+            Assert.AreEqual(new SlotNumber(1), sut.GetCurrentSlot(1));
+            Assert.AreEqual(new SlotNumber(0), sut.GetCurrentSlot(2));
+            Assert.AreEqual(new SlotNumber(2, 0), sut.GetCurrentSlot(3));
+
+            sut[0xFFFF] = SlotSelectionRegisterValue(0, 1, 2, 3);
+            sut.WriteToSlotSelectionRegister(SlotSelectionRegisterValue(2, 2, 2, 2));
+
+            Assert.AreEqual(new SlotNumber(2, 0), sut.GetCurrentSlot(0));
+            Assert.AreEqual(new SlotNumber(2, 1), sut.GetCurrentSlot(1));
+            Assert.AreEqual(new SlotNumber(2, 2), sut.GetCurrentSlot(2));
+            Assert.AreEqual(new SlotNumber(2, 3), sut.GetCurrentSlot(3));
+        }
+
+        [Test]
+        public void Writing_subslot_selection_register_does_not_fire_event_if_primary_slot()
+        {
+            var sut = new SlotsSystem(new TwinBit[] {2});
+            var subslotSelectorValue = Fixture.Create<byte>();
+            var eventFired = false;
+
+            sut.SecondarySlotSelectionRegisterWritten += (sender, args) =>
+            {
+                eventFired = true;
+            };
+
+            sut.WriteToSlotSelectionRegister(0);
+            sut[0xFFFF] = subslotSelectorValue;
+
+            Assert.False(eventFired);
+        }
+
+        [Test]
+        public void Writing_subslot_selection_register_fires_event_if_expanded_slot()
+        {
+            var sut = new SlotsSystem(new TwinBit[] { 2 });
+            var subslotSelectorValue = Fixture.Create<byte>();
+            byte subslotSelectorValueInEvent = 0;
+            TwinBit primarySlotValueInEvent = 0;
+            var eventFired = false;
+
+            sut.SecondarySlotSelectionRegisterWritten += (sender, args) =>
+            {
+                eventFired = true;
+                subslotSelectorValueInEvent = args.Value;
+                primarySlotValueInEvent = args.PrimarySlotNumber;
+            };
+
+            sut.WriteToSlotSelectionRegister(SlotSelectionRegisterValue(0, 0, 0, 2));
+            sut[0xFFFF] = subslotSelectorValue;
+
+            Assert.True(eventFired);
+            Assert.AreEqual(subslotSelectorValue, subslotSelectorValueInEvent);
+            Assert.AreEqual(2, primarySlotValueInEvent);
+        }
+
         #endregion
+
+        private byte SlotSelectionRegisterValue(Z80Page page0, Z80Page page1, Z80Page page2, Z80Page page3)
+        {
+            return (byte)(page0 + (page1 << 2) + (page2 << 4) + (page3 << 6));
+        }
 
         private byte[] RepeatByte(byte value, int count)
         {
