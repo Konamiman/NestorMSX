@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Globalization;
+using System.Text.RegularExpressions;
 
 namespace Konamiman.NestorMSX.Misc
 {
@@ -115,6 +117,32 @@ namespace Konamiman.NestorMSX.Misc
                 return string.Format("{0}-{1}", PrimarySlotNumber, SubSlotNumber);
             else
                 return PrimarySlotNumber.ToString();
+        }
+
+        private static int asciiForZero = Convert.ToByte('0');
+
+        public static SlotNumber Parse(string s)
+        {
+            var allowWhitespace = NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite;
+
+            if (s == null)
+                throw new ArgumentNullException(nameof(s));
+
+            byte byteValue;
+            if(byte.TryParse(s, allowWhitespace, CultureInfo.InvariantCulture, out byteValue))
+                return new SlotNumber(byteValue);
+
+            if(Regex.IsMatch(s, @" *\#([0-9A-Fa-f]){1,2} *") && byte.TryParse(
+                s.Trim(' ','#'), allowWhitespace | NumberStyles.AllowHexSpecifier, CultureInfo.InvariantCulture, out byteValue))
+                return new SlotNumber(byteValue);
+
+            if(Regex.IsMatch(s, @" *[0-3]-[0-3] *"))
+            {
+                s = s.Trim();
+                return new SlotNumber(s[0] - asciiForZero, s[2] - asciiForZero);
+            }
+
+            throw new FormatException($"{s} is not a valid slot number representation");
         }
     }
 }
