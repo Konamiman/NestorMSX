@@ -60,6 +60,8 @@
     <Compile Include="Configuration.cs" />
     <Compile Include="Exceptions\ConfigurationException.cs" />
     <Compile Include="Exceptions\EmulationEnvironmentCreationException.cs" />
+    <Compile Include="Hardware\IMappedRam.cs" />
+    <Compile Include="Hardware\MappedRam.cs" />
     <Compile Include="Hardware\SecondarySlotSelectionRegisterWrittenEventArgs.cs" />
     <Compile Include="Host\EmulatorHostForm.cs">
       <SubType>Form</SubType>
