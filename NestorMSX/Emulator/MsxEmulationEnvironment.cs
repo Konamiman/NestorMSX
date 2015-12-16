@@ -18,30 +18,35 @@ namespace Konamiman.NestorMSX.Emulator
 
         private DosFunctionCallExecutor dosFunctionsExecutor;
         private MsxEmulator emulator;
-        private IKeyEventSource keyboardEventSource;
-        private EmulatorHostForm form;
+
+        public IKeyEventSource KeyboardEventSource { get; }
+        public EmulatorHostForm HostForm { get; }
+        public IExternallyControlledSlotsSystem SlotsSystem { get; }
+        public IExternallyControlledTms9918 Vdp { get; set; }
+        public IZ80Processor Z80 { get; }
+        public IKeyboardController KeyboardController { get; }
 
         public MsxEmulationEnvironment(Configuration config)
         {
-            var z80 = CreateCpu(config);
+            Z80 = CreateCpu(config);
 
-            var slots = CreateSlotsSystem(config);
+            SlotsSystem = CreateSlotsSystem(config);
             
-            form = CreateHostForm(config, z80);
-            keyboardEventSource = form;
+            HostForm = CreateHostForm(config, Z80);
+            KeyboardEventSource = HostForm;
 
-            var vdp = CreateVdp(config, form);
-            form.Vdp = vdp;
+            Vdp = CreateVdp(config, HostForm);
+            HostForm.Vdp = Vdp;
 
-            var keyboard = CreateKeyboardController(config, form);
+            KeyboardController = CreateKeyboardController(config, HostForm);
             
-            ConfigureDiskRom(config, slots, z80);
+            ConfigureDiskRom(config, SlotsSystem, Z80);
             
             var hardware = new MsxHardwareSet {
-                Cpu = z80,
-                KeyboardController = keyboard,
-                SlotsSystem = slots,
-                Vdp = vdp
+                Cpu = Z80,
+                KeyboardController = KeyboardController,
+                SlotsSystem = SlotsSystem,
+                Vdp = Vdp
             };
 
             emulator = new MsxEmulator(hardware);
@@ -110,9 +115,9 @@ namespace Konamiman.NestorMSX.Emulator
 
         public void Run()
         {
-            keyboardEventSource.StartGeneratingKeyEvents();
+            KeyboardEventSource.StartGeneratingKeyEvents();
             new Task(() => emulator.Run()).Start();
-            Application.Run(form);
+            Application.Run(HostForm);
         }
     }
 }

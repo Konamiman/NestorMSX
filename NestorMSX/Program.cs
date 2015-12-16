@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Windows.Forms;
 using Konamiman.NestorMSX.Emulator;
 using Konamiman.NestorMSX.Exceptions;
@@ -27,9 +26,26 @@ namespace Konamiman.NestorMSX
             }
 
             var environment = CreateEmulationEnvironment(args);
+            LoadPlugins(environment);
 
             if(environment != null)
                 environment.Run();
+        }
+
+        private static void LoadPlugins(MsxEmulationEnvironment environment)
+        {
+            var pluginContex = new PluginContext
+            {
+                Cpu = environment.Z80,
+                HostForm = environment.HostForm,
+                SlotsSystem = environment.SlotsSystem,
+                Vdp = environment.Vdp,
+                KeyEventSource = environment.KeyboardEventSource
+            };
+
+            var pluginsLoader = new PluginsLoader(pluginContex, Tell);
+
+            pluginsLoader.LoadPlugins();
         }
 
         private static MsxEmulationEnvironment CreateEmulationEnvironment(string[] args)

@@ -41,6 +41,10 @@
     <ApplicationIcon>NestorMSX.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net40\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -51,9 +55,9 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
-    <Reference Include="Z80dotNet, Version=1.0.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Z80dotNet.1.0.2.0\lib\net40-Client\Z80dotNet.dll</HintPath>
+    <Reference Include="Z80dotNet, Version=1.0.5.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Z80dotNet.1.0.5.0\lib\net40-Client\Z80dotNet.dll</HintPath>
+      <Private>True</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -62,7 +66,6 @@
     <Compile Include="Exceptions\EmulationEnvironmentCreationException.cs" />
     <Compile Include="Hardware\IMappedRam.cs" />
     <Compile Include="Hardware\MappedRam.cs" />
-    <Compile Include="Hardware\SecondarySlotSelectionRegisterWrittenEventArgs.cs" />
     <Compile Include="Host\EmulatorHostForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -70,18 +73,10 @@
       <DependentUpon>EmulatorHostForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Emulator\MsxHardwareSet.cs" />
-    <Compile Include="Hardware\IExternallyControlledSlotsSystem.cs" />
-    <Compile Include="Hardware\IExternallyControlledTms9918.cs" />
-    <Compile Include="Hardware\IKeyboardController.cs" />
-    <Compile Include="Host\IKeyEventSource.cs" />
-    <Compile Include="Hardware\ISlotsSystem.cs" />
-    <Compile Include="Hardware\ITms9918.cs" />
     <Compile Include="Hardware\ITms9918DisplayRenderer.cs" />
     <Compile Include="Hardware\KeyboardController.cs" />
-    <Compile Include="Hardware\KeyEventArgs.cs" />
     <Compile Include="Hardware\NotConnectedMemory.cs" />
     <Compile Include="Hardware\PlainRom.cs" />
-    <Compile Include="Hardware\SlotSelectionRegisterWrittenEventArgs.cs" />
     <Compile Include="Hardware\SlotsSystem.cs" />
     <Compile Include="Hardware\Tms9918.cs" />
     <Compile Include="Host\DisplayRenderer.cs" />
@@ -100,10 +95,8 @@
     <Compile Include="Misc\KeyTestForm.Designer.cs">
       <DependentUpon>KeyTestForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Misc\SlotNumber.cs" />
     <Compile Include="Misc\StringExtensions.cs" />
-    <Compile Include="Misc\TwinBit.cs" />
-    <Compile Include="Misc\Z80Page.cs" />
+    <Compile Include="PluginsLoader.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Host\EmulatorHostForm.resx">
@@ -133,11 +126,13 @@
     <None Include="JapaneseMsx1Bios.rom">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <Content Include="NestorMSX.config">
+    <None Include="NestorMSX.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <SubType>Designer</SubType>
-    </Content>
+    </None>
     <None Include="packages.config" />
+    <None Include="plugins.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -156,6 +151,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="NestorMSX.ico" />
+    <Content Include="plugins\README.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="SpanishMsx1Bios.rom">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -163,8 +161,20 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\NestorMSX.BuiltInPlugins\NestorMSX.BuiltInPlugins.csproj">
+      <Project>{a04bb668-5cb3-467a-b575-4c72ca62e7f9}</Project>
+      <Name>NestorMSX.BuiltInPlugins</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\NestorMSX.Infrastructure\NestorMSX.Infrastructure.csproj">
+      <Project>{41786ee5-ecd9-4b70-b0d9-ed4878ae9fc5}</Project>
+      <Name>NestorMSX.Infrastructure</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>move NestorMSX.BuiltInPlugins.* $(TargetDir)plugins</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

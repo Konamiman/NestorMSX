@@ -53,9 +53,9 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="Z80dotNet, Version=1.0.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Z80dotNet.1.0.2.0\lib\net40-Client\Z80dotNet.dll</HintPath>
+    <Reference Include="Z80dotNet, Version=1.0.5.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Z80dotNet.1.0.5.0\lib\net40-Client\Z80dotNet.dll</HintPath>
+      <Private>True</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -72,6 +72,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\NestorMSX.Infrastructure\NestorMSX.Infrastructure.csproj">
+      <Project>{41786ee5-ecd9-4b70-b0d9-ed4878ae9fc5}</Project>
+      <Name>NestorMSX.Infrastructure</Name>
+    </ProjectReference>
     <ProjectReference Include="..\NestorMSX\NestorMSX.csproj">
       <Project>{68edf6dd-384a-4264-a64d-e67a58dfc9ba}</Project>
       <Name>NestorMSX</Name>
