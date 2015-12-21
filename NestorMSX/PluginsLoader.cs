@@ -2,8 +2,8 @@
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using Newtonsoft.Json;
 using System.Collections.Generic;
+using Konamiman.NestorMSX.Misc;
 
 namespace Konamiman.NestorMSX
 {
@@ -18,17 +18,43 @@ namespace Konamiman.NestorMSX
             this.tell = tell;
         }
 
+        /// <summary>
+        /// Parses a JSON string into an object. Arrays are converted to object[],
+        /// objects are converted to Dictionary&lt;string, object&gt;.
+        /// </summary>
         public void LoadPlugins()
         {
             var configFileText = File.ReadAllText("plugins.config");
-            var allConfigValues = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, string>>>(configFileText);
-            var commonConfigValues = allConfigValues["sharedPluginsConfig"];
+            IDictionary<string, object> allConfigValues;
 
-            var activePluginNames =
-                allConfigValues.Keys
-                .Where(k => k != "sharedPluginsConfig")
-                .Where(k => !allConfigValues[k].ContainsKey("active") || allConfigValues[k]["active"].Equals("true", StringComparison.InvariantCultureIgnoreCase))
-                .ToArray();
+            try
+            {
+                allConfigValues = JsonParser.Parse(configFileText) as IDictionary<string, object>;
+            }
+            catch(Exception ex)
+            {
+                throw new InvalidOperationException("Error when parsing plugins.config file: " + ex.Message);
+            }
+
+            if (allConfigValues == null)
+                ThrowNotValidJson();
+
+            var commonConfigValues = allConfigValues["sharedPluginsConfig"] as IDictionary<string, object>;
+            var plugins = allConfigValues["plugins"] as IDictionary<string, object>;
+            if(commonConfigValues == null || plugins == null)
+                ThrowNotValidJson();
+
+            var validPluginConfigs =
+                plugins
+                    .Where(p => p.Value is IDictionary<string, object>)
+                    .ToDictionary(p => p.Key, p => (IDictionary<string, object>)p.Value);
+
+            var activePluginConfigs =
+                validPluginConfigs.Keys
+                    .Where(k => !validPluginConfigs[k].ContainsKey("active") || (validPluginConfigs[k]["active"] as bool?) == true)
+                    .ToDictionary(k => k, k => validPluginConfigs[k]);
+
+            var namesOfPluginsConfiguredAsActive = activePluginConfigs.Keys;
 
             var pluginsDirectory = new DirectoryInfo("plugins");
             
@@ -40,20 +66,20 @@ namespace Konamiman.NestorMSX
                 .Union(pluginsDirectory.GetDirectories().SelectMany(d => getDllFilenames(d)))
                 .ToArray();
 
-            var allPluginsByName =
+            var allAvailablePluginsByName =
                 pluginAssemblyFileNames.SelectMany(n => GetPluginsInAssembly(n))
                     .ToDictionary(x => x.Key, x => x.Value);
 
-            foreach(var pluginName in activePluginNames)
+            foreach(var pluginName in namesOfPluginsConfiguredAsActive)
             {
                 try
                 {
-                    var pluginConfig = allConfigValues[pluginName];
+                    var pluginConfig = validPluginConfigs[pluginName];
                     foreach(var sharedConfigKey in commonConfigValues.Keys)
                         if(!pluginConfig.ContainsKey(sharedConfigKey))
                             pluginConfig[sharedConfigKey] = commonConfigValues[sharedConfigKey];
 
-                    LoadPlugin(pluginName, allPluginsByName, pluginConfig);
+                    LoadPlugin(pluginName, allAvailablePluginsByName, pluginConfig);
                 }
                 catch(Exception ex)
                 {
@@ -62,26 +88,36 @@ namespace Konamiman.NestorMSX
             }
         }
 
+        private static void ThrowNotValidJson()
+        {
+            throw new InvalidOperationException("plugins.config is not a valid json file");
+        }
+
         private IDictionary<string, Type> GetPluginsInAssembly(string assemblyFileName)
         {
             var assembly = Assembly.LoadFile(assemblyFileName);
 
+            Func<Type, NestorMSXPluginAttribute> getPluginAttribute =
+                t => (NestorMSXPluginAttribute)t.GetCustomAttributes(typeof(NestorMSXPluginAttribute), false).SingleOrDefault();
+
             var pluginTypes =
                 assembly.GetTypes()
-                    .Where(t => t.GetCustomAttributes(typeof(NestorMSXPluginAttribute), false).Length > 0)
+                    .Where(t => getPluginAttribute(t) != null)
                     .ToArray();
 
-            var pluginTypesByName =
-                pluginTypes
-                    .ToDictionary(t =>
-                        ((NestorMSXPluginAttribute)t.GetCustomAttributes(typeof(NestorMSXPluginAttribute), false)
-                            .Single())
-                            .Name ?? t.FullName);
+            var pluginTypesByName = pluginTypes.ToDictionary(t => t.FullName);
+
+            foreach(var type in pluginTypes)
+            {
+                var pluginAttribute = getPluginAttribute(type);
+                if(pluginAttribute.Name != null)
+                    pluginTypesByName[pluginAttribute.Name] = type;
+            }
 
             return pluginTypesByName;
         }
 
-        private void LoadPlugin(string pluginName, IDictionary<string, Type> pluginsByName, IDictionary<string, string> pluginConfig)
+        private void LoadPlugin(string pluginName, IDictionary<string, Type> pluginsByName, IDictionary<string, object> pluginConfig)
         {
             if(!pluginsByName.ContainsKey(pluginName))
                 throw new InvalidOperationException($"No plugin with name '{pluginName}' found");
@@ -89,7 +125,7 @@ namespace Konamiman.NestorMSX
             var type = pluginsByName[pluginName];
 
             var constructor = type
-                .GetConstructor(new[] {typeof(PluginContext), typeof(IDictionary<string, string>)});
+                .GetConstructor(new[] {typeof(PluginContext), typeof(IDictionary<string, object>)});
 
             if(constructor == null)
                 throw new InvalidOperationException("No suitable constructor found for " + type.FullName);

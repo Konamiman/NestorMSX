@@ -86,6 +86,7 @@
     <Compile Include="Host\IDrawingSurface.cs" />
     <Compile Include="Emulator\MsxEmulator.cs" />
     <Compile Include="Emulator\MsxEmulationEnvironment.cs" />
+    <Compile Include="Misc\JsonParser.cs" />
     <Compile Include="Misc\MandatoryAttribute.cs" />
     <Compile Include="Misc\FileUtils.cs" />
     <Compile Include="Misc\IniDeserializer.cs" />
@@ -132,6 +133,7 @@
     <None Include="packages.config" />
     <None Include="plugins.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </None>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

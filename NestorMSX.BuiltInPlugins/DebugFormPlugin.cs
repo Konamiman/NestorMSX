@@ -9,7 +9,7 @@ namespace Konamiman.NestorMSX.BuiltInPlugins
         private readonly IZ80Processor z80;
         private readonly DebugForm debugForm;
 
-        public DebugFormPlugin(PluginContext context, IDictionary<string, string> pluginConfig)
+        public DebugFormPlugin(PluginContext context, IDictionary<string, object> pluginConfig)
         {
             this.z80 = context.Cpu;
             this.debugForm = new DebugForm();

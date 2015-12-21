@@ -45,7 +45,14 @@ namespace Konamiman.NestorMSX
 
             var pluginsLoader = new PluginsLoader(pluginContex, Tell);
 
-            pluginsLoader.LoadPlugins();
+            try
+            {
+                pluginsLoader.LoadPlugins();
+            }
+            catch(Exception ex)
+            {
+                Tell("Error when loading plugins: " + ex.Message);
+            }
         }
 
         private static MsxEmulationEnvironment CreateEmulationEnvironment(string[] args)
