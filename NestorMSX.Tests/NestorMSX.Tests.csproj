@@ -72,6 +72,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\NestorMSX.BuiltInPlugins\NestorMSX.BuiltInPlugins.csproj">
+      <Project>{a04bb668-5cb3-467a-b575-4c72ca62e7f9}</Project>
+      <Name>NestorMSX.BuiltInPlugins</Name>
+    </ProjectReference>
     <ProjectReference Include="..\NestorMSX.Infrastructure\NestorMSX.Infrastructure.csproj">
       <Project>{41786ee5-ecd9-4b70-b0d9-ed4878ae9fc5}</Project>
       <Name>NestorMSX.Infrastructure</Name>

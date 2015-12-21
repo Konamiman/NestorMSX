@@ -54,6 +54,13 @@
       <DependentUpon>DebugForm.cs</DependentUpon>
     </Compile>
     <Compile Include="DebugFormPlugin.cs" />
+    <Compile Include="MemoryTypes\DosFunctionCallExecutor.cs" />
+    <Compile Include="MemoryTypes\IMappedRam.cs" />
+    <Compile Include="MemoryTypes\MappedRam.cs" />
+    <Compile Include="MemoryTypes\MappedRamPlugin.cs" />
+    <Compile Include="MemoryTypes\PlainRom.cs" />
+    <Compile Include="MemoryTypes\PlainRomPlugin.cs" />
+    <Compile Include="MemoryTypes\SpecialDiskRomPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

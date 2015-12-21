@@ -42,7 +42,7 @@ namespace Konamiman.NestorMSX
                 Vdp = environment.Vdp,
                 KeyEventSource = environment.KeyboardEventSource
             };
-
+       
             var pluginsLoader = new PluginsLoader(pluginContex, Tell);
 
             try

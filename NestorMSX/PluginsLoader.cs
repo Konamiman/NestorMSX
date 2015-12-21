@@ -79,7 +79,7 @@ namespace Konamiman.NestorMSX
                         if(!pluginConfig.ContainsKey(sharedConfigKey))
                             pluginConfig[sharedConfigKey] = commonConfigValues[sharedConfigKey];
 
-                    LoadPlugin(pluginName, allAvailablePluginsByName, pluginConfig);
+                    var pluginInstance = LoadPlugin(pluginName, allAvailablePluginsByName, pluginConfig);
                 }
                 catch(Exception ex)
                 {
@@ -117,7 +117,7 @@ namespace Konamiman.NestorMSX
             return pluginTypesByName;
         }
 
-        private void LoadPlugin(string pluginName, IDictionary<string, Type> pluginsByName, IDictionary<string, object> pluginConfig)
+        private object LoadPlugin(string pluginName, IDictionary<string, Type> pluginsByName, IDictionary<string, object> pluginConfig)
         {
             if(!pluginsByName.ContainsKey(pluginName))
                 throw new InvalidOperationException($"No plugin with name '{pluginName}' found");
@@ -130,7 +130,7 @@ namespace Konamiman.NestorMSX
             if(constructor == null)
                 throw new InvalidOperationException("No suitable constructor found for " + type.FullName);
 
-            Activator.CreateInstance(type, new object[] {context, pluginConfig});
+            return Activator.CreateInstance(type, new object[] {context, pluginConfig});
         }
     }
 }

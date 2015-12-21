@@ -41,5 +41,8 @@ namespace Konamiman.NestorMSX
 
         [Mandatory]
         public string EncodingForCopyAndPaste { get; set; }
+
+        [Mandatory]
+        public string MachineName { get; set; }
     }
 }

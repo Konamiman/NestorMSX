@@ -64,8 +64,6 @@
     <Compile Include="Configuration.cs" />
     <Compile Include="Exceptions\ConfigurationException.cs" />
     <Compile Include="Exceptions\EmulationEnvironmentCreationException.cs" />
-    <Compile Include="Hardware\IMappedRam.cs" />
-    <Compile Include="Hardware\MappedRam.cs" />
     <Compile Include="Host\EmulatorHostForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -76,11 +74,9 @@
     <Compile Include="Hardware\ITms9918DisplayRenderer.cs" />
     <Compile Include="Hardware\KeyboardController.cs" />
     <Compile Include="Hardware\NotConnectedMemory.cs" />
-    <Compile Include="Hardware\PlainRom.cs" />
     <Compile Include="Hardware\SlotsSystem.cs" />
     <Compile Include="Hardware\Tms9918.cs" />
     <Compile Include="Host\DisplayRenderer.cs" />
-    <Compile Include="Host\DosFunctionCallExecutor.cs" />
     <Compile Include="Host\GraphicsBasedDisplay.cs" />
     <Compile Include="Host\ICharacterBasedDisplay.cs" />
     <Compile Include="Host\IDrawingSurface.cs" />
@@ -96,7 +92,6 @@
     <Compile Include="Misc\KeyTestForm.Designer.cs">
       <DependentUpon>KeyTestForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Misc\StringExtensions.cs" />
     <Compile Include="PluginsLoader.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -121,12 +116,15 @@
     <None Include="DiskBasic\dskbasic.mac" />
     <None Include="DiskBasic\L80.CPM" />
     <None Include="DiskBasic\M80.CPM" />
-    <None Include="diskrom.rom">
+    <Content Include="machines\Shared\SpecialDiskRom.rom">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="JapaneseMsx1Bios.rom">
+    </Content>
+    <Content Include="machines\Shared\JapaneseMsx1Bios.rom">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    </Content>
+    <Content Include="machines\Spanish MSX1\machine.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="NestorMSX.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -156,7 +154,13 @@
     <Content Include="plugins\README.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="machines\Shared\SpanishMsx1Bios.rom">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="SpanishMsx1Bios.rom">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="diskrom.rom">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
@@ -175,7 +179,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>move NestorMSX.BuiltInPlugins.* $(TargetDir)plugins</PostBuildEvent>
+    <PostBuildEvent>copy NestorMSX.BuiltInPlugins.* $(TargetDir)plugins</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

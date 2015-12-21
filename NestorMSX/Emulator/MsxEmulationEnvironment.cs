@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Konamiman.NestorMSX.Exceptions;
@@ -18,6 +20,7 @@ namespace Konamiman.NestorMSX.Emulator
 
         private DosFunctionCallExecutor dosFunctionsExecutor;
         private MsxEmulator emulator;
+        private IDictionary<string, object> machineConfig;
 
         public IKeyEventSource KeyboardEventSource { get; }
         public EmulatorHostForm HostForm { get; }
@@ -28,6 +31,8 @@ namespace Konamiman.NestorMSX.Emulator
 
         public MsxEmulationEnvironment(Configuration config)
         {
+            LoadMachineConfig(config);
+
             Z80 = CreateCpu(config);
 
             SlotsSystem = CreateSlotsSystem(config);
@@ -52,12 +57,35 @@ namespace Konamiman.NestorMSX.Emulator
             emulator = new MsxEmulator(hardware);
         }
 
+        private void LoadMachineConfig(Configuration config)
+        {
+            var machineName = config.MachineName;
+            var folder = Path.Combine("machines", machineName).AsAbsolutePath();
+            if(!Directory.Exists(folder))
+                throw new ConfigurationException($"Machine folder not found for '{machineName}'");
+
+            var configFilePath = Path.Combine(folder, "machine.config");
+            if(!File.Exists(configFilePath))
+                throw new ConfigurationException($"machine.config file not found for '{machineName}'");
+
+            var json = File.ReadAllText(configFilePath);
+            try
+            {
+                machineConfig = (IDictionary<string, object>)JsonParser.Parse(json);
+            }
+            catch(Exception ex)
+            {
+                throw new ConfigurationException($"Error when reading machine.config file for '{machineName}': {ex.Message}");
+            }
+        }
+
         private void ConfigureDiskRom(Configuration config, IExternallyControlledSlotsSystem slots, IZ80Processor z80)
         {
-            if(config.DiskRomFile != null) {
+            if (config.DiskRomFile != null)
+            {
                 slots.SetSlotContents(1, new PlainRom(FileUtils.ReadAllBytes(config.DiskRomFile), 1));
                 z80.BeforeInstructionFetch += Z80OnBeforeInstructionFetch;
-                dosFunctionsExecutor = new DosFunctionCallExecutor(z80.Registers, slots, config);
+                dosFunctionsExecutor = new DosFunctionCallExecutor(z80.Registers, slots, config.FilesystemBaseLocation);
             }
         }
 
@@ -78,6 +106,17 @@ namespace Konamiman.NestorMSX.Emulator
 
         private IExternallyControlledSlotsSystem CreateSlotsSystem(Configuration config)
         {
+            foreach (var slotConfig in machineConfig["slots"] as IDictionary<string, object>)
+            {
+                SlotNumber slotNumber;
+                if (!SlotNumber.TryParse(slotConfig.Key, out slotNumber))
+                    continue;
+
+                var configValues = (IDictionary<string, object>)slotConfig.Value;
+            }
+
+            //WIP...
+
             var slots = new SlotsSystem();
 
             slots.SetSlotContents(0, new PlainRom(FileUtils.ReadAllBytes(config.BiosFile)));

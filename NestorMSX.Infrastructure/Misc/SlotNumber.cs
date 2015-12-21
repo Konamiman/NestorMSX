@@ -123,26 +123,47 @@ namespace Konamiman.NestorMSX.Misc
 
         public static SlotNumber Parse(string s)
         {
-            var allowWhitespace = NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite;
-
             if (s == null)
                 throw new ArgumentNullException(nameof(s));
 
+            SlotNumber result;
+            if(!TryParse(s, out result))
+                throw new FormatException($"{s} is not a valid slot number representation");
+
+            return result;
+        }
+
+        public static bool TryParse(string s, out SlotNumber result)
+        {
+            var allowWhitespace = NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite;
+
+            if(s == null)
+            {
+                result = new SlotNumber();
+                return false;
+            }
+                
             byte byteValue;
             if(byte.TryParse(s, allowWhitespace, CultureInfo.InvariantCulture, out byteValue))
-                return new SlotNumber(byteValue);
+                result = new SlotNumber(byteValue);
 
-            if(Regex.IsMatch(s, @" *\#([0-9A-Fa-f]){1,2} *") && byte.TryParse(
+            else if(Regex.IsMatch(s, @" *\#([0-9A-Fa-f]){1,2} *") && byte.TryParse(
                 s.Trim(' ','#'), allowWhitespace | NumberStyles.AllowHexSpecifier, CultureInfo.InvariantCulture, out byteValue))
-                return new SlotNumber(byteValue);
+                result = new SlotNumber(byteValue);
 
-            if(Regex.IsMatch(s, @" *[0-3]-[0-3] *"))
+            else if(Regex.IsMatch(s, @" *[0-3]-[0-3] *"))
             {
                 s = s.Trim();
-                return new SlotNumber(s[0] - asciiForZero, s[2] - asciiForZero);
+                result = new SlotNumber(s[0] - asciiForZero, s[2] - asciiForZero);
             }
 
-            throw new FormatException($"{s} is not a valid slot number representation");
+            else
+            {
+                result = new SlotNumber();
+                return false;
+            }
+
+            return true;
         }
     }
 }

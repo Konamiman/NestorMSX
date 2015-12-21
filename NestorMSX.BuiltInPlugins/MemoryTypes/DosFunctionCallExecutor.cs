@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Konamiman.NestorMSX.Exceptions;
 using Konamiman.NestorMSX.Misc;
 using Konamiman.Z80dotNet;
 
@@ -45,18 +44,18 @@ namespace Konamiman.NestorMSX.Host
             {typeof(NotSupportedException), InvalidPathname}
         };
 
-        public DosFunctionCallExecutor(IZ80Registers regs, IMemory memory, Configuration config)
+        public DosFunctionCallExecutor(IZ80Registers regs, IMemory memory, string filesystemBaseLocation)
         {
             this.regs = regs;
             this.memory = memory;
 
-            filesystemBase = config.FilesystemBaseLocation.AsAbsolutePath();
+            filesystemBase = filesystemBaseLocation.AsAbsolutePath();
             if(!Directory.Exists(filesystemBase))
                 try {
                     Directory.CreateDirectory(filesystemBase);
                 }
                 catch(Exception ex) {
-                    throw new EmulationEnvironmentCreationException(
+                    throw new InvalidOperationException(
                         "Error when trying to create the base directory for DiskBASIC:\r\n{0}\r\n\r\nDirectory location as specified in config file:\r\n{1}"
                         .FormatWith(ex.Message, filesystemBase));
                 }
