@@ -4,11 +4,15 @@ using System.Linq;
 using System.Reflection;
 using System.Collections.Generic;
 using Konamiman.NestorMSX.Misc;
+using Konamiman.Z80dotNet;
 
 namespace Konamiman.NestorMSX
 {
     class PluginsLoader
     {
+        private static IDictionary<string, Type> pluginTypes;
+        private object[] loadedPlugins;
+
         private readonly PluginContext context;
         private Action<string, object[]> tell;
 
@@ -18,14 +22,48 @@ namespace Konamiman.NestorMSX
             this.tell = tell;
         }
 
+        private IDictionary<string, Type> GetPluginTypes()
+        {
+            if(pluginTypes != null)
+                return pluginTypes;
+
+            var pluginsDirectory = new DirectoryInfo("plugins");
+
+            Func<DirectoryInfo, string[]> getDllFilenames =
+                dir => dir.GetFiles("*.dll").Select(f => f.FullName).ToArray();
+
+            var pluginAssemblyFileNames =
+                getDllFilenames(pluginsDirectory)
+                .Union(pluginsDirectory.GetDirectories().SelectMany(d => getDllFilenames(d)))
+                .ToArray();
+
+            pluginTypes =
+                pluginAssemblyFileNames.SelectMany(n => GetPluginsInAssembly(n))
+                    .ToDictionary(x => x.Key, x => x.Value);
+
+            return pluginTypes;
+        }
+
         /// <summary>
-        /// Parses a JSON string into an object. Arrays are converted to object[],
-        /// objects are converted to Dictionary&lt;string, object&gt;.
+        /// Gets an instance of a plugin to be inserted in a slot.
         /// </summary>
-        public void LoadPlugins()
+        /// <param name="pluginName"></param>
+        /// <param name="pluginConfig"></param>
+        /// <returns></returns>
+        public object GetPluginInstanceForSlot(string pluginName, IDictionary<string, object> pluginConfig)
+        {
+            return LoadPlugin(pluginName, pluginConfig, requireGetMemory: true);
+        }
+
+        /// <summary>
+        /// Creates an instance of each of the available plugins that have
+        /// an entry in plugins.config and don't have active=false.
+        /// </summary>
+        public void LoadGlobalPlugins()
         {
             var configFileText = File.ReadAllText("plugins.config");
             IDictionary<string, object> allConfigValues;
+            var loadedPluginsList = new List<object>();
 
             try
             {
@@ -56,19 +94,7 @@ namespace Konamiman.NestorMSX
 
             var namesOfPluginsConfiguredAsActive = activePluginConfigs.Keys;
 
-            var pluginsDirectory = new DirectoryInfo("plugins");
-            
-            Func<DirectoryInfo, string[]> getDllFilenames =
-                dir => dir.GetFiles("*.dll").Select(f => f.FullName).ToArray();
-
-            var pluginAssemblyFileNames =
-                getDllFilenames(pluginsDirectory)
-                .Union(pluginsDirectory.GetDirectories().SelectMany(d => getDllFilenames(d)))
-                .ToArray();
-
-            var allAvailablePluginsByName =
-                pluginAssemblyFileNames.SelectMany(n => GetPluginsInAssembly(n))
-                    .ToDictionary(x => x.Key, x => x.Value);
+            var allAvailablePluginsByName = GetPluginTypes();
 
             foreach(var pluginName in namesOfPluginsConfiguredAsActive)
             {
@@ -79,13 +105,16 @@ namespace Konamiman.NestorMSX
                         if(!pluginConfig.ContainsKey(sharedConfigKey))
                             pluginConfig[sharedConfigKey] = commonConfigValues[sharedConfigKey];
 
-                    var pluginInstance = LoadPlugin(pluginName, allAvailablePluginsByName, pluginConfig);
+                    var pluginInstance = LoadPlugin(pluginName, pluginConfig, requireGetMemory: false);
+                    loadedPluginsList.Add(pluginInstance);
                 }
                 catch(Exception ex)
                 {
                     tell("Could not load plugin '{0}': {1}", new[] {pluginName, ex.Message});
                 }
             }
+
+            loadedPlugins = loadedPluginsList.ToArray();
         }
 
         private static void ThrowNotValidJson()
@@ -117,18 +146,30 @@ namespace Konamiman.NestorMSX
             return pluginTypesByName;
         }
 
-        private object LoadPlugin(string pluginName, IDictionary<string, Type> pluginsByName, IDictionary<string, object> pluginConfig)
+        private object LoadPlugin(
+            string pluginName, 
+            IDictionary<string, object> pluginConfig,
+            bool requireGetMemory)
         {
-            if(!pluginsByName.ContainsKey(pluginName))
+            var pluginTypes = GetPluginTypes();
+
+            if(!pluginTypes.ContainsKey(pluginName))
                 throw new InvalidOperationException($"No plugin with name '{pluginName}' found");
 
-            var type = pluginsByName[pluginName];
+            var type = pluginTypes[pluginName];
 
             var constructor = type
                 .GetConstructor(new[] {typeof(PluginContext), typeof(IDictionary<string, object>)});
 
             if(constructor == null)
                 throw new InvalidOperationException("No suitable constructor found for " + type.FullName);
+
+            if(requireGetMemory)
+            {
+                var getMemoryMethod = type.GetMethod("GetMemory");
+                if(getMemoryMethod == null || getMemoryMethod.GetParameters().Length > 0 || getMemoryMethod.ReturnType != typeof(IMemory))
+                    throw new InvalidOperationException(type.FullName + " has no suitable GetMemory method");
+            }
 
             return Activator.CreateInstance(type, new object[] {context, pluginConfig});
         }

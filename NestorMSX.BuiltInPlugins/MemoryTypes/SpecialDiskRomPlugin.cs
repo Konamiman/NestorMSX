@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
 using Konamiman.NestorMSX.Hardware;
 using Konamiman.NestorMSX.Host;
 using Konamiman.NestorMSX.Misc;
@@ -19,16 +18,13 @@ namespace Konamiman.NestorMSX.BuiltInPlugins.MemoryTypes
 
         public SpecialDiskRomPlugin(PluginContext context, IDictionary<string, object> pluginConfig)
         {
-            var pluginPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            var sharedPath = pluginPath + "..\\Shared";
-
             if (!pluginConfig.ContainsKey("file"))
                 throw new InvalidOperationException("No 'file' key in config file");
 
-            fileName = Path.Combine(pluginPath, (string)pluginConfig["file"]);
+            fileName = Path.Combine((string)pluginConfig["machineDirectory"], (string)pluginConfig["file"]);
             if (!File.Exists(fileName))
             {
-                fileName = Path.Combine(sharedPath, (string)pluginConfig["file"]);
+                fileName = Path.Combine((string)pluginConfig["sharedDirectory"], (string)pluginConfig["file"]);
                 if (!File.Exists(fileName))
                 {
                     throw new InvalidOperationException($"File not found: {pluginConfig["file"]}");

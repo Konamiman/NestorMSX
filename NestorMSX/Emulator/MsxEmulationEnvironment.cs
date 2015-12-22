@@ -8,6 +8,8 @@ using Konamiman.NestorMSX.Hardware;
 using Konamiman.NestorMSX.Host;
 using Konamiman.NestorMSX.Misc;
 using Konamiman.Z80dotNet;
+using System.Linq;
+using System.Reflection;
 
 namespace Konamiman.NestorMSX.Emulator
 {
@@ -21,22 +23,23 @@ namespace Konamiman.NestorMSX.Emulator
         private DosFunctionCallExecutor dosFunctionsExecutor;
         private MsxEmulator emulator;
         private IDictionary<string, object> machineConfig;
+        private Action<string, object[]> tell;
 
         public IKeyEventSource KeyboardEventSource { get; }
         public EmulatorHostForm HostForm { get; }
-        public IExternallyControlledSlotsSystem SlotsSystem { get; }
+        public IExternallyControlledSlotsSystem SlotsSystem { get; private set; }
         public IExternallyControlledTms9918 Vdp { get; set; }
         public IZ80Processor Z80 { get; }
         public IKeyboardController KeyboardController { get; }
 
-        public MsxEmulationEnvironment(Configuration config)
+        public MsxEmulationEnvironment(Configuration config, Action<string, object[]> tell)
         {
+            this.tell = tell;
+
             LoadMachineConfig(config);
 
             Z80 = CreateCpu(config);
 
-            SlotsSystem = CreateSlotsSystem(config);
-            
             HostForm = CreateHostForm(config, Z80);
             KeyboardEventSource = HostForm;
 
@@ -44,7 +47,19 @@ namespace Konamiman.NestorMSX.Emulator
             HostForm.Vdp = Vdp;
 
             KeyboardController = CreateKeyboardController(config, HostForm);
-            
+
+            var pluginContext = new PluginContext
+            {
+                Cpu = Z80,
+                HostForm = HostForm,
+                SlotsSystem = SlotsSystem,
+                Vdp = Vdp,
+                KeyEventSource = KeyboardEventSource
+            };
+            var pluginLoader = new PluginsLoader(pluginContext, tell);
+
+            CreateSlotsSystem(pluginLoader, config);
+
             ConfigureDiskRom(config, SlotsSystem, Z80);
             
             var hardware = new MsxHardwareSet {
@@ -77,6 +92,11 @@ namespace Konamiman.NestorMSX.Emulator
             {
                 throw new ConfigurationException($"Error when reading machine.config file for '{machineName}': {ex.Message}");
             }
+
+            if(machineConfig.ContainsKey("expandedSlots"))
+                SlotsSystem = new SlotsSystem(((object[])machineConfig["expandedSlots"]).Select(x => (TwinBit)(long)x).ToArray());
+            else
+                SlotsSystem = new SlotsSystem();
         }
 
         private void ConfigureDiskRom(Configuration config, IExternallyControlledSlotsSystem slots, IZ80Processor z80)
@@ -104,7 +124,7 @@ namespace Konamiman.NestorMSX.Emulator
             return new EmulatorHostForm(cpu, config);
         }
 
-        private IExternallyControlledSlotsSystem CreateSlotsSystem(Configuration config)
+        private void CreateSlotsSystem(PluginsLoader pluginLoader, Configuration config)
         {
             foreach (var slotConfig in machineConfig["slots"] as IDictionary<string, object>)
             {
@@ -113,21 +133,22 @@ namespace Konamiman.NestorMSX.Emulator
                     continue;
 
                 var configValues = (IDictionary<string, object>)slotConfig.Value;
+                configValues["machineDirectory"] =
+                    Path.Combine(
+                        Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
+                        @"machines/" + config.MachineName);
+                configValues["sharedDirectory"] =
+                    Path.Combine(
+                        Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
+                        @"machines/Shared");
+
+                var pluginInstance = pluginLoader.GetPluginInstanceForSlot((string)configValues["type"], configValues);
+
+                var getMemoryMethod = pluginInstance.GetType().GetMethod("GetMemory");
+                var memory = (IMemory)getMemoryMethod.Invoke(pluginInstance, null);
+
+                SlotsSystem.SetSlotContents(slotNumber, memory);
             }
-
-            //WIP...
-
-            var slots = new SlotsSystem();
-
-            slots.SetSlotContents(0, new PlainRom(FileUtils.ReadAllBytes(config.BiosFile)));
-
-            if(config.Slot2RomFile != null)
-                slots.SetSlotContents(2, new PlainRom(FileUtils.ReadAllBytes(config.Slot2RomFile), 1));
-
-            var ram = new PlainMemory(ushort.MaxValue + 1);
-            slots.SetSlotContents(3, ram);
-
-            return slots;
         }
 
         private IZ80Processor CreateCpu(Configuration config)

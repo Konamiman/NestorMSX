@@ -19,18 +19,15 @@ namespace Konamiman.NestorMSX.BuiltInPlugins.MemoryTypes
         public PlainRomPlugin(PluginContext context, IDictionary<string, object> pluginConfig)
         {
             if(pluginConfig.ContainsKey("page"))
-                page = (int)(long)pluginConfig["key"];
-
-            var pluginPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            var sharedPath = pluginPath + "..\\Shared";
+                page = (int)(long)pluginConfig["page"];
 
             if(!pluginConfig.ContainsKey("file"))
                 throw new InvalidOperationException("No 'file' key in config file");
 
-            fileName = Path.Combine(pluginPath, (string)pluginConfig["file"]);
+            fileName = Path.Combine((string)pluginConfig["machineDirectory"], (string)pluginConfig["file"]);
             if(!File.Exists(fileName))
             {
-                fileName = Path.Combine(sharedPath, (string)pluginConfig["file"]);
+                fileName = Path.Combine((string)pluginConfig["sharedDirectory"], (string)pluginConfig["file"]);
                 if(!File.Exists(fileName))
                 {
                     throw new InvalidOperationException($"File not found: {pluginConfig["file"]}");

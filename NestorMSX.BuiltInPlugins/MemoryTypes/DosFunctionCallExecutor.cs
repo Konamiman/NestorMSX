@@ -49,7 +49,7 @@ namespace Konamiman.NestorMSX.Host
             this.regs = regs;
             this.memory = memory;
 
-            filesystemBase = filesystemBaseLocation.AsAbsolutePath();
+            filesystemBase = filesystemBaseLocation;
             if(!Directory.Exists(filesystemBase))
                 try {
                     Directory.CreateDirectory(filesystemBase);

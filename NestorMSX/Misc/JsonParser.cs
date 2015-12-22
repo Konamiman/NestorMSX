@@ -5,6 +5,10 @@ namespace Konamiman.NestorMSX.Misc
 {
     public static class JsonParser
     {
+        /// <summary>
+        /// Parses a JSON string into an object. Arrays are converted to object[],
+        /// objects are converted to Dictionary&lt;string, object&gt;.
+        /// </summary>
         public static object Parse(string json)
         {
             var token = JToken.Parse(json);

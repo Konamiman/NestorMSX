@@ -47,7 +47,7 @@ namespace Konamiman.NestorMSX
 
             try
             {
-                pluginsLoader.LoadPlugins();
+                pluginsLoader.LoadGlobalPlugins();
             }
             catch(Exception ex)
             {
@@ -85,7 +85,7 @@ namespace Konamiman.NestorMSX
             if(slot2FileNameOverride != null)
                 config.Slot2RomFile = slot2FileNameOverride;
 
-            return new MsxEmulationEnvironment(config);
+            return new MsxEmulationEnvironment(config, Tell);
         }
 
         private void ParseArgs(string[] args, ref string configFileName, ref string slot2FileNameOverride)
