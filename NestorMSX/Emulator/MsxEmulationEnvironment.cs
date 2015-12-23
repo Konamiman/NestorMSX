@@ -20,7 +20,6 @@ namespace Konamiman.NestorMSX.Emulator
     {
         private const int BDOS = 0xFB03;    //as defined in dskbasic.mac
 
-        private DosFunctionCallExecutor dosFunctionsExecutor;
         private MsxEmulator emulator;
         private IDictionary<string, object> machineConfig;
         private Action<string, object[]> tell;
@@ -48,6 +47,8 @@ namespace Konamiman.NestorMSX.Emulator
 
             KeyboardController = CreateKeyboardController(config, HostForm);
 
+            SlotsSystem = CreateEmptySlotsSystem();
+
             var pluginContext = new PluginContext
             {
                 Cpu = Z80,
@@ -57,11 +58,9 @@ namespace Konamiman.NestorMSX.Emulator
                 KeyEventSource = KeyboardEventSource
             };
             var pluginLoader = new PluginsLoader(pluginContext, tell);
-
+            
             CreateSlotsSystem(pluginLoader, config);
 
-            ConfigureDiskRom(config, SlotsSystem, Z80);
-            
             var hardware = new MsxHardwareSet {
                 Cpu = Z80,
                 KeyboardController = KeyboardController,
@@ -92,21 +91,14 @@ namespace Konamiman.NestorMSX.Emulator
             {
                 throw new ConfigurationException($"Error when reading machine.config file for '{machineName}': {ex.Message}");
             }
-
-            if(machineConfig.ContainsKey("expandedSlots"))
-                SlotsSystem = new SlotsSystem(((object[])machineConfig["expandedSlots"]).Select(x => (TwinBit)(long)x).ToArray());
-            else
-                SlotsSystem = new SlotsSystem();
         }
 
-        private void ConfigureDiskRom(Configuration config, IExternallyControlledSlotsSystem slots, IZ80Processor z80)
+        private IExternallyControlledSlotsSystem CreateEmptySlotsSystem()
         {
-            if (config.DiskRomFile != null)
-            {
-                slots.SetSlotContents(1, new PlainRom(FileUtils.ReadAllBytes(config.DiskRomFile), 1));
-                z80.BeforeInstructionFetch += Z80OnBeforeInstructionFetch;
-                dosFunctionsExecutor = new DosFunctionCallExecutor(z80.Registers, slots, config.FilesystemBaseLocation);
-            }
+            var expandedSlots = machineConfig
+                .GetValueOrDefault<int[]>("expandedSlots", new int[0])
+                .Select(s =>(TwinBit)s).ToArray();
+            return new SlotsSystem(expandedSlots);
         }
 
         private KeyboardController CreateKeyboardController(Configuration config, IKeyEventSource keyEventSource)
@@ -133,6 +125,9 @@ namespace Konamiman.NestorMSX.Emulator
                     continue;
 
                 var configValues = (IDictionary<string, object>)slotConfig.Value;
+
+                var typeName = (string)configValues["type"];
+
                 configValues["machineDirectory"] =
                     Path.Combine(
                         Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
@@ -142,12 +137,39 @@ namespace Konamiman.NestorMSX.Emulator
                         Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
                         @"machines/Shared");
 
-                var pluginInstance = pluginLoader.GetPluginInstanceForSlot((string)configValues["type"], configValues);
+                object pluginInstance;
+                try
+                {
+                    pluginInstance = pluginLoader.GetPluginInstanceForSlot(typeName, configValues);
+                }
+                catch(Exception ex)
+                {
+                    var message = ex.InnerException == null ? ex.Message : ex.InnerException.Message;
+                    tell($"Could not load plugin {typeName} in slot {slotConfig.Key}: {message}", new object[0]);
+                    continue;
+                }
 
                 var getMemoryMethod = pluginInstance.GetType().GetMethod("GetMemory");
-                var memory = (IMemory)getMemoryMethod.Invoke(pluginInstance, null);
 
-                SlotsSystem.SetSlotContents(slotNumber, memory);
+                IMemory memory;
+                try
+                {
+                    memory = (IMemory)getMemoryMethod.Invoke(pluginInstance, null);
+                }
+                catch (TargetInvocationException ex)
+                {
+                    tell($"Error when invoking GetMemory for plugin {typeName} in slot {slotConfig.Key}: {ex.InnerException.Message}", new object[0]);
+                    continue;
+                }
+
+                try
+                {
+                    SlotsSystem.SetSlotContents(slotNumber, memory);
+                }
+                catch(Exception ex)
+                {
+                    tell($"Error when setting contents for slot {slotConfig.Key}: {ex.Message}", new object[0]);
+                }
             }
         }
 
@@ -163,14 +185,6 @@ namespace Konamiman.NestorMSX.Emulator
                 z80.ClockFrequencyInMHz = config.CpuSpeedInMHz;
 
             return z80;
-        }
-
-        private void Z80OnBeforeInstructionFetch(object sender, BeforeInstructionFetchEventArgs eventArgs)
-        {
-            if(((IZ80Processor)sender).Registers.PC == BDOS)
-            {
-                dosFunctionsExecutor.ExecuteFunctionCall();
-            }
         }
 
         public void Run()

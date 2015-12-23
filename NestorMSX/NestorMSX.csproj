@@ -62,7 +62,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Configuration.cs" />
-    <Compile Include="Exceptions\ConfigurationException.cs" />
     <Compile Include="Exceptions\EmulationEnvironmentCreationException.cs" />
     <Compile Include="Host\EmulatorHostForm.cs">
       <SubType>Form</SubType>
@@ -180,7 +179,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy NestorMSX.BuiltInPlugins.* $(TargetDir)plugins</PostBuildEvent>
+    <PostBuildEvent>move NestorMSX.BuiltInPlugins.* $(TargetDir)plugins</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

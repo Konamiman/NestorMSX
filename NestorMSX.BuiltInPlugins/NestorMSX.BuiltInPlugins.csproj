@@ -58,7 +58,9 @@
     <Compile Include="MemoryTypes\IMappedRam.cs" />
     <Compile Include="MemoryTypes\MappedRam.cs" />
     <Compile Include="MemoryTypes\MappedRamPlugin.cs" />
+    <Compile Include="MemoryTypes\PlainRam.cs" />
     <Compile Include="MemoryTypes\PlainRom.cs" />
+    <Compile Include="MemoryTypes\PlainRamPlugin.cs" />
     <Compile Include="MemoryTypes\PlainRomPlugin.cs" />
     <Compile Include="MemoryTypes\SpecialDiskRomPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
