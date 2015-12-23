@@ -124,6 +124,7 @@
     </Content>
     <Content Include="machines\Spanish MSX1\machine.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </Content>
     <None Include="NestorMSX.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

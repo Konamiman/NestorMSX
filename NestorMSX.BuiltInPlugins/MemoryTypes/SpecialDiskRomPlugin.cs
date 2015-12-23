@@ -41,6 +41,7 @@ namespace Konamiman.NestorMSX.BuiltInPlugins.MemoryTypes
             if (((IZ80Processor)sender).Registers.PC == BDOS)
             {
                 dosFunctionsExecutor.ExecuteFunctionCall();
+                ((IZ80Processor)sender).ExecuteRet();
             }
         }
 
