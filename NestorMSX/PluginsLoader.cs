@@ -63,16 +63,25 @@ namespace Konamiman.NestorMSX
         {
             var configFileText = File.ReadAllText("plugins.config");
             IDictionary<string, object> allConfigValues;
-            var loadedPluginsList = new List<object>();
 
             try
             {
                 allConfigValues = JsonParser.Parse(configFileText) as IDictionary<string, object>;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw new InvalidOperationException("Error when parsing plugins.config file: " + ex.Message);
             }
+
+            LoadPlugins(allConfigValues);
+        }
+        
+        public void LoadPlugins(IDictionary<string, object> allConfigValues)
+        {
+            if(!allConfigValues.ContainsKey("plugins"))
+                return;
+
+            var loadedPluginsList = new List<object>();
 
             if (allConfigValues == null)
                 ThrowNotValidJson();

@@ -61,6 +61,8 @@ namespace Konamiman.NestorMSX.Emulator
             
             CreateSlotsSystem(pluginLoader, config);
 
+            pluginLoader.LoadPlugins(machineConfig);
+
             var hardware = new MsxHardwareSet {
                 Cpu = Z80,
                 KeyboardController = KeyboardController,
@@ -125,6 +127,7 @@ namespace Konamiman.NestorMSX.Emulator
                     continue;
 
                 var configValues = (IDictionary<string, object>)slotConfig.Value;
+                configValues["slotNumber"] = slotNumber.EncodedByte;
 
                 var typeName = (string)configValues["type"];
 
