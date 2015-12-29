@@ -18,36 +18,38 @@ namespace Konamiman.NestorMSX.Emulator
     /// </summary>
     public class MsxEmulationEnvironment
     {
-        private const int BDOS = 0xFB03;    //as defined in dskbasic.mac
-
         private MsxEmulator emulator;
         private IDictionary<string, object> machineConfig;
         private Action<string, object[]> tell;
+        private Configuration globalConfig;
 
         public IKeyEventSource KeyboardEventSource { get; }
         public EmulatorHostForm HostForm { get; }
-        public IExternallyControlledSlotsSystem SlotsSystem { get; private set; }
+        public IExternallyControlledSlotsSystem SlotsSystem { get; }
         public IExternallyControlledTms9918 Vdp { get; set; }
         public IZ80Processor Z80 { get; }
         public IKeyboardController KeyboardController { get; }
+        public PluginsLoader PluginsLoader { get; }
 
         public MsxEmulationEnvironment(Configuration config, Action<string, object[]> tell)
         {
+            this.globalConfig = config;
             this.tell = tell;
 
-            LoadMachineConfig(config);
+            LoadMachineConfig();
+            GetExtraConfig().MergeInto(machineConfig);
 
-            Z80 = CreateCpu(config);
+            Z80 = CreateCpu();
 
-            HostForm = CreateHostForm(config, Z80);
+            HostForm = CreateHostForm(Z80);
             KeyboardEventSource = HostForm;
 
             HostForm.SetFormTitle(config.MachineName);
 
-            Vdp = CreateVdp(config, HostForm);
+            Vdp = CreateVdp(HostForm);
             HostForm.Vdp = Vdp;
 
-            KeyboardController = CreateKeyboardController(config, HostForm);
+            KeyboardController = CreateKeyboardController(HostForm);
 
             SlotsSystem = CreateEmptySlotsSystem();
 
@@ -59,11 +61,13 @@ namespace Konamiman.NestorMSX.Emulator
                 Vdp = Vdp,
                 KeyEventSource = KeyboardEventSource
             };
-            var pluginLoader = new PluginsLoader(pluginContext, tell, config.MachineName);
-            
-            CreateSlotsSystem(pluginLoader, config);
+            PluginsLoader = new PluginsLoader(pluginContext, tell);
 
-            pluginLoader.LoadPlugins(machineConfig);
+            LoadGlobalPlugins();
+
+            CreateSlotsSystem();
+
+            PluginsLoader.LoadPlugins(machineConfig, GetExtraConfig());
 
             var hardware = new MsxHardwareSet {
                 Cpu = Z80,
@@ -75,9 +79,37 @@ namespace Konamiman.NestorMSX.Emulator
             emulator = new MsxEmulator(hardware);
         }
 
-        private void LoadMachineConfig(Configuration config)
+        /// <summary>
+        /// Creates an instance of each of the available plugins that have
+        /// an entry in plugins.config and don't have active=false.
+        /// </summary>
+        private void LoadGlobalPlugins()
         {
-            var machineName = config.MachineName;
+            var configFileText = File.ReadAllText("plugins.config");
+            IDictionary<string, object> allConfigValues;
+
+            try
+            {
+                allConfigValues = JsonParser.Parse(configFileText) as IDictionary<string, object>;
+            }
+            catch (Exception ex)
+            {
+                throw new ConfigurationException("Error when parsing plugins.config file: " + ex.Message);
+            }
+
+            try
+            {
+                PluginsLoader.LoadPlugins(allConfigValues, GetExtraConfig());
+            }
+            catch(Exception ex)
+            {
+                throw new Exception("Error when loading global plugins: " + ex.Message);
+            }
+        }
+
+        private void LoadMachineConfig()
+        {
+            var machineName = globalConfig.MachineName;
             var folder = Path.Combine("machines", machineName).AsAbsolutePath();
             if(!Directory.Exists(folder))
                 throw new ConfigurationException($"Machine folder not found for '{machineName}'");
@@ -105,22 +137,22 @@ namespace Konamiman.NestorMSX.Emulator
             return new SlotsSystem(expandedSlots);
         }
 
-        private KeyboardController CreateKeyboardController(Configuration config, IKeyEventSource keyEventSource)
+        private KeyboardController CreateKeyboardController(IKeyEventSource keyEventSource)
         {
-            return new KeyboardController(keyEventSource, FileUtils.ReadAllText(config.KeymapFile));
+            return new KeyboardController(keyEventSource, FileUtils.ReadAllText(globalConfig.KeymapFile));
         }
 
-        private IExternallyControlledTms9918 CreateVdp(Configuration config, IDrawingSurface drawingSurface)
+        private IExternallyControlledTms9918 CreateVdp(IDrawingSurface drawingSurface)
         {
-            return new Tms9918(new DisplayRenderer(new GraphicsBasedDisplay(drawingSurface, config), config), config);
+            return new Tms9918(new DisplayRenderer(new GraphicsBasedDisplay(drawingSurface, globalConfig), globalConfig), globalConfig);
         }
 
-        private EmulatorHostForm CreateHostForm(Configuration config, IZ80Processor cpu)
+        private EmulatorHostForm CreateHostForm(IZ80Processor cpu)
         {
-            return new EmulatorHostForm(cpu, config);
+            return new EmulatorHostForm(cpu, globalConfig);
         }
 
-        private void CreateSlotsSystem(PluginsLoader pluginLoader, Configuration config)
+        private void CreateSlotsSystem()
         {
             foreach (var slotConfig in machineConfig["slots"] as IDictionary<string, object>)
             {
@@ -133,23 +165,16 @@ namespace Konamiman.NestorMSX.Emulator
 
                 var typeName = (string)configValues["type"];
 
-                configValues["machineDirectory"] =
-                    Path.Combine(
-                        Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
-                        @"machines/" + config.MachineName);
-                configValues["sharedDirectory"] =
-                    Path.Combine(
-                        Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
-                        @"machines/Shared");
+                GetExtraConfig().MergeInto(configValues);
 
                 object pluginInstance;
                 try
                 {
-                    pluginInstance = pluginLoader.GetPluginInstanceForSlot(typeName, configValues);
+                    pluginInstance = PluginsLoader.GetPluginInstanceForSlot(typeName, configValues);
                 }
                 catch(Exception ex)
                 {
-                    var message = ex.InnerException == null ? ex.Message : ex.InnerException.Message;
+                    var message = ex.InnerException?.Message ?? ex.Message;
                     tell($"Could not load plugin {typeName} in slot {slotConfig.Key}: {message}", new object[0]);
                     continue;
                 }
@@ -178,16 +203,30 @@ namespace Konamiman.NestorMSX.Emulator
             }
         }
 
-        private IZ80Processor CreateCpu(Configuration config)
+        private IDictionary<string, object> GetExtraConfig()
+        {
+            return new Dictionary<string, object>
+            {
+                { "NestorMSX.machineName", globalConfig.MachineName },
+                { "NestorMSX.machineDirectory", Path.Combine(
+                    Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
+                    @"machines/" + globalConfig.MachineName) },
+                { "NestorMSX.sharedDirectory", Path.Combine(
+                    Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
+                    @"machines/Shared") }
+            };
+        }
+
+        private IZ80Processor CreateCpu()
         {
             var z80 = new Z80Processor();
 
-            if(config.CpuSpeedInMHz == 0)
+            if(globalConfig.CpuSpeedInMHz == 0)
                 z80.ClockSynchronizer = null;
-            else if(config.CpuSpeedInMHz < 0.001M || config.CpuSpeedInMHz > 100)
+            else if(globalConfig.CpuSpeedInMHz < 0.001M || globalConfig.CpuSpeedInMHz > 100)
                 throw new ConfigurationException("CPU speed must be either zero or a value between 0.001 and 100");
             else
-                z80.ClockFrequencyInMHz = config.CpuSpeedInMHz;
+                z80.ClockFrequencyInMHz = globalConfig.CpuSpeedInMHz;
 
             return z80;
         }

@@ -59,10 +59,10 @@ namespace Konamiman.NestorMSX.Misc
         /// <exception cref="ConfigurationException">File not found in either directory</exception>
         public static string GetPluginFilePath(this IDictionary<string, object> config, string fileName)
         {
-            var filePath = Path.Combine(config.GetValue<string>("machineDirectory"), fileName);
+            var filePath = Path.Combine(config.GetValue<string>("NestorMSX.machineDirectory"), fileName);
             if (!File.Exists(filePath))
             {
-                filePath = Path.Combine(config.GetValue<string>("sharedDirectory"), fileName);
+                filePath = Path.Combine(config.GetValue<string>("NestorMSX.sharedDirectory"), fileName);
                 if (!File.Exists(filePath))
                 {
                     throw new ConfigurationException($"File not found: {fileName}");
@@ -151,6 +151,13 @@ namespace Konamiman.NestorMSX.Misc
                 null,
                 CallingConventions.Any,
                 argumentTypes, null);
+        }
+
+        public static void MergeInto(this IDictionary<string, object> source, IDictionary<string, object> destination)
+        {
+            foreach(var key in source.Keys)
+                if(!destination.ContainsKey(key))
+                    destination[key] = source[key];
         }
     }
 }

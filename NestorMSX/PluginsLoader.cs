@@ -8,20 +8,18 @@ using Konamiman.Z80dotNet;
 
 namespace Konamiman.NestorMSX
 {
-    class PluginsLoader
+    public class PluginsLoader
     {
         private static IDictionary<string, Type> pluginTypes;
         private object[] loadedPlugins;
 
         private readonly PluginContext context;
         private Action<string, object[]> tell;
-        private readonly string machineName;
 
-        public PluginsLoader(PluginContext context, Action<string, object[]> tell, string machineName)
+        public PluginsLoader(PluginContext context, Action<string, object[]> tell)
         {
             this.context = context;
             this.tell = tell;
-            this.machineName = machineName;
         }
 
         private IDictionary<string, Type> GetPluginTypes()
@@ -40,7 +38,7 @@ namespace Konamiman.NestorMSX
                 .ToArray();
 
             pluginTypes =
-                pluginAssemblyFileNames.SelectMany(n => GetPluginsInAssembly(n))
+                pluginAssemblyFileNames.SelectMany(GetPluginsInAssembly)
                     .ToDictionary(x => x.Key, x => x.Value);
 
             return pluginTypes;
@@ -61,28 +59,7 @@ namespace Konamiman.NestorMSX
             return instance;
         }
 
-        /// <summary>
-        /// Creates an instance of each of the available plugins that have
-        /// an entry in plugins.config and don't have active=false.
-        /// </summary>
-        public void LoadGlobalPlugins()
-        {
-            var configFileText = File.ReadAllText("plugins.config");
-            IDictionary<string, object> allConfigValues;
-
-            try
-            {
-                allConfigValues = JsonParser.Parse(configFileText) as IDictionary<string, object>;
-            }
-            catch (Exception ex)
-            {
-                throw new InvalidOperationException("Error when parsing plugins.config file: " + ex.Message);
-            }
-
-            LoadPlugins(allConfigValues);
-        }
-        
-        public void LoadPlugins(IDictionary<string, object> allConfigValues)
+        public void LoadPlugins(IDictionary<string, object> allConfigValues, IDictionary<string, object> pluginConfigToMerge)
         {
             if (allConfigValues == null)
                 ThrowNotValidJson();
@@ -114,6 +91,9 @@ namespace Konamiman.NestorMSX
                 try
                 {
                     var pluginConfig = validPluginConfigs[pluginName];
+
+                    pluginConfigToMerge.MergeInto(pluginConfig);
+
                     foreach(var sharedConfigKey in commonConfigValues.Keys)
                         if(!pluginConfig.ContainsKey(sharedConfigKey))
                             pluginConfig[sharedConfigKey] = commonConfigValues[sharedConfigKey];
@@ -169,7 +149,6 @@ namespace Konamiman.NestorMSX
             bool requireGetMemory)
         {
             var pluginConfigClone = pluginConfig.Keys.ToDictionary(k => k, k => pluginConfig[k]);
-            pluginConfigClone["machineName"] = machineName;
 
             var pluginTypes = GetPluginTypes();
 
