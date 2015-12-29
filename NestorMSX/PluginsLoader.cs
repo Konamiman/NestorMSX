@@ -15,11 +15,13 @@ namespace Konamiman.NestorMSX
 
         private readonly PluginContext context;
         private Action<string, object[]> tell;
+        private readonly string machineName;
 
-        public PluginsLoader(PluginContext context, Action<string, object[]> tell)
+        public PluginsLoader(PluginContext context, Action<string, object[]> tell, string machineName)
         {
             this.context = context;
             this.tell = tell;
+            this.machineName = machineName;
         }
 
         private IDictionary<string, Type> GetPluginTypes()
@@ -166,6 +168,9 @@ namespace Konamiman.NestorMSX
             IDictionary<string, object> pluginConfig,
             bool requireGetMemory)
         {
+            var pluginConfigClone = pluginConfig.Keys.ToDictionary(k => k, k => pluginConfig[k]);
+            pluginConfigClone["machineName"] = machineName;
+
             var pluginTypes = GetPluginTypes();
 
             if(!pluginTypes.ContainsKey(pluginName))
@@ -193,8 +198,8 @@ namespace Konamiman.NestorMSX
 
             return 
                 factoryMethod == null ? 
-                Activator.CreateInstance(type, context, pluginConfig) : 
-                factoryMethod.Invoke(null, new object[] {context, pluginConfig});
+                Activator.CreateInstance(type, context, pluginConfigClone) : 
+                factoryMethod.Invoke(null, new object[] {context, pluginConfigClone});
         }
     }
 }

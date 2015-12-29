@@ -11,6 +11,7 @@ namespace Konamiman.NestorMSX
     public class Program
     {
         private const string BasePathInDevelopmentEnvironment = @"c:\VS\Projects\Z80dotNet\NestorMSX\";
+        private static Configuration config;
 
         /// <summary>
         /// The main entry point for the application.
@@ -43,7 +44,7 @@ namespace Konamiman.NestorMSX
                 KeyEventSource = environment.KeyboardEventSource
             };
        
-            var pluginsLoader = new PluginsLoader(pluginContex, Tell);
+            var pluginsLoader = new PluginsLoader(pluginContex, Tell, config.MachineName);
 
             try
             {
@@ -81,7 +82,7 @@ namespace Konamiman.NestorMSX
 
             ParseArgs(args, ref configFileName, ref slot2FileNameOverride);
 
-            var config = ReadConfig(configFileName);
+            config = ReadConfig(configFileName);
             if(slot2FileNameOverride != null)
                 config.Slot2RomFile = slot2FileNameOverride;
 

@@ -59,7 +59,7 @@ namespace Konamiman.NestorMSX.Emulator
                 Vdp = Vdp,
                 KeyEventSource = KeyboardEventSource
             };
-            var pluginLoader = new PluginsLoader(pluginContext, tell);
+            var pluginLoader = new PluginsLoader(pluginContext, tell, config.MachineName);
             
             CreateSlotsSystem(pluginLoader, config);
 
