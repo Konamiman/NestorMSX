@@ -52,7 +52,11 @@ namespace Konamiman.NestorMSX
         /// <returns></returns>
         public object GetPluginInstanceForSlot(string pluginName, IDictionary<string, object> pluginConfig)
         {
-            return LoadPlugin(pluginName, pluginConfig, requireGetMemory: true);
+            var instance = LoadPlugin(pluginName, pluginConfig, requireGetMemory: true);
+            if(instance == null)
+                throw new InvalidOperationException("The plugin factory method returned null");
+
+            return instance;
         }
 
         /// <summary>
@@ -78,14 +82,14 @@ namespace Konamiman.NestorMSX
         
         public void LoadPlugins(IDictionary<string, object> allConfigValues)
         {
+            if (allConfigValues == null)
+                ThrowNotValidJson();
+
             if(!allConfigValues.ContainsKey("plugins"))
                 return;
 
             var loadedPluginsList = new List<object>();
-
-            if (allConfigValues == null)
-                ThrowNotValidJson();
-
+            
             var commonConfigValues = allConfigValues["sharedPluginsConfig"] as IDictionary<string, object>;
             var plugins = allConfigValues["plugins"] as IDictionary<string, object>;
             if(commonConfigValues == null || plugins == null)
@@ -103,8 +107,6 @@ namespace Konamiman.NestorMSX
 
             var namesOfPluginsConfiguredAsActive = activePluginConfigs.Keys;
 
-            var allAvailablePluginsByName = GetPluginTypes();
-
             foreach(var pluginName in namesOfPluginsConfiguredAsActive)
             {
                 try
@@ -115,7 +117,8 @@ namespace Konamiman.NestorMSX
                             pluginConfig[sharedConfigKey] = commonConfigValues[sharedConfigKey];
 
                     var pluginInstance = LoadPlugin(pluginName, pluginConfig, requireGetMemory: false);
-                    loadedPluginsList.Add(pluginInstance);
+                    if(pluginInstance != null)
+                        loadedPluginsList.Add(pluginInstance);
                 }
                 catch(Exception ex)
                 {
@@ -155,6 +158,9 @@ namespace Konamiman.NestorMSX
             return pluginTypesByName;
         }
 
+        private static Type[] argumentsForConstruction = 
+            {typeof (PluginContext), typeof (IDictionary<string, object>)};
+
         private object LoadPlugin(
             string pluginName, 
             IDictionary<string, object> pluginConfig,
@@ -167,11 +173,16 @@ namespace Konamiman.NestorMSX
 
             var type = pluginTypes[pluginName];
 
-            var constructor = type
-                .GetConstructor(new[] {typeof(PluginContext), typeof(IDictionary<string, object>)});
+            var factoryMethod = type
+                .GetMethod("GetInstance", BindingFlags.Static | BindingFlags.Public, null,
+                    argumentsForConstruction, null);
 
-            if(constructor == null)
-                throw new InvalidOperationException("No suitable constructor found for " + type.FullName);
+            if (factoryMethod == null || !factoryMethod.ReturnType.IsAssignableFrom(type))
+            {
+                var constructor = type.GetConstructor(argumentsForConstruction);
+                if(constructor == null)
+                    throw new InvalidOperationException("No suitable factory method nor constructor found for " + type.FullName);
+            }
 
             if(requireGetMemory)
             {
@@ -180,7 +191,10 @@ namespace Konamiman.NestorMSX
                     throw new InvalidOperationException(type.FullName + " has no suitable GetMemory method");
             }
 
-            return Activator.CreateInstance(type, new object[] {context, pluginConfig});
+            return 
+                factoryMethod == null ? 
+                Activator.CreateInstance(type, context, pluginConfig) : 
+                factoryMethod.Invoke(null, new object[] {context, pluginConfig});
         }
     }
 }

@@ -9,12 +9,17 @@ namespace Konamiman.NestorMSX.BuiltInPlugins
         private readonly IZ80Processor z80;
         private readonly DebugForm debugForm;
 
-        public DebugFormPlugin(PluginContext context, IDictionary<string, object> pluginConfig)
+        private DebugFormPlugin(PluginContext context, IDictionary<string, object> pluginConfig)
         {
             this.z80 = context.Cpu;
             this.debugForm = new DebugForm();
             this.debugForm.Show(context.HostForm);
             context.KeyEventSource.KeyPressed += KeyEventSourceOnKeyPressed;
+        }
+
+        public static DebugFormPlugin GetInstance(PluginContext context, IDictionary<string, object> pluginConfig)
+        {
+            return new DebugFormPlugin(context, pluginConfig);
         }
 
         private void KeyEventSourceOnKeyPressed(object sender, Hardware.KeyEventArgs keyEventArgs)
