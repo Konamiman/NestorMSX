@@ -42,6 +42,8 @@ namespace Konamiman.NestorMSX.Emulator
             HostForm = CreateHostForm(config, Z80);
             KeyboardEventSource = HostForm;
 
+            HostForm.SetFormTitle(config.MachineName);
+
             Vdp = CreateVdp(config, HostForm);
             HostForm.Vdp = Vdp;
 

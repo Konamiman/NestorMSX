@@ -37,6 +37,11 @@ namespace Konamiman.NestorMSX.Host
 
         public IExternallyControlledTms9918 Vdp { get; set; }
 
+        public void SetFormTitle(string title)
+        {
+            this.Text = "NestorMSX - " + title;
+        }
+
         #region Initialization
 
         public EmulatorHostForm() : this(null, null)
