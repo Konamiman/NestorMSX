@@ -8,20 +8,19 @@ namespace Konamiman.NestorMSX.Hardware
     public class MappedRam : IMappedRam
     {
         private const int segmentSize = 16*1024;
-        private static int[] allowedSizes = new[] {4, 8, 16, 32, 64, 128, 256};
+        private static readonly int[] allowedSizes = {4, 8, 16, 32, 64, 128, 256};
 
         private readonly byte[] memory;
-        private readonly int sizeInSegments;
         private readonly byte segmentMask;
 
-        private readonly Dictionary<ushort, int> addressOffsetsPerEachPage;
+        private readonly IDictionary<ushort, int> addressOffsetsPerEachPage;
         
         public MappedRam(int sizeInSegments)
         {
             if(!allowedSizes.Contains(sizeInSegments))
-                throw new ArgumentException("Size in segments must be a power of two between 4 and 256", nameof(sizeInSegments));
+                throw new ArgumentException("Size in segments must be a power of two between 4 and 256",
+                    nameof(sizeInSegments));
 
-            this.sizeInSegments = sizeInSegments;
             memory = new byte[sizeInSegments * segmentSize];
             segmentMask = (byte)(sizeInSegments - 1);
 

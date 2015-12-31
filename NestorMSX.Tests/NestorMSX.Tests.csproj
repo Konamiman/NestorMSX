@@ -59,6 +59,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Ascii8RomTests.cs" />
     <Compile Include="ConfigurationUtilsTests.cs" />
     <Compile Include="MappedRamTests.cs" />
     <Compile Include="NotConnectedMemoryTests.cs" />

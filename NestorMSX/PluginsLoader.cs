@@ -14,7 +14,7 @@ namespace Konamiman.NestorMSX
         private object[] loadedPlugins;
 
         private readonly PluginContext context;
-        private Action<string, object[]> tell;
+        private readonly Action<string, object[]> tell;
 
         public PluginsLoader(PluginContext context, Action<string, object[]> tell)
         {
