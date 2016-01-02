@@ -33,13 +33,13 @@ namespace Konamiman.NestorMSX.Misc
         public static string Replace(this string str, string oldValue, string newValue, StringComparison comparison)
         {
             if(oldValue == null) {
-                throw new ArgumentNullException("oldValue");
+                throw new ArgumentNullException(nameof(oldValue));
             }
             if(oldValue == "") {
-                throw new ArgumentException("String cannot be of zero length.", "oldValue");
+                throw new ArgumentException("String cannot be of zero length.", nameof(oldValue));
             }
 
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
 
             int previousIndex = 0;
             int index = str.IndexOf(oldValue, comparison);

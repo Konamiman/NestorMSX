@@ -82,7 +82,7 @@ namespace Konamiman.NestorMSX.Misc
             if(value == null)
                 return null;
 
-            if(type.IsAssignableFrom(value.GetType()))
+            if(type.IsInstanceOfType(value))
                 return value;
 
             if(type.IsArray)
