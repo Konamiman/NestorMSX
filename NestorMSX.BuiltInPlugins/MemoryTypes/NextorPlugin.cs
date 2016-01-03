@@ -122,8 +122,8 @@ namespace Konamiman.NestorMSX.BuiltInPlugins.MemoryTypes
             var deviceIndex = z80.Registers.A;
             var numberOfSectors = z80.Registers.B;
             var logicalUnit = z80.Registers.C;
-            var memoryAddress = z80.Registers.HL;
-            var sectorAddress = z80.Registers.DE;
+            var memoryAddress = z80.Registers.HL.ToUShort();
+            var sectorAddress = z80.Registers.DE.ToUShort();
 
             if(deviceIndex != 1 || logicalUnit != 1) {
                 z80.Registers.A = _IDEVL;
@@ -154,7 +154,7 @@ namespace Konamiman.NestorMSX.BuiltInPlugins.MemoryTypes
             z80.Registers.A = 0;
         }
 
-        private void ReadSectors(int sectorNumber, short memoryAddress, byte numberOfSectors)
+        private void ReadSectors(int sectorNumber, ushort memoryAddress, byte numberOfSectors)
         {
             var data = new byte[numberOfSectors * 512];
             diskImageFileStream.Read(data, 0, data.Length);
@@ -162,7 +162,7 @@ namespace Konamiman.NestorMSX.BuiltInPlugins.MemoryTypes
             SetMemoryContents(memoryAddress, data);
         }
 
-        private void WriteSectors(int sectorNumber, short memoryAddress, byte numberOfSectors)
+        private void WriteSectors(int sectorNumber, ushort memoryAddress, byte numberOfSectors)
         {
             var data = new byte[numberOfSectors * 512];
 
@@ -176,7 +176,7 @@ namespace Konamiman.NestorMSX.BuiltInPlugins.MemoryTypes
         {
             var deviceIndex = z80.Registers.A;
             var infoBlockIndex = z80.Registers.B;
-            var memoryAddress = z80.Registers.HL;
+            var memoryAddress = z80.Registers.HL.ToUShort();
 
             if(deviceIndex != 1) {
                 z80.Registers.A = 1; //Device not available
@@ -230,7 +230,7 @@ namespace Konamiman.NestorMSX.BuiltInPlugins.MemoryTypes
         {
             var deviceIndex = z80.Registers.A;
             var logicalUnit = z80.Registers.B;
-            var memoryAddress = z80.Registers.HL;
+            var memoryAddress = z80.Registers.HL.ToUShort();
 
             if(deviceIndex != 1 || logicalUnit > 1) {
                 z80.Registers.A = 1; //Invalid device/LUN
