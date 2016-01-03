@@ -25,6 +25,8 @@ namespace Konamiman.NestorMSX.BuiltInPlugins.MemoryTypes
 
         private IDictionary<ushort, Action> kernelRoutines;
 
+        private Ascii8Rom kernel;
+
         public NextorPlugin(PluginContext context, IDictionary<string, object> pluginConfig)
         {
             kernelRoutines = new Dictionary<ushort, Action>
@@ -50,6 +52,8 @@ namespace Konamiman.NestorMSX.BuiltInPlugins.MemoryTypes
             z80.MemoryAccess += Z80_MemoryAccess;
 
             this.driverNameBytes = PaddedArrayFromString("NestorMSX Nextor plugin", 32);
+
+            this.kernel = new Ascii8Rom(File.ReadAllBytes(kernelFilePath));
         }
 
         private byte[] PaddedArrayFromString(string theString, int totalLength)
@@ -65,6 +69,9 @@ namespace Konamiman.NestorMSX.BuiltInPlugins.MemoryTypes
             if(memory.GetCurrentSlot(1) != slotNumber)
                 return;
 
+            if(kernel.CurrentBlockInBank(1) != 14)
+                return;
+
             if(e.Address == 0x410E) {
                 e.CancelMemoryAccess = true;
                 e.Value = 1;    //Device-based driver
@@ -78,12 +85,15 @@ namespace Konamiman.NestorMSX.BuiltInPlugins.MemoryTypes
 
         public IMemory GetMemory()
         {
-            return new Ascii8Rom(File.ReadAllBytes(kernelFilePath));
+            return kernel;
         }
 
         private void Z80_BeforeInstructionFetch(object sender, BeforeInstructionFetchEventArgs e)
         {
             if(memory.GetCurrentSlot(1) != slotNumber)
+                return;
+
+            if(kernel.CurrentBlockInBank(1) != 14)
                 return;
 
             if(kernelRoutines.ContainsKey(z80.Registers.PC)) {
@@ -141,6 +151,7 @@ namespace Konamiman.NestorMSX.BuiltInPlugins.MemoryTypes
                 ReadSectors(sectorNumber, memoryAddress, numberOfSectors);
 
             z80.Registers.B = numberOfSectors;
+            z80.Registers.A = 0;
         }
 
         private void ReadSectors(int sectorNumber, short memoryAddress, byte numberOfSectors)
@@ -167,11 +178,18 @@ namespace Konamiman.NestorMSX.BuiltInPlugins.MemoryTypes
             var infoBlockIndex = z80.Registers.B;
             var memoryAddress = z80.Registers.HL;
 
+            if(deviceIndex != 1) {
+                z80.Registers.A = 1; //Device not available
+                return;
+            }
+
             string info = null;
 
             if(infoBlockIndex == 0) {
                 memory[memoryAddress] = 1; //One logical unit
-                memory[memoryAddress] = 0; //Features
+                memory[memoryAddress+1] = 0; //Features
+                z80.Registers.A = 0;
+                return;
             }
             else if(infoBlockIndex == 1) {
                 info = "Konamiman";
@@ -221,6 +239,8 @@ namespace Konamiman.NestorMSX.BuiltInPlugins.MemoryTypes
 
             var info = new byte[12];
 
+            info[2] = 2; //sector size = 0x200
+
             var numberOfSectors = BitConverter.GetBytes(maxSectorNumber + 1);
             if(BitConverter.IsLittleEndian) {
                 Array.Copy(numberOfSectors, 0, info, 3, 4);
@@ -231,6 +251,8 @@ namespace Konamiman.NestorMSX.BuiltInPlugins.MemoryTypes
                 info[2] = numberOfSectors[1];
                 info[3] = numberOfSectors[0];
             }
+
+            SetMemoryContents(memoryAddress, info);
 
             z80.Registers.A = 0;
         }

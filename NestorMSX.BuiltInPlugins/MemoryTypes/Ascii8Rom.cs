@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Konamiman.Z80dotNet;
+using System.Diagnostics;
 
 namespace Konamiman.NestorMSX.Hardware
 {
@@ -34,10 +35,17 @@ namespace Konamiman.NestorMSX.Hardware
 
             contentsOffsetsPerEachBank = new Dictionary<int, int> {
                 { 0x4000, 0x0000 },
-                { 0x6000, 0x0000 },
-                { 0x8000, 0x0000 },
-                { 0xA000, 0x0000 }
+                { 0x6000, 0x2000 },
+                { 0x8000, 0x4000 },
+                { 0xA000, 0x6000 }
             };
+        }
+
+        private static int[] bankStartAddresses = { 0, 0x4000, 0x6000, 0x8000, 0xA000 };
+
+        public int CurrentBlockInBank(int bankNumber)
+        {
+            return contentsOffsetsPerEachBank[bankStartAddresses[bankNumber]] >> 13;
         }
 
         public byte this[int address]
