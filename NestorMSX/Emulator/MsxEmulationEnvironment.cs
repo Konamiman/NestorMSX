@@ -25,6 +25,7 @@ namespace Konamiman.NestorMSX.Emulator
         private IDictionary<string, object> machineSharedPluginsConfig;
         private Action<string, object[]> tell;
         private Configuration globalConfig;
+        private PluginContext pluginContext;
         private List<object> loadedPlugins = new List<object>();
         
         public IKeyEventSource KeyboardEventSource { get; }
@@ -58,13 +59,14 @@ namespace Konamiman.NestorMSX.Emulator
             HostForm.Vdp = Vdp;
             KeyboardController = CreateKeyboardController(HostForm);
 
-            var pluginContext = new PluginContext
+            pluginContext = new PluginContext
             {
                 Cpu = Z80,
                 HostForm = HostForm,
                 SlotsSystem = SlotsSystem,
                 Vdp = Vdp,
-                KeyEventSource = KeyboardEventSource
+                KeyEventSource = KeyboardEventSource,
+                LoadedPlugins = null
             };
             PluginsLoader = new PluginsLoader(pluginContext, tell);
             LoadGlobalPlugins();
@@ -132,8 +134,9 @@ namespace Konamiman.NestorMSX.Emulator
 
         private void RegisterPlugin(object plugin)
         {
-            if(plugin != null && !loadedPlugins.Contains(plugin))
+            if(plugin != null && !loadedPlugins.Contains(plugin)) {
                 loadedPlugins.Add(plugin);
+            }
         }
 
         private void LoadMachineConfig()
@@ -265,6 +268,9 @@ namespace Konamiman.NestorMSX.Emulator
 
         public void Run()
         {
+            pluginContext.LoadedPlugins = loadedPlugins.ToArray();
+            pluginContext.FireInitializationCompleteEvent();
+
             KeyboardEventSource.StartGeneratingKeyEvents();
             new Task(() => emulator.Run()).Start();
             Application.Run(HostForm);

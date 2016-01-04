@@ -36,17 +36,15 @@ namespace Konamiman.NestorMSX.Tests
         }
 
         [Test]
-        public void Gets_data_from_block_0_by_default()
+        public void Gets_data_from_first_blocks_by_default()
         {
             Assert.AreEqual(0, Sut[0x4000]);
-            Assert.AreEqual(0, Sut[0x6000]);
-            Assert.AreEqual(0, Sut[0x8000]);
-            Assert.AreEqual(0, Sut[0xA000]);
+            Assert.AreEqual(1, Sut[0x6000]);
+            Assert.AreEqual(2, Sut[0x8000]);
 
             Assert.AreEqual(9, Sut[0x4001]);
-            Assert.AreEqual(9, Sut[0x6001]);
-            Assert.AreEqual(9, Sut[0x8001]);
-            Assert.AreEqual(9, Sut[0xA001]);
+            Assert.AreEqual(19, Sut[0x6001]);
+            Assert.AreEqual(29, Sut[0x8001]);
         }
 
         [Test]
