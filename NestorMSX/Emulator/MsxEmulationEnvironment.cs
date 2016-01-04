@@ -20,10 +20,13 @@ namespace Konamiman.NestorMSX.Emulator
     {
         private MsxEmulator emulator;
         private IDictionary<string, object> machineConfig;
+        private IDictionary<string, object> injectedConfig;
+        private IDictionary<string, object> globalSharedPluginsConfig;
+        private IDictionary<string, object> machineSharedPluginsConfig;
         private Action<string, object[]> tell;
         private Configuration globalConfig;
         private List<object> loadedPlugins = new List<object>();
-
+        
         public IKeyEventSource KeyboardEventSource { get; }
         public EmulatorHostForm HostForm { get; }
         public IExternallyControlledSlotsSystem SlotsSystem { get; }
@@ -43,21 +46,17 @@ namespace Konamiman.NestorMSX.Emulator
             this.tell = tell;
 
             LoadMachineConfig();
-            GetExtraConfig().MergeInto(machineConfig);
+            GenerateInjectedConfig();
 
             Z80 = CreateCpu();
+            SlotsSystem = CreateEmptySlotsSystem();
 
             HostForm = CreateHostForm(Z80);
             KeyboardEventSource = HostForm;
-
             HostForm.SetFormTitle(config.MachineName);
-
             Vdp = CreateVdp(HostForm);
             HostForm.Vdp = Vdp;
-
             KeyboardController = CreateKeyboardController(HostForm);
-
-            SlotsSystem = CreateEmptySlotsSystem();
 
             var pluginContext = new PluginContext
             {
@@ -68,12 +67,10 @@ namespace Konamiman.NestorMSX.Emulator
                 KeyEventSource = KeyboardEventSource
             };
             PluginsLoader = new PluginsLoader(pluginContext, tell);
-
             LoadGlobalPlugins();
+            LoadMachinePlugins();
 
             CreateSlotsSystem();
-
-            PluginsLoader.LoadPlugins(machineConfig, GetExtraConfig());
 
             var hardware = new MsxHardwareSet {
                 Cpu = Z80,
@@ -105,7 +102,9 @@ namespace Konamiman.NestorMSX.Emulator
 
             try
             {
-                var plugins = PluginsLoader.LoadPlugins(allConfigValues, GetExtraConfig());
+                var globalPlugins = allConfigValues.GetDictionaryOrDefault("plugins");
+                globalSharedPluginsConfig = allConfigValues.GetDictionaryOrDefault("sharedPluginsConfig");
+                var plugins = PluginsLoader.LoadPlugins(globalPlugins, machineSharedPluginsConfig, globalSharedPluginsConfig, injectedConfig);
                 foreach(var plugin in plugins)
                     RegisterPlugin(plugin);
             }
@@ -115,9 +114,25 @@ namespace Konamiman.NestorMSX.Emulator
             }
         }
 
+        private void LoadMachinePlugins()
+        {
+            var machinePlugins = machineConfig.GetDictionaryOrDefault("plugins");
+
+            try
+            {
+                var plugins = PluginsLoader.LoadPlugins(machinePlugins, machineSharedPluginsConfig, globalSharedPluginsConfig, injectedConfig);
+                foreach (var plugin in plugins)
+                    RegisterPlugin(plugin);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error when loading machine plugins: " + ex.Message);
+            }
+        }
+
         private void RegisterPlugin(object plugin)
         {
-            if(!loadedPlugins.Contains(plugin))
+            if(plugin != null && !loadedPlugins.Contains(plugin))
                 loadedPlugins.Add(plugin);
         }
 
@@ -141,6 +156,8 @@ namespace Konamiman.NestorMSX.Emulator
             {
                 throw new ConfigurationException($"Error when reading machine.config file for '{machineName}': {ex.Message}");
             }
+
+            machineSharedPluginsConfig = machineConfig.GetDictionaryOrDefault("sharedPluginsConfig");
         }
 
         private IExternallyControlledSlotsSystem CreateEmptySlotsSystem()
@@ -174,17 +191,17 @@ namespace Konamiman.NestorMSX.Emulator
                 if (!SlotNumber.TryParse(slotConfig.Key, out slotNumber))
                     continue;
 
-                var configValues = (IDictionary<string, object>)slotConfig.Value;
-                configValues["slotNumber"] = slotNumber.EncodedByte;
+                var pluginConfig = (IDictionary<string, object>)slotConfig.Value;
+                pluginConfig["slotNumber"] = slotNumber.EncodedByte;
 
-                var typeName = (string)configValues["type"];
+                var typeName = (string)pluginConfig["type"];
 
-                GetExtraConfig().MergeInto(configValues);
+                injectedConfig.MergeInto(pluginConfig);
 
                 object pluginInstance;
                 try
                 {
-                    pluginInstance = PluginsLoader.GetPluginInstanceForSlot(typeName, configValues);
+                    pluginInstance = PluginsLoader.GetPluginInstanceForSlot(typeName, pluginConfig, machineSharedPluginsConfig, globalSharedPluginsConfig, injectedConfig);
                     RegisterPlugin(pluginInstance);
                 }
                 catch(Exception ex)
@@ -218,9 +235,9 @@ namespace Konamiman.NestorMSX.Emulator
             }
         }
 
-        private IDictionary<string, object> GetExtraConfig()
+        private void GenerateInjectedConfig()
         {
-            return new Dictionary<string, object>
+            injectedConfig = new Dictionary<string, object>
             {
                 { "NestorMSX.machineName", globalConfig.MachineName },
                 { "NestorMSX.machineDirectory", Path.Combine(

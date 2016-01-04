@@ -1,11 +1,7 @@
 ﻿using System;
-using System.CodeDom;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using Konamiman.NestorMSX.Exceptions;
-using System.Collections;
 using System.IO;
 
 namespace Konamiman.NestorMSX.Misc
@@ -46,6 +42,26 @@ namespace Konamiman.NestorMSX.Misc
             var value = config.ContainsKey(key) ? config[key] : defaultValue;
 
             return AdaptValue<T>(key, value);
+        }
+
+        /// <summary>
+        /// Gets the value of the configuration for the specified key as a dictionary.
+        /// If the key does not exist, returns an empty dictionary. 
+        /// </summary>
+        /// <param name="config"></param>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public static IDictionary<string, object> GetDictionaryOrDefault(this IDictionary<string, object> config, string key)
+        {
+            if (!config.ContainsKey(key))
+                return new Dictionary<string, object>();
+
+            var value = config[key];
+
+            if (!(value is IDictionary<string, object>))
+                throw new ConfigurationException($"Configuration key '{key}' has value '{value.ToString()}', that can't be converted to a dictionary");
+
+            return (IDictionary<string, object>)value;
         }
 
         /// <summary>
@@ -153,6 +169,12 @@ namespace Konamiman.NestorMSX.Misc
                 argumentTypes, null);
         }
 
+        /// <summary>
+        /// Merges the dictionary into another one. Merging is done by
+        /// adding the keys that don't already exist in the destination.
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="destination"></param>
         public static void MergeInto(this IDictionary<string, object> source, IDictionary<string, object> destination)
         {
             foreach(var key in source.Keys)

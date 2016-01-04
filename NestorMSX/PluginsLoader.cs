@@ -48,33 +48,28 @@ namespace Konamiman.NestorMSX
         /// </summary>
         /// <param name="pluginName"></param>
         /// <param name="pluginConfig"></param>
-        /// <returns></returns>
-        public object GetPluginInstanceForSlot(string pluginName, IDictionary<string, object> pluginConfig)
+        /// <returns>The loaded plugin instance</returns>
+        public object GetPluginInstanceForSlot(string pluginName, params IDictionary<string, object>[] pluginConfigs)
         {
-            var instance = LoadPlugin(pluginName, pluginConfig, requireGetMemory: true);
+            var instance = LoadPlugin(pluginName, true, pluginConfigs);
             if(instance == null)
                 throw new InvalidOperationException("The plugin factory method returned null");
 
             return instance;
         }
 
-        public IEnumerable<object> LoadPlugins(IDictionary<string, object> allConfigValues, IDictionary<string, object> pluginConfigToMerge)
+        /// <summary>
+        /// Gets all the globally defined plugins (defined in the "plugins" section of a config file)
+        /// </summary>
+        /// <param name="pluginsSectionInConfig">The "plugins" section of a config file</param>
+        /// <param name="pluginConfigs">Plugin configurations to apply, more prioritary first</param>
+        /// <returns>All the loaded plugin instances</returns>
+        public IEnumerable<object> LoadPlugins(IDictionary<string, object> pluginsSectionInConfig, params IDictionary<string, object>[] pluginConfigs)
         {
-            if (allConfigValues == null)
-                ThrowNotValidJson();
-
-            if(!allConfigValues.ContainsKey("plugins"))
-                return new object[0];
-
             var loadedPluginsList = new List<object>();
             
-            var commonConfigValues = allConfigValues["sharedPluginsConfig"] as IDictionary<string, object>;
-            var plugins = allConfigValues["plugins"] as IDictionary<string, object>;
-            if(commonConfigValues == null || plugins == null)
-                ThrowNotValidJson();
-
             var validPluginConfigs =
-                plugins
+                pluginsSectionInConfig
                     .Where(p => p.Value is IDictionary<string, object>)
                     .ToDictionary(p => p.Key, p => (IDictionary<string, object>)p.Value);
 
@@ -91,13 +86,7 @@ namespace Konamiman.NestorMSX
                 {
                     var pluginConfig = validPluginConfigs[pluginName];
 
-                    pluginConfigToMerge.MergeInto(pluginConfig);
-
-                    foreach(var sharedConfigKey in commonConfigValues.Keys)
-                        if(!pluginConfig.ContainsKey(sharedConfigKey))
-                            pluginConfig[sharedConfigKey] = commonConfigValues[sharedConfigKey];
-
-                    var pluginInstance = LoadPlugin(pluginName, pluginConfig, requireGetMemory: false);
+                    var pluginInstance = LoadPlugin(pluginName, false, pluginConfigs);
                     if(pluginInstance != null)
                         loadedPluginsList.Add(pluginInstance);
                 }
@@ -142,12 +131,23 @@ namespace Konamiman.NestorMSX
         private static Type[] argumentsForConstruction = 
             {typeof (PluginContext), typeof (IDictionary<string, object>)};
 
+
+        /// <summary>
+        /// Loads one single plugin
+        /// </summary>
+        /// <param name="pluginName">Name of the plugin</param>
+        /// <param name="requireGetMemory">True if "GetMemory" method is required</param>
+        /// <param name="pluginConfigs">Plugin configurations to apply, more prioritary first</param>
+        /// <returns>The generated plugin instance</returns>
         private object LoadPlugin(
-            string pluginName, 
-            IDictionary<string, object> pluginConfig,
-            bool requireGetMemory)
+            string pluginName,
+            bool requireGetMemory,
+            params IDictionary<string, object>[] pluginConfigs)
         {
-            var pluginConfigClone = pluginConfig.Keys.ToDictionary(k => k, k => pluginConfig[k]);
+            var mainPluginConfig = pluginConfigs[0];
+            var pluginConfigClone = mainPluginConfig.Keys.ToDictionary(k => k, k => mainPluginConfig[k]);
+            foreach(var extraPluginConfig in pluginConfigs.Skip(1))
+                extraPluginConfig.MergeInto(pluginConfigClone);
 
             var pluginTypes = GetPluginTypes();
 
