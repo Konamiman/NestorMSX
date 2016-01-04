@@ -56,7 +56,6 @@ namespace Konamiman.NestorMSX.Emulator
             KeyboardEventSource = HostForm;
             HostForm.SetFormTitle(config.MachineName);
             Vdp = CreateVdp(HostForm);
-            HostForm.Vdp = Vdp;
             KeyboardController = CreateKeyboardController(HostForm);
 
             pluginContext = new PluginContext

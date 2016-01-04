@@ -84,14 +84,18 @@ namespace Konamiman.NestorMSX
             {
                 try
                 {
-                    var pluginConfig = validPluginConfigs[pluginName];
+                    var pluginConfig = validPluginConfigs[pluginName] as IDictionary<string, object>;
+                    var allPluginConfigs = new[] {pluginConfig}.Concat(pluginConfigs).ToArray();
 
-                    var pluginInstance = LoadPlugin(pluginName, false, pluginConfigs);
+                    var pluginInstance = LoadPlugin(pluginName, false, allPluginConfigs);
                     if(pluginInstance != null)
                         loadedPluginsList.Add(pluginInstance);
                 }
                 catch(Exception ex)
                 {
+                    if(ex is TargetInvocationException)
+                        ex = ex.InnerException;
+
                     tell("Could not load plugin '{0}': {1}", new[] {pluginName, ex.Message});
                 }
             }
