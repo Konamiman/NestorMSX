@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Konamiman.Z80dotNet;
+using KeyEventArgs = Konamiman.NestorMSX.Hardware.KeyEventArgs;
 
 namespace Konamiman.NestorMSX.BuiltInPlugins
 {
@@ -22,7 +23,7 @@ namespace Konamiman.NestorMSX.BuiltInPlugins
             return new DebugFormPlugin(context, pluginConfig);
         }
 
-        private void KeyEventSourceOnKeyPressed(object sender, Hardware.KeyEventArgs keyEventArgs)
+        private void KeyEventSourceOnKeyPressed(object sender, KeyEventArgs keyEventArgs)
         {
             debugForm.Append(keyEventArgs.Value.ToString());
         }

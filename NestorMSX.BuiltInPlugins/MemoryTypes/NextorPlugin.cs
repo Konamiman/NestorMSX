@@ -21,7 +21,7 @@ namespace Konamiman.NestorMSX.BuiltInPlugins.MemoryTypes
         private string diskImageFilePath;
         private FileStream diskImageFileStream;
         private long maxSectorNumber;
-        private byte[] driverNameBytes;
+        private string diskImageName;
 
         private IDictionary<ushort, Action> kernelRoutines;
 
@@ -41,6 +41,7 @@ namespace Konamiman.NestorMSX.BuiltInPlugins.MemoryTypes
 
             this.kernelFilePath = pluginConfig.GetPluginFilePath(pluginConfig.GetValue<string>("kernelFile"));
             this.diskImageFilePath = pluginConfig.GetValue<string>("diskImageFile").AsAbsolutePath();
+            this.diskImageName = Path.GetFileName(diskImageFilePath);
             this.z80 = context.Cpu;
             this.memory = context.SlotsSystem;
             this.slotNumber = new SlotNumber(pluginConfig.GetValue<byte>("slotNumber"));
@@ -49,38 +50,27 @@ namespace Konamiman.NestorMSX.BuiltInPlugins.MemoryTypes
             this.diskImageFileStream = File.Open(diskImageFilePath, FileMode.Open, FileAccess.ReadWrite);
 
             z80.BeforeInstructionFetch += Z80_BeforeInstructionFetch;
-            z80.MemoryAccess += Z80_MemoryAccess;
 
-            this.driverNameBytes = PaddedArrayFromString("NestorMSX Nextor plugin", 32);
+            this.kernel = new Ascii8Rom(ReadKernelFile());
+        }
 
-            this.kernel = new Ascii8Rom(File.ReadAllBytes(kernelFilePath));
+        private byte[] ReadKernelFile()
+        {
+            const int driverOffset = 112*1024;
+
+            var kernelContents = File.ReadAllBytes(kernelFilePath);
+
+            kernelContents[driverOffset + 0x010E] = 1; //Device-based driver
+            Array.Copy(PaddedArrayFromString("NestorMSX Nextor plugin", 32), 0, kernelContents, driverOffset + 0x0110, 32);
+
+            return kernelContents;
         }
 
         private byte[] PaddedArrayFromString(string theString, int totalLength)
         {
+            if(theString.Length > totalLength)
+                theString = theString.Remove(totalLength);
             return Encoding.ASCII.GetBytes(theString.PadRight(totalLength));
-        }
-
-        private void Z80_MemoryAccess(object sender, MemoryAccessEventArgs e)
-        {
-            if(e.EventType != MemoryAccessEventType.BeforeMemoryRead)
-                return;
-
-            if(memory.GetCurrentSlot(1) != slotNumber)
-                return;
-
-            if(kernel.CurrentBlockInBank(1) != 14)
-                return;
-
-            if(e.Address == 0x410E) {
-                e.CancelMemoryAccess = true;
-                e.Value = 1;    //Device-based driver
-            }
-
-            if(e.Address >= 0x4110 && e.Address < (0x4110 + 32)) {
-                e.CancelMemoryAccess = true;
-                e.Value = driverNameBytes[e.Address - 0x4110];
-            }
         }
 
         public IMemory GetMemory()
@@ -195,10 +185,10 @@ namespace Konamiman.NestorMSX.BuiltInPlugins.MemoryTypes
                 info = "Konamiman";
             }
             else if(infoBlockIndex == 2) {
-                info = "Disk image file";
+                info = diskImageName;
             }
             else if(infoBlockIndex == 3) {
-                info = "0";
+                info = "1";
             }
             else {
                 z80.Registers.A = 1;

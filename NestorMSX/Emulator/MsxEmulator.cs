@@ -37,6 +37,9 @@ namespace Konamiman.NestorMSX.Emulator
 
         private void HandlePortWrite(MemoryAccessEventArgs args)
         {
+            if(args.CancelMemoryAccess)
+                return; //Value already handled by a plugin
+
             switch(args.Address) {
                 case 0x98:
                     hardware.Vdp.WriteToPort(0, args.Value);
@@ -55,7 +58,9 @@ namespace Konamiman.NestorMSX.Emulator
 
         private void HandlePortRead(MemoryAccessEventArgs args)
         {
-            args.CancelMemoryAccess = true;
+            if(args.CancelMemoryAccess)
+                return; //Value already set by a plugin
+
             switch(args.Address) {
                 case 0x98:
                     args.Value = hardware.Vdp.ReadFromPort(0);
@@ -73,6 +78,8 @@ namespace Konamiman.NestorMSX.Emulator
                     args.Value = 0xFF;
                     break;
             }
+
+            args.CancelMemoryAccess = true;
         }
     }
 }

@@ -54,6 +54,7 @@
       <DependentUpon>DebugForm.cs</DependentUpon>
     </Compile>
     <Compile Include="DebugFormPlugin.cs" />
+    <Compile Include="Hardware\ClockIcPlugin.cs" />
     <Compile Include="MemoryTypes\DosFunctionCallExecutor.cs" />
     <Compile Include="MemoryTypes\IMappedRam.cs" />
     <Compile Include="MemoryTypes\Ascii8Rom.cs" />
