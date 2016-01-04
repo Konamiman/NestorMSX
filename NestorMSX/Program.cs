@@ -15,6 +15,7 @@ namespace Konamiman.NestorMSX
         private const string BasePathInDevelopmentEnvironment = @"c:\VS\Projects\Z80dotNet\NestorMSX\";
         private static Configuration config;
         private static MsxEmulationEnvironment emulationEnvironment;
+        private static string machineName;
 
         /// <summary>
         /// The main entry point for the application.
@@ -28,6 +29,10 @@ namespace Konamiman.NestorMSX
                 Application.Run(new KeyTestForm());
                 return;
             }
+
+            machineName = GetMachineName();
+            if(machineName == null)
+                return;
 
             emulationEnvironment = CreateEmulationEnvironment(args);
             if(emulationEnvironment == null)
@@ -81,7 +86,7 @@ namespace Konamiman.NestorMSX
 
             var configDictionary = ReadConfig(configFileName);
 
-            return new MsxEmulationEnvironment(configDictionary, Tell);
+            return new MsxEmulationEnvironment(configDictionary, Tell, machineName);
         }
 
         private void ParseArgs(string[] args, ref string configFileName)
@@ -114,6 +119,40 @@ namespace Konamiman.NestorMSX
         public static void Tell(string message, params object[] parameters)
         {
             MessageBox.Show(message.FormatWith(parameters), "NestorMSX");
+        }
+
+        private static string GetMachineName()
+        {
+            var availableMachineNames = GetAvailableMachineNames();
+
+            var stateFilePath = "NestorMSX.state".AsAbsolutePath();
+            if(File.Exists(stateFilePath)) {
+                var previousMachineName = File.ReadAllText(stateFilePath);
+                if(availableMachineNames.Contains(previousMachineName))
+                    return previousMachineName;
+            }
+
+            var form = new MachineSelectionForm();
+            form.SetMachinesListItems(availableMachineNames);
+            var dialogResult = form.ShowDialog();
+
+            if(dialogResult == DialogResult.OK) {
+                File.WriteAllText(stateFilePath, form.SelectedMachine);
+                return form.SelectedMachine;
+            }
+                
+            return null;
+        }
+
+        private static string[] GetAvailableMachineNames()
+        {
+            var machinesDirectory = "machines".AsAbsolutePath();
+            var folders = Directory
+                .GetDirectories(machinesDirectory)
+                .Where(d => File.Exists(Path.Combine(d, "machine.config")))
+                .Select(d => Path.GetFileName(d));
+
+            return folders.ToArray();
         }
     }
 }

@@ -42,10 +42,10 @@ namespace Konamiman.NestorMSX.Emulator
             return loadedPlugins.ToArray();
         }
 
-        public MsxEmulationEnvironment(IDictionary<string, object> configDictionary, Action<string, object[]> tell)
+        public MsxEmulationEnvironment(IDictionary<string, object> configDictionary, Action<string, object[]> tell, string machineName)
         {
             var defaultEmulationParameters = configDictionary.GetValue<IDictionary<string, object>>("defaultEmulationParameters");
-            this.machineName = defaultEmulationParameters.GetValue<string>("machineName");
+            this.machineName = machineName;
 
             LoadMachineConfig();
             GenerateInjectedConfig();
@@ -104,7 +104,6 @@ namespace Konamiman.NestorMSX.Emulator
             config.VerticalMarginInPixels = configDictionary.GetValueOrDefault("verticalMarginInPixels", 16);
             config.KeymapFile = configDictionary.GetValue<string>("keymapFile").AsAbsolutePath();
             config.VdpFrequencyMultiplier = configDictionary.GetValueOrDefault<decimal>("vdpFrequencyMultiplier", 1);
-            config.MachineName = configDictionary.GetValue<string>("machineName");
 
             return config;
         }

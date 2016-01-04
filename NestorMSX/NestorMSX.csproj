@@ -81,6 +81,12 @@
     <Compile Include="Host\IDrawingSurface.cs" />
     <Compile Include="Emulator\MsxEmulator.cs" />
     <Compile Include="Emulator\MsxEmulationEnvironment.cs" />
+    <Compile Include="MachineSelectionForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MachineSelectionForm.Designer.cs">
+      <DependentUpon>MachineSelectionForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Misc\JsonParser.cs" />
     <Compile Include="Misc\MandatoryAttribute.cs" />
     <Compile Include="Misc\FileUtils.cs" />
@@ -96,6 +102,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Host\EmulatorHostForm.resx">
       <DependentUpon>EmulatorHostForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MachineSelectionForm.resx">
+      <DependentUpon>MachineSelectionForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Misc\KeyTestForm.resx">
       <DependentUpon>KeyTestForm.cs</DependentUpon>
