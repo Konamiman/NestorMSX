@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Konamiman.NestorMSX.Misc
 {
@@ -11,6 +12,10 @@ namespace Konamiman.NestorMSX.Misc
         /// </summary>
         public static object Parse(string json)
         {
+            var lines = json.Split('\r', '\n');
+            lines = lines.Where(line => !line.Trim().StartsWith("//")).ToArray();
+            json = string.Join("\r\n", lines);
+
             var token = JToken.Parse(json);
             return GetObjectFor(token);
         }

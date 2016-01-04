@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 using Konamiman.NestorMSX.Exceptions;
-using Konamiman.NestorMSX.Hardware;
-using Konamiman.NestorMSX.Misc;
 using Konamiman.Z80dotNet;
 using KeyEventArgs = Konamiman.NestorMSX.Hardware.KeyEventArgs;
 

@@ -26,6 +26,7 @@ namespace Konamiman.NestorMSX.Emulator
         private Action<string, object[]> tell;
         private Configuration globalConfig;
         private PluginContext pluginContext;
+        private string machineName;
         private List<object> loadedPlugins = new List<object>();
         
         public IKeyEventSource KeyboardEventSource { get; }
@@ -41,20 +42,29 @@ namespace Konamiman.NestorMSX.Emulator
             return loadedPlugins.ToArray();
         }
 
-        public MsxEmulationEnvironment(Configuration config, Action<string, object[]> tell)
+        public MsxEmulationEnvironment(IDictionary<string, object> configDictionary, Action<string, object[]> tell)
         {
-            this.globalConfig = config;
-            this.tell = tell;
+            var defaultEmulationParameters = configDictionary.GetValue<IDictionary<string, object>>("defaultEmulationParameters");
+            this.machineName = defaultEmulationParameters.GetValue<string>("machineName");
 
             LoadMachineConfig();
             GenerateInjectedConfig();
+
+            var machineEmulationParameters = machineConfig.GetDictionaryOrDefault("emulationParameters");
+            defaultEmulationParameters.MergeInto(machineEmulationParameters);
+
+            this.globalConfig = ConvertConfigDictionaryToObject(machineEmulationParameters);
+            globalConfig.GlobalPluginsConfig = configDictionary.GetDictionaryOrDefault("plugins");
+            globalConfig.SharedPluginsConfig = configDictionary.GetDictionaryOrDefault("sharedPluginsConfig");
+            
+            this.tell = tell;
 
             Z80 = CreateCpu();
             SlotsSystem = CreateEmptySlotsSystem();
 
             HostForm = CreateHostForm(Z80);
             KeyboardEventSource = HostForm;
-            HostForm.SetFormTitle(config.MachineName);
+            HostForm.SetFormTitle(machineName);
             Vdp = CreateVdp(HostForm);
             KeyboardController = CreateKeyboardController(HostForm);
 
@@ -83,28 +93,32 @@ namespace Konamiman.NestorMSX.Emulator
             emulator = new MsxEmulator(hardware);
         }
 
+        private static Configuration ConvertConfigDictionaryToObject(IDictionary<string, object> configDictionary)
+        {
+            var config = new Configuration();
+
+            config.ColorsFile = configDictionary.GetValue<string>("colorsFile").AsAbsolutePath();
+            config.CpuSpeedInMHz = configDictionary.GetValueOrDefault<decimal>("cpuSpeedInMHz", 0);
+            config.DisplayZoomLevel = configDictionary.GetValueOrDefault("displayZoomLevel", 2);
+            config.HorizontalMarginInPixels = configDictionary.GetValueOrDefault("horizontalMarginInPixels", 8);
+            config.VerticalMarginInPixels = configDictionary.GetValueOrDefault("verticalMarginInPixels", 16);
+            config.KeymapFile = configDictionary.GetValue<string>("keymapFile").AsAbsolutePath();
+            config.VdpFrequencyMultiplier = configDictionary.GetValueOrDefault<decimal>("vdpFrequencyMultiplier", 1);
+            config.MachineName = configDictionary.GetValue<string>("machineName");
+
+            return config;
+        }
+
         /// <summary>
         /// Creates an instance of each of the available plugins that have
         /// an entry in plugins.config and don't have active=false.
         /// </summary>
         private void LoadGlobalPlugins()
         {
-            var configFileText = File.ReadAllText("plugins.config");
-            IDictionary<string, object> allConfigValues;
-
             try
             {
-                allConfigValues = JsonParser.Parse(configFileText) as IDictionary<string, object>;
-            }
-            catch (Exception ex)
-            {
-                throw new ConfigurationException("Error when parsing plugins.config file: " + ex.Message);
-            }
-
-            try
-            {
-                var globalPlugins = allConfigValues.GetDictionaryOrDefault("plugins");
-                globalSharedPluginsConfig = allConfigValues.GetDictionaryOrDefault("sharedPluginsConfig");
+                var globalPlugins = globalConfig.GlobalPluginsConfig;
+                globalSharedPluginsConfig = globalConfig.SharedPluginsConfig;
                 var plugins = PluginsLoader.LoadPlugins(globalPlugins, machineSharedPluginsConfig, globalSharedPluginsConfig, injectedConfig);
                 foreach(var plugin in plugins)
                     RegisterPlugin(plugin);
@@ -140,7 +154,6 @@ namespace Konamiman.NestorMSX.Emulator
 
         private void LoadMachineConfig()
         {
-            var machineName = globalConfig.MachineName;
             var folder = Path.Combine("machines", machineName).AsAbsolutePath();
             if(!Directory.Exists(folder))
                 throw new ConfigurationException($"Machine folder not found for '{machineName}'");
@@ -241,10 +254,10 @@ namespace Konamiman.NestorMSX.Emulator
         {
             injectedConfig = new Dictionary<string, object>
             {
-                { "NestorMSX.machineName", globalConfig.MachineName },
+                { "NestorMSX.machineName", machineName },
                 { "NestorMSX.machineDirectory", Path.Combine(
                     Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
-                    @"machines/" + globalConfig.MachineName) },
+                    @"machines/" + machineName) },
                 { "NestorMSX.sharedDirectory", Path.Combine(
                     Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
                     @"machines/Shared") }

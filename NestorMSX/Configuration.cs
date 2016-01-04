@@ -1,4 +1,5 @@
-﻿using Konamiman.NestorMSX.Misc;
+﻿using System.Collections.Generic;
+using Konamiman.NestorMSX.Misc;
 
 namespace Konamiman.NestorMSX
 {
@@ -7,9 +8,6 @@ namespace Konamiman.NestorMSX
     /// </summary>
     public class Configuration
     {
-        [Mandatory]
-        public string BiosFile { get; set; }
-
         [Mandatory]
         public string KeymapFile { get; set; }
 
@@ -26,23 +24,11 @@ namespace Konamiman.NestorMSX
 
         public int VerticalMarginInPixels { get; set; }
 
-        public string FilesystemBaseLocation { get; set; }
-
-        [Mandatory]
-        public string DiskRomFile { get; set; }
-
-        public string Slot2RomFile { get; set; }
-
-        [Mandatory]
-        public string CopyKey { get; set; }
-
-        [Mandatory]
-        public string PasteKey { get; set; }
-
-        [Mandatory]
-        public string EncodingForCopyAndPaste { get; set; }
-
         [Mandatory]
         public string MachineName { get; set; }
+
+        public IDictionary<string, object> GlobalPluginsConfig { get; set; }
+
+        public IDictionary<string, object> SharedPluginsConfig { get; set; }
     }
 }

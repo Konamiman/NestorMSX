@@ -75,70 +75,40 @@ namespace Konamiman.NestorMSX
 
         private MsxEmulationEnvironment CreateEmulationEnvironmentCore(string[] args)
         {
-            string slot2FileNameOverride = null;
             var configFileName = "NestorMSX.config".AsAbsolutePath();
 
-            ParseArgs(args, ref configFileName, ref slot2FileNameOverride);
+            ParseArgs(args, ref configFileName);
 
-            config = ReadConfig(configFileName);
-            if(slot2FileNameOverride != null)
-                config.Slot2RomFile = slot2FileNameOverride;
+            var configDictionary = ReadConfig(configFileName);
 
-            return new MsxEmulationEnvironment(config, Tell);
+            return new MsxEmulationEnvironment(configDictionary, Tell);
         }
 
-        private void ParseArgs(string[] args, ref string configFileName, ref string slot2FileNameOverride)
+        private void ParseArgs(string[] args, ref string configFileName)
         {
             var configKey = "config=";
-            var slot2Key = "slot2=";
 
             foreach(var arg in args) {
                 if(arg.StartsWith(configKey, StringComparison.InvariantCultureIgnoreCase))
                     configFileName = arg.Substring(configKey.Length).AsAbsolutePath();
-
-                if(arg.StartsWith(slot2Key, StringComparison.InvariantCultureIgnoreCase))
-                    slot2FileNameOverride = arg.Substring(slot2Key.Length).AsAbsolutePath();
             }
         }
 
-        private static Configuration ReadConfig(string configFileName)
+        private static IDictionary<string, object> ReadConfig(string configFileName)
         {
-            Configuration config;
-
             try {
-                config = IniDeserializer.Deserialize<Configuration>(configFileName);
+                var configFileContents = File.ReadAllText(configFileName);
+                var configDictionary = (IDictionary<string, object>)JsonParser.Parse(configFileContents);
+                return configDictionary;
             }
             catch(FileNotFoundException ex) {
                 throw new ConfigurationException(
-                    "Configuration file not found. It is supposed to be here:\r\n{0}".FormatWith(configFileName),
-                    ex);
+                    $"Configuration file not found. It is supposed to be here:\r\n{configFileName}", ex);
             }
-            catch(DeserializationException ex) {
+            catch(Exception ex) {
                 throw new ConfigurationException(
-                    "The value of '{0}' is invalid. Perhaps it should be a number but it is not?".FormatWith(ex.Key),
-                    ex);
+                    $"Error when parsing configuration file: ({ex.GetType().Name}) {ex.Message}", ex);
             }
-
-            VerifyMandatoryFields(config);
-
-            return config;
-        }
-
-        private static void VerifyMandatoryFields(Configuration config)
-        {
-            var mandatoryStringProperties =
-                config.GetType().GetProperties()
-                    .Where(p => p.GetCustomAttributes(typeof(MandatoryAttribute), false).Any());
-
-            foreach(var property in mandatoryStringProperties) {
-                var value = (string)property.GetValue(config, null);
-                if(string.IsNullOrWhiteSpace(value))
-                    throw new ConfigurationException("Key '{0}' must have a value.".FormatWith(property.Name));
-            }
-
-            if(config.DiskRomFile != null && config.FilesystemBaseLocation == null)
-                throw new ConfigurationException(
-                    "A value for 'FilesystemBaseLocation' must be provided if 'DiskRomFile' has a value'");
         }
 
         public static void Tell(string message, params object[] parameters)
