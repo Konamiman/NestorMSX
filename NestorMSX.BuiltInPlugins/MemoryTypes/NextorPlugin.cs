@@ -9,7 +9,7 @@ using Konamiman.Z80dotNet;
 namespace Konamiman.NestorMSX.BuiltInPlugins.MemoryTypes
 {
     [NestorMSXPlugin("Nextor")]
-    public class NextorPlugin
+    public class NextorPlugin : IDisposable
     {
         private const int _IDEVL = 0xB5;
         private const int _RNF = 0xF9;
@@ -245,6 +245,11 @@ namespace Konamiman.NestorMSX.BuiltInPlugins.MemoryTypes
             SetMemoryContents(memoryAddress, info);
 
             z80.Registers.A = 0;
+        }
+
+        public void Dispose()
+        {
+            diskImageFileStream.Dispose();
         }
     }
 }

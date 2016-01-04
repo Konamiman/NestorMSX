@@ -22,6 +22,7 @@ namespace Konamiman.NestorMSX.Emulator
         private IDictionary<string, object> machineConfig;
         private Action<string, object[]> tell;
         private Configuration globalConfig;
+        private List<object> loadedPlugins = new List<object>();
 
         public IKeyEventSource KeyboardEventSource { get; }
         public EmulatorHostForm HostForm { get; }
@@ -30,6 +31,11 @@ namespace Konamiman.NestorMSX.Emulator
         public IZ80Processor Z80 { get; }
         public IKeyboardController KeyboardController { get; }
         public PluginsLoader PluginsLoader { get; }
+
+        public IEnumerable<object> GetLoadedPlugins()
+        {
+            return loadedPlugins.ToArray();
+        }
 
         public MsxEmulationEnvironment(Configuration config, Action<string, object[]> tell)
         {
@@ -99,12 +105,20 @@ namespace Konamiman.NestorMSX.Emulator
 
             try
             {
-                PluginsLoader.LoadPlugins(allConfigValues, GetExtraConfig());
+                var plugins = PluginsLoader.LoadPlugins(allConfigValues, GetExtraConfig());
+                foreach(var plugin in plugins)
+                    RegisterPlugin(plugin);
             }
             catch(Exception ex)
             {
                 throw new Exception("Error when loading global plugins: " + ex.Message);
             }
+        }
+
+        private void RegisterPlugin(object plugin)
+        {
+            if(!loadedPlugins.Contains(plugin))
+                loadedPlugins.Add(plugin);
         }
 
         private void LoadMachineConfig()
@@ -171,6 +185,7 @@ namespace Konamiman.NestorMSX.Emulator
                 try
                 {
                     pluginInstance = PluginsLoader.GetPluginInstanceForSlot(typeName, configValues);
+                    RegisterPlugin(pluginInstance);
                 }
                 catch(Exception ex)
                 {

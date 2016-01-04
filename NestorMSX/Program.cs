@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Windows.Forms;
 using Konamiman.NestorMSX.Emulator;
 using Konamiman.NestorMSX.Exceptions;
@@ -13,6 +14,7 @@ namespace Konamiman.NestorMSX
     {
         private const string BasePathInDevelopmentEnvironment = @"c:\VS\Projects\Z80dotNet\NestorMSX\";
         private static Configuration config;
+        private static MsxEmulationEnvironment emulationEnvironment;
 
         /// <summary>
         /// The main entry point for the application.
@@ -27,14 +29,30 @@ namespace Konamiman.NestorMSX
                 return;
             }
 
-            var environment = CreateEmulationEnvironment(args);
-            if(environment == null)
+            emulationEnvironment = CreateEmulationEnvironment(args);
+            if(emulationEnvironment == null)
                 return;
 
-            environment.Run();
+            Application.ApplicationExit += Application_ApplicationExit;
+
+            emulationEnvironment.Run();
         }
 
-        
+        private static void Application_ApplicationExit(object sender, EventArgs e)
+        {
+            var disposablePlugins =
+                emulationEnvironment.GetLoadedPlugins().Where(p => p is IDisposable).Cast<IDisposable>();
+
+            foreach(var plugin in disposablePlugins)
+                try
+                {
+                    plugin.Dispose();
+                }
+                catch
+                {
+                    
+                }
+        }
 
         private static MsxEmulationEnvironment CreateEmulationEnvironment(string[] args)
         {

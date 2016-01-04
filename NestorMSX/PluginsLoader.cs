@@ -11,7 +11,6 @@ namespace Konamiman.NestorMSX
     public class PluginsLoader
     {
         private static IDictionary<string, Type> pluginTypes;
-        private object[] loadedPlugins;
 
         private readonly PluginContext context;
         private readonly Action<string, object[]> tell;
@@ -59,13 +58,13 @@ namespace Konamiman.NestorMSX
             return instance;
         }
 
-        public void LoadPlugins(IDictionary<string, object> allConfigValues, IDictionary<string, object> pluginConfigToMerge)
+        public IEnumerable<object> LoadPlugins(IDictionary<string, object> allConfigValues, IDictionary<string, object> pluginConfigToMerge)
         {
             if (allConfigValues == null)
                 ThrowNotValidJson();
 
             if(!allConfigValues.ContainsKey("plugins"))
-                return;
+                return new object[0];
 
             var loadedPluginsList = new List<object>();
             
@@ -108,7 +107,7 @@ namespace Konamiman.NestorMSX
                 }
             }
 
-            loadedPlugins = loadedPluginsList.ToArray();
+            return loadedPluginsList.ToArray();
         }
 
         private static void ThrowNotValidJson()
