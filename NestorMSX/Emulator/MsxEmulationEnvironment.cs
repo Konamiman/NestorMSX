@@ -28,14 +28,17 @@ namespace Konamiman.NestorMSX.Emulator
         private PluginContext pluginContext;
         private string machineName;
         private List<object> loadedPlugins = new List<object>();
+        private IDictionary<string, object> configDictionary;
+        private IDictionary<string, object> defaultEmulationParameters;
+        private IClockSynchronizer originalClockSynchronizer;
         
-        public IKeyEventSource KeyboardEventSource { get; }
+        public IKeyEventSource KeyboardEventSource { get; private set; }
         public EmulatorHostForm HostForm { get; }
-        public IExternallyControlledSlotsSystem SlotsSystem { get; }
+        public IExternallyControlledSlotsSystem SlotsSystem { get; private set; }
         public IExternallyControlledTms9918 Vdp { get; set; }
-        public IZ80Processor Z80 { get; }
-        public IKeyboardController KeyboardController { get; }
-        public PluginsLoader PluginsLoader { get; }
+        public IZ80Processor Z80 { get; private set; }
+        public IKeyboardController KeyboardController { get; private set; }
+        public PluginsLoader PluginsLoader { get; private set; }
 
         public IEnumerable<object> GetLoadedPlugins()
         {
@@ -44,7 +47,13 @@ namespace Konamiman.NestorMSX.Emulator
 
         public MsxEmulationEnvironment(IDictionary<string, object> configDictionary, Action<string, object[]> tell, string machineName)
         {
-            var defaultEmulationParameters = configDictionary.GetValue<IDictionary<string, object>>("defaultEmulationParameters");
+            this.configDictionary = configDictionary;
+            defaultEmulationParameters = configDictionary.GetValue<IDictionary<string, object>>("defaultEmulationParameters");
+            this.tell = tell;
+            HostForm = new EmulatorHostForm(this);
+            Z80 = new Z80Processor();
+            this.originalClockSynchronizer = Z80.ClockSynchronizer;
+
             this.machineName = machineName;
 
             LoadMachineConfig();
@@ -56,15 +65,14 @@ namespace Konamiman.NestorMSX.Emulator
             this.globalConfig = ConvertConfigDictionaryToObject(machineEmulationParameters);
             globalConfig.GlobalPluginsConfig = configDictionary.GetDictionaryOrDefault("plugins");
             globalConfig.SharedPluginsConfig = configDictionary.GetDictionaryOrDefault("sharedPluginsConfig");
-            
-            this.tell = tell;
 
-            Z80 = CreateCpu();
+            HostForm.ApplyConfig(globalConfig);
+
+            ConfigureCpu();
             SlotsSystem = CreateEmptySlotsSystem();
 
-            HostForm = CreateHostForm(Z80);
             KeyboardEventSource = HostForm;
-            HostForm.SetFormTitle(machineName);
+            HostForm.SetFormTitle(this.machineName);
             Vdp = CreateVdp(HostForm);
             KeyboardController = CreateKeyboardController(HostForm);
 
@@ -83,7 +91,8 @@ namespace Konamiman.NestorMSX.Emulator
 
             CreateSlotsSystem();
 
-            var hardware = new MsxHardwareSet {
+            var hardware = new MsxHardwareSet
+            {
                 Cpu = Z80,
                 KeyboardController = KeyboardController,
                 SlotsSystem = SlotsSystem,
@@ -192,11 +201,6 @@ namespace Konamiman.NestorMSX.Emulator
             return new Tms9918(new DisplayRenderer(new GraphicsBasedDisplay(drawingSurface, globalConfig), globalConfig), globalConfig);
         }
 
-        private EmulatorHostForm CreateHostForm(IZ80Processor cpu)
-        {
-            return new EmulatorHostForm(cpu, globalConfig);
-        }
-
         private void CreateSlotsSystem()
         {
             foreach (var slotConfig in machineConfig["slots"] as IDictionary<string, object>)
@@ -263,20 +267,35 @@ namespace Konamiman.NestorMSX.Emulator
             };
         }
 
-        private IZ80Processor CreateCpu()
+        private void ConfigureCpu()
         {
-            var z80 = new Z80Processor();
-
             if(globalConfig.CpuSpeedInMHz == 0)
-                z80.ClockSynchronizer = null;
+                Z80.ClockSynchronizer = null;
             else if(globalConfig.CpuSpeedInMHz < 0.001M || globalConfig.CpuSpeedInMHz > 100)
                 throw new ConfigurationException("CPU speed must be either zero or a value between 0.001 and 100");
-            else
-                z80.ClockFrequencyInMHz = globalConfig.CpuSpeedInMHz;
-
-            return z80;
+            else {
+                Z80.ClockSynchronizer = originalClockSynchronizer;
+                Z80.ClockFrequencyInMHz = globalConfig.CpuSpeedInMHz;
+            }
         }
 
+        public void DisposePlugins()
+        {
+            var disposablePlugins = GetLoadedPlugins().Where(p => p is IDisposable).Cast<IDisposable>();
+
+            foreach (var plugin in disposablePlugins)
+                try
+                {
+                    plugin.Dispose();
+                }
+                catch
+                {
+
+                }
+
+            loadedPlugins.Clear();
+        }
+        
         public void Run()
         {
             pluginContext.LoadedPlugins = loadedPlugins.ToArray();

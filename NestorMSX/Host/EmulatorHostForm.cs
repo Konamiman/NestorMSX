@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
+using Konamiman.NestorMSX.Emulator;
 using Konamiman.NestorMSX.Exceptions;
 using Konamiman.Z80dotNet;
 using KeyEventArgs = Konamiman.NestorMSX.Hardware.KeyEventArgs;
@@ -13,6 +14,7 @@ namespace Konamiman.NestorMSX.Host
     /// </summary>
     public partial class EmulatorHostForm : Form, IKeyEventSource, IDrawingSurface
     {
+        private readonly MsxEmulationEnvironment emulationEnvironment;
         private const int WM_KEYDOWN = 0x100;
         private const int WM_KEYUP = 0x101;
 
@@ -25,22 +27,25 @@ namespace Konamiman.NestorMSX.Host
 
         #region Initialization
 
-        public EmulatorHostForm() : this(null, null)
+        public EmulatorHostForm() : this(null) { }
+
+        public EmulatorHostForm(MsxEmulationEnvironment emulationEnvironment)
         {
+            this.emulationEnvironment = emulationEnvironment;
+            InitializeComponent();
+            canvas.Paint += CanvasOnPaint;
         }
 
-        public EmulatorHostForm(IZ80Processor processor, Configuration config)
+        public void ApplyConfig(Configuration config)
         {
-            InitializeComponent();
-            if(config == null)
+            if (config == null)
                 return;
 
             ValidateConfiguration(config);
-            
-            var width = (int)(((32*8) + config.HorizontalMarginInPixels*2)*config.DisplayZoomLevel);
-            var height = (int)(((24*8) + config.VerticalMarginInPixels*2)*config.DisplayZoomLevel);
-            ClientSize = new Size(width, height);
-            canvas.Paint += CanvasOnPaint;
+
+            var width = (int)(((32 * 8) + config.HorizontalMarginInPixels * 2) * config.DisplayZoomLevel);
+            var height = (int)(((24 * 8) + config.VerticalMarginInPixels * 2) * config.DisplayZoomLevel);
+            ClientSize = new Size(width, height + mainMenu.Height);
         }
 
         private static void ValidateConfiguration(Configuration config)
@@ -113,5 +118,35 @@ namespace Konamiman.NestorMSX.Host
         }
 
         #endregion
+
+        private void emulationToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void resetCPUToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            emulationEnvironment.Z80.Reset();
+        }
+
+        private void restartEmulationToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Application.Restart();
+        }
+
+        private void restartAsADifferentMachineToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var newMachineName = Program.ShowMachineSelectionDialog();
+            if(newMachineName == null)
+                return;
+
+            Program.SaveMachineNameAsState(newMachineName);
+            Application.Restart();
+        }
+
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
     }
 }

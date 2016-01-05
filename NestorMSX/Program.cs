@@ -16,6 +16,7 @@ namespace Konamiman.NestorMSX
         private static Configuration config;
         private static MsxEmulationEnvironment emulationEnvironment;
         private static string machineName;
+        private static string stateFilePath;
 
         /// <summary>
         /// The main entry point for the application.
@@ -25,14 +26,22 @@ namespace Konamiman.NestorMSX
         {
             Application.EnableVisualStyles();
 
+            stateFilePath = "NestorMSX.state".AsAbsolutePath();
+
             if (args.Length > 0 && args[0].ToLower() == "keytest") {
                 Application.Run(new KeyTestForm());
                 return;
             }
 
-            machineName = GetMachineName();
+            if(args.Length > 0)
+                machineName = args[0].Trim();
+            else
+                machineName = GetMachineName();
+
             if(machineName == null)
                 return;
+
+            SaveMachineNameAsState(machineName);
 
             emulationEnvironment = CreateEmulationEnvironment(args);
             if(emulationEnvironment == null)
@@ -45,18 +54,7 @@ namespace Konamiman.NestorMSX
 
         private static void Application_ApplicationExit(object sender, EventArgs e)
         {
-            var disposablePlugins =
-                emulationEnvironment.GetLoadedPlugins().Where(p => p is IDisposable).Cast<IDisposable>();
-
-            foreach(var plugin in disposablePlugins)
-                try
-                {
-                    plugin.Dispose();
-                }
-                catch
-                {
-                    
-                }
+           emulationEnvironment.DisposePlugins();
         }
 
         private static MsxEmulationEnvironment CreateEmulationEnvironment(string[] args)
@@ -125,23 +123,29 @@ namespace Konamiman.NestorMSX
         {
             var availableMachineNames = GetAvailableMachineNames();
 
-            var stateFilePath = "NestorMSX.state".AsAbsolutePath();
             if(File.Exists(stateFilePath)) {
                 var previousMachineName = File.ReadAllText(stateFilePath);
                 if(availableMachineNames.Contains(previousMachineName))
                     return previousMachineName;
             }
 
-            var form = new MachineSelectionForm();
-            form.SetMachinesListItems(availableMachineNames);
-            var dialogResult = form.ShowDialog();
+            return ShowMachineSelectionDialog(availableMachineNames);
+        }
 
-            if(dialogResult == DialogResult.OK) {
-                File.WriteAllText(stateFilePath, form.SelectedMachine);
+        public static void SaveMachineNameAsState(string machineName)
+        {
+            File.WriteAllText(stateFilePath, machineName);
+        }
+
+        public static string ShowMachineSelectionDialog(string[] availableMachineNames = null)
+        {
+            var form = new MachineSelectionForm();
+            form.SetMachinesListItems(availableMachineNames ?? GetAvailableMachineNames());
+            var dialogResult = form.ShowDialog();
+            if (dialogResult == DialogResult.OK)
                 return form.SelectedMachine;
-            }
-                
-            return null;
+            else
+                return null;
         }
 
         private static string[] GetAvailableMachineNames()
