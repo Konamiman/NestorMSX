@@ -6,7 +6,7 @@ using System.IO;
 
 namespace Konamiman.NestorMSX.Misc
 {
-    public static class ConfigurationUtils
+    public static class DictionaryUtils
     {
         /// <summary>
         /// Gets the value of the configuration for the specified key, converted
@@ -65,27 +65,70 @@ namespace Konamiman.NestorMSX.Misc
         }
 
         /// <summary>
-        /// Gets the full path of a file that is placed in the machine directory
-        /// or in the shared directory.
+        /// Gets the full path of a file that is placed in the machine directory,
+        /// in the shared directory, or in the application directory.
         /// </summary>
-        /// <param name="config">The dictionary containing the configuration</param>
+        /// <param name="config">The dictionary containing the configuration,
+        /// it is assumed to be the dictionary passed by NestorMSX to the plugin constructor.</param>
         /// <param name="fileName">The name of the file</param>
+        /// <param name="throwIfFileNotFound">If true, a <see cref="ConfigurationException"/>will be thrown
+        /// if the file is not found. Otherwise, null will be returned.</param>
         /// <returns>The full path of the file in the machine directory
         /// or in the shared directory, wherever the file is found first</returns>
         /// <exception cref="ConfigurationException">File not found in either directory</exception>
-        public static string GetPluginFilePath(this IDictionary<string, object> config, string fileName)
+        public static string GetMachineFilePath(this IDictionary<string, object> config, string fileName, bool throwIfFileNotFound = true)
         {
-            var filePath = Path.Combine(config.GetValue<string>("NestorMSX.machineDirectory"), fileName);
-            if (!File.Exists(filePath))
+            var searchLocationKeys = new[]
             {
-                filePath = Path.Combine(config.GetValue<string>("NestorMSX.sharedDirectory"), fileName);
-                if (!File.Exists(filePath))
-                {
-                    throw new ConfigurationException($"File not found: {fileName}");
-                }
+                "NestorMSX.machineDirectory",
+                "NestorMSX.sharedDirectory",
+                "NestorMSX.applicationDirectory"
+            };
+
+            foreach(var key in searchLocationKeys) {
+                if(!config.ContainsKey(key))
+                    continue;
+
+                var filePath = Path.Combine(config.GetValue<string>(key), fileName);
+                if(File.Exists(filePath))
+                    return filePath;
             }
 
-            return filePath;
+            if(throwIfFileNotFound)
+                throw new ConfigurationException($"Machine file not found: {fileName}");
+            else
+                return null;
+        }
+
+        /// <summary>
+        /// Gets the full path of a file that is placed in the machine directory,
+        /// in the shared directory, in the application directory, or a certain data directory.
+        /// </summary>
+        /// <param name="config">The dictionary containing the configuration,
+        /// it is assumed to be the dictionary passed by NestorMSX to the plugin constructor.</param>
+        /// <param name="fileName">The name of the file</param>
+        /// <param name="throwIfFileNotFound">If true, a <see cref="ConfigurationException"/>will be thrown
+        /// if the file is not found. Otherwise, the file path will be returned (relative to the data directory).</param>
+        /// <param name="basePath">The data directory to search the file in.
+        /// If null or not specified, <see cref="StringExtensions.DefaultBasePath"/> is used.</param>
+        /// <returns>The full path of the file in the machine directory
+        /// or in the shared directory, wherever the file is found first</returns>
+        /// <exception cref="ConfigurationException">File not found in either directory</exception>
+        /// <remarks>The default value for <see cref="StringExtensions.DefaultBasePath"/> is set
+        /// from the "dataDirectory" key in the "sharedPluginsConfig" section in either machine.config
+        /// or NestorMSX.Config. If no such key exists, "$MyDocuments$\NestorMSX" is used.</remarks>
+        public static string GetMachineOrDataFilePath(this IDictionary<string, object> config, string fileName,
+            string basePath = null, bool throwIfFileNotFound = true)
+        {
+            var path = config.GetMachineFilePath(fileName, false);
+            if(path != null)
+                return path;
+
+            path = fileName.AsAbsolutePath(basePath);
+            if(File.Exists(path) || !throwIfFileNotFound)
+                return path;
+            
+            throw new ConfigurationException($"File file not found: {fileName}");
         }
 
         private static T AdaptValue<T>(string key, object value)

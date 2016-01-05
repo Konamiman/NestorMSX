@@ -24,7 +24,7 @@ namespace Konamiman.NestorMSX.Misc
         private static T ReadAllContents<T>(Func<string, T> readContents, string fileName)
         {
             try {
-                return readContents(fileName.AsAbsolutePath());
+                return readContents(fileName.AsApplicationFilePath());
             }
             catch(Exception ex) {
                 throw new EmulationEnvironmentCreationException(

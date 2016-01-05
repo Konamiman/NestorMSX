@@ -39,7 +39,7 @@ namespace Konamiman.NestorMSX.BuiltInPlugins.MemoryTypes
                 { 0x4169, LUN_INFO  }
             };
 
-            this.kernelFilePath = pluginConfig.GetPluginFilePath(pluginConfig.GetValue<string>("kernelFile"));
+            this.kernelFilePath = pluginConfig.GetMachineFilePath(pluginConfig.GetValue<string>("kernelFile"));
             this.diskImageFilePath = pluginConfig.GetValue<string>("diskImageFile").AsAbsolutePath();
             this.diskImageName = Path.GetFileName(diskImageFilePath);
             this.z80 = context.Cpu;

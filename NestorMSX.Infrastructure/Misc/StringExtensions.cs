@@ -2,16 +2,42 @@
 using System.IO;
 using System.Reflection;
 using System.Text;
-using System.Windows.Forms;
 
 namespace Konamiman.NestorMSX.Misc
 {
     public static class StringExtensions
     {
+        /// <summary>
+        /// Default base path for the AsAbsolutePath method.
+        /// </summary>
+        public static string DefaultBasePath { get; set; } = "$MyDocuments$/NestorMSX";
+
+        /// <summary>
+        /// Returns the full path of a file, relative to the application directory.
+        /// </summary>
+        /// <param name="path">File name</param>
+        /// <returns>File path, relative to the application directory 
+        /// (or unmodified if it was already an absolute path)</returns>
+        public static string AsApplicationFilePath(this string path)
+        {
+            return path.AsAbsolutePath(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location));
+        }
+
+        /// <summary>
+        /// Returns the full path of a file, relative to the specified base path
+        /// and with all the appearances of $SpecialFolder$ (as defined in <b>Environment.SpecialFolder</b>) 
+        /// properly substituted.
+        /// </summary>
+        /// <param name="path">File name</param>
+        /// <param name="basePath">Base path to compose the full path.
+        /// If null, <see cref="DefaultBasePath"/> is used.</param>
+        /// <returns>File path, relative to the base directory 
+        /// (or unmodified if it was already an absolute path) and will all the appearances of
+        /// $SpecialFolder$ properly substituted.</returns>
         public static string AsAbsolutePath(this string path, string basePath = null)
         {
             if(basePath == null)
-                basePath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+                basePath = DefaultBasePath.AsAbsolutePath("");
 
             var specialFolderNames = Enum.GetNames(typeof(Environment.SpecialFolder));
             foreach(var name in specialFolderNames) {
@@ -30,6 +56,14 @@ namespace Konamiman.NestorMSX.Misc
             return path;
         }
 
+        /// <summary>
+        /// Performs a string replacement with a given string comparison type.
+        /// </summary>
+        /// <param name="str">The source string</param>
+        /// <param name="oldValue">The substring to replace</param>
+        /// <param name="newValue">The replacement value</param>
+        /// <param name="comparison">The type of comparison to use</param>
+        /// <returns>The original string with the replacement performed</returns>
         public static string Replace(this string str, string oldValue, string newValue, StringComparison comparison)
         {
             if(oldValue == null) {
@@ -59,11 +93,6 @@ namespace Konamiman.NestorMSX.Misc
         public static string FormatWith(this string str, params object[] parameters)
         {
             return string.Format(str, parameters);
-        }
-
-        public static bool IsValidKeyName(this string keyName)
-        {
-            return Enum.IsDefined(typeof(Keys), keyName);
         }
     }
 }

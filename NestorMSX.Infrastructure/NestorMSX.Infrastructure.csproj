@@ -57,7 +57,7 @@
     <Compile Include="Hardware\SlotSelectionRegisterWrittenEventArgs.cs" />
     <Compile Include="Host\IKeyEventSource.cs" />
     <Compile Include="Menus\MenuEntry.cs" />
-    <Compile Include="Misc\ConfigurationUtils.cs" />
+    <Compile Include="Misc\DictionaryUtils.cs" />
     <Compile Include="Misc\SlotNumber.cs" />
     <Compile Include="Misc\StringExtensions.cs" />
     <Compile Include="Misc\TwinBit.cs" />

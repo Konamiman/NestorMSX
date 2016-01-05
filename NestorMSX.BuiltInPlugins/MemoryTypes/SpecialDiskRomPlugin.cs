@@ -21,10 +21,10 @@ namespace Konamiman.NestorMSX.BuiltInPlugins.MemoryTypes
             if (!pluginConfig.ContainsKey("file"))
                 throw new InvalidOperationException("No 'file' key in config file");
 
-            fileName = pluginConfig.GetPluginFilePath(pluginConfig.GetValue<string>("file"));
+            fileName = pluginConfig.GetMachineFilePath(pluginConfig.GetValue<string>("file"));
 
             context.Cpu.BeforeInstructionFetch += Z80OnBeforeInstructionFetch;
-            var filesystemBasePath = ((string)pluginConfig["filesystemBasePath"]).AsAbsolutePath();
+            var filesystemBasePath = pluginConfig.GetValue<string>("filesystemBasePath").AsAbsolutePath();
             dosFunctionsExecutor = new DosFunctionCallExecutor(context.Cpu.Registers, context.SlotsSystem, filesystemBasePath);
         }
 

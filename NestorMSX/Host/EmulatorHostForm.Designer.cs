@@ -30,14 +30,14 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(EmulatorHostForm));
             this.canvas = new System.Windows.Forms.PictureBox();
             this.mainMenu = new System.Windows.Forms.MenuStrip();
+            this.pluginsMenu = new System.Windows.Forms.ToolStripMenuItem();
             this.emulationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.resetCPUToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.restartEmulationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.restartAsADifferentMachineToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.pluginsMenu = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.canvas)).BeginInit();
             this.mainMenu.SuspendLayout();
             this.SuspendLayout();
@@ -64,6 +64,13 @@
             this.mainMenu.TabIndex = 1;
             this.mainMenu.Text = "menuStrip1";
             // 
+            // pluginsMenu
+            // 
+            this.pluginsMenu.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
+            this.pluginsMenu.Name = "pluginsMenu";
+            this.pluginsMenu.Size = new System.Drawing.Size(68, 24);
+            this.pluginsMenu.Text = "Plugins";
+            // 
             // emulationToolStripMenuItem
             // 
             this.emulationToolStripMenuItem.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
@@ -83,8 +90,13 @@
             // 
             this.resetCPUToolStripMenuItem.Name = "resetCPUToolStripMenuItem";
             this.resetCPUToolStripMenuItem.Size = new System.Drawing.Size(290, 26);
-            this.resetCPUToolStripMenuItem.Text = "Reset CPU";
+            this.resetCPUToolStripMenuItem.Text = "Reset";
             this.resetCPUToolStripMenuItem.Click += new System.EventHandler(this.resetCPUToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(287, 6);
             // 
             // restartEmulationToolStripMenuItem
             // 
@@ -100,11 +112,6 @@
             this.restartAsADifferentMachineToolStripMenuItem.Text = "Restart as a different machine...";
             this.restartAsADifferentMachineToolStripMenuItem.Click += new System.EventHandler(this.restartAsADifferentMachineToolStripMenuItem_Click);
             // 
-            // toolStripSeparator1
-            // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(287, 6);
-            // 
             // toolStripMenuItem1
             // 
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
@@ -116,13 +123,6 @@
             this.exitToolStripMenuItem.Size = new System.Drawing.Size(290, 26);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
-            // 
-            // pluginsMenu
-            // 
-            this.pluginsMenu.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
-            this.pluginsMenu.Name = "pluginsMenu";
-            this.pluginsMenu.Size = new System.Drawing.Size(68, 24);
-            this.pluginsMenu.Text = "Plugins";
             // 
             // EmulatorHostForm
             // 

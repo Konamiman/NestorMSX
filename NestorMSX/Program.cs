@@ -26,7 +26,7 @@ namespace Konamiman.NestorMSX
         {
             Application.EnableVisualStyles();
 
-            stateFilePath = "NestorMSX.state".AsAbsolutePath();
+            stateFilePath = "NestorMSX.state".AsApplicationFilePath();
 
             if (args.Length > 0 && args[0].ToLower() == "keytest") {
                 Application.Run(new KeyTestForm());
@@ -78,7 +78,7 @@ namespace Konamiman.NestorMSX
 
         private MsxEmulationEnvironment CreateEmulationEnvironmentCore(string[] args)
         {
-            var configFileName = "NestorMSX.config".AsAbsolutePath();
+            var configFileName = "NestorMSX.config".AsApplicationFilePath();
 
             ParseArgs(args, ref configFileName);
 
@@ -93,7 +93,7 @@ namespace Konamiman.NestorMSX
 
             foreach(var arg in args) {
                 if(arg.StartsWith(configKey, StringComparison.InvariantCultureIgnoreCase))
-                    configFileName = arg.Substring(configKey.Length).AsAbsolutePath();
+                    configFileName = arg.Substring(configKey.Length).AsApplicationFilePath();
             }
         }
 
@@ -150,7 +150,7 @@ namespace Konamiman.NestorMSX
 
         private static string[] GetAvailableMachineNames()
         {
-            var machinesDirectory = "machines".AsAbsolutePath();
+            var machinesDirectory = "machines".AsApplicationFilePath();
             var folders = Directory
                 .GetDirectories(machinesDirectory)
                 .Where(d => File.Exists(Path.Combine(d, "machine.config")))

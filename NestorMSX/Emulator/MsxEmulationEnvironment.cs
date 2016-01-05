@@ -107,12 +107,12 @@ namespace Konamiman.NestorMSX.Emulator
         {
             var config = new Configuration();
 
-            config.ColorsFile = configDictionary.GetValue<string>("colorsFile").AsAbsolutePath();
+            config.ColorsFile = configDictionary.GetValue<string>("colorsFile").AsApplicationFilePath();
             config.CpuSpeedInMHz = configDictionary.GetValueOrDefault<decimal>("cpuSpeedInMHz", 0);
             config.DisplayZoomLevel = configDictionary.GetValueOrDefault("displayZoomLevel", 2);
             config.HorizontalMarginInPixels = configDictionary.GetValueOrDefault("horizontalMarginInPixels", 8);
             config.VerticalMarginInPixels = configDictionary.GetValueOrDefault("verticalMarginInPixels", 16);
-            config.KeymapFile = configDictionary.GetValue<string>("keymapFile").AsAbsolutePath();
+            config.KeymapFile = configDictionary.GetValue<string>("keymapFile").AsApplicationFilePath();
             config.VdpFrequencyMultiplier = configDictionary.GetValueOrDefault<decimal>("vdpFrequencyMultiplier", 1);
 
             return config;
@@ -163,7 +163,7 @@ namespace Konamiman.NestorMSX.Emulator
 
         private void LoadMachineConfig()
         {
-            var folder = Path.Combine("machines", machineName).AsAbsolutePath();
+            var folder = Path.Combine("machines", machineName).AsApplicationFilePath();
             if(!Directory.Exists(folder))
                 throw new ConfigurationException($"Machine folder not found for '{machineName}'");
 
@@ -256,15 +256,18 @@ namespace Konamiman.NestorMSX.Emulator
 
         private void GenerateInjectedConfig()
         {
+            var applicationDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+
             injectedConfig = new Dictionary<string, object>
             {
                 { "NestorMSX.machineName", machineName },
                 { "NestorMSX.machineDirectory", Path.Combine(
-                    Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
+                    applicationDirectory,
                     @"machines/" + machineName) },
                 { "NestorMSX.sharedDirectory", Path.Combine(
-                    Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
-                    @"machines/Shared") }
+                    applicationDirectory,
+                    @"machines/Shared") },
+                { "NestorMSX.applicationDirectory", applicationDirectory }
             };
         }
 
@@ -299,6 +302,11 @@ namespace Konamiman.NestorMSX.Emulator
         
         public void Run()
         {
+            if(machineSharedPluginsConfig.ContainsKey("dataDirectory"))
+                StringExtensions.DefaultBasePath = machineSharedPluginsConfig.GetValue<string>("dataDirectory");
+            else if(globalSharedPluginsConfig.ContainsKey("dataDirectory"))
+                StringExtensions.DefaultBasePath = globalSharedPluginsConfig.GetValue<string>("dataDirectory");
+
             pluginContext.LoadedPlugins = loadedPlugins.ToArray();
             pluginContext.FireInitializationCompleteEvent();
 
