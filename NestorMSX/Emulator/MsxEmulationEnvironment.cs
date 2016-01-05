@@ -83,7 +83,8 @@ namespace Konamiman.NestorMSX.Emulator
                 SlotsSystem = SlotsSystem,
                 Vdp = Vdp,
                 KeyEventSource = KeyboardEventSource,
-                LoadedPlugins = null
+                LoadedPlugins = null,
+                SetMenuEntry = HostForm.SetPluginMenuEntry
             };
             PluginsLoader = new PluginsLoader(pluginContext, tell);
             LoadGlobalPlugins();

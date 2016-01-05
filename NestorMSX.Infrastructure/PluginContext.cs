@@ -4,6 +4,7 @@ using Konamiman.NestorMSX.Hardware;
 using Konamiman.NestorMSX.Host;
 using Konamiman.Z80dotNet;
 using System.Windows.Forms;
+using Konamiman.NestorMSX.Menus;
 
 namespace Konamiman.NestorMSX
 {
@@ -54,5 +55,12 @@ namespace Konamiman.NestorMSX
             if(EnvironmentInitializationComplete != null)
                 EnvironmentInitializationComplete(this, EventArgs.Empty);
         }
+
+        /// <summary>
+        /// Delegate that allows to set the menu entry for the plugin in the host form.
+        /// The first argument must be set to the plugin instance.
+        /// The second argument is the menu entry to set, or null to remove an existing entry.
+        /// </summary>
+        public Action<object, MenuEntry> SetMenuEntry { get; set; }
     }
 }
