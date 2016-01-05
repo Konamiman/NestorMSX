@@ -49,7 +49,7 @@
             this.Controls.Add(this.txtDebug);
             this.Name = "DebugForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "DebugForm";
+            this.Text = "NestorMSX - Keylogger test";
             this.ResumeLayout(false);
             this.PerformLayout();
 

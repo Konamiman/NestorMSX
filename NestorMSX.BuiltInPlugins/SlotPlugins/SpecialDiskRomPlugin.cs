@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using Konamiman.NestorMSX.Hardware;
-using Konamiman.NestorMSX.Host;
+using Konamiman.NestorMSX.BuiltInPlugins.MemoryTypes;
 using Konamiman.NestorMSX.Misc;
 using Konamiman.Z80dotNet;
 
-namespace Konamiman.NestorMSX.BuiltInPlugins.MemoryTypes
+namespace Konamiman.NestorMSX.Plugins
 {
     [NestorMSXPlugin("Special DiskROM")]
     public class SpecialDiskRomPlugin

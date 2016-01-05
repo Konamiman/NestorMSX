@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Konamiman.NestorMSX.Exceptions;
@@ -8,8 +10,6 @@ using Konamiman.NestorMSX.Hardware;
 using Konamiman.NestorMSX.Host;
 using Konamiman.NestorMSX.Misc;
 using Konamiman.Z80dotNet;
-using System.Linq;
-using System.Reflection;
 
 namespace Konamiman.NestorMSX.Emulator
 {

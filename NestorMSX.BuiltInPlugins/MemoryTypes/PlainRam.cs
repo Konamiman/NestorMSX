@@ -2,7 +2,7 @@
 using System.Linq;
 using Konamiman.Z80dotNet;
 
-namespace Konamiman.NestorMSX.Hardware
+namespace Konamiman.NestorMSX.BuiltInPlugins.MemoryTypes
 {
     /// <summary>
     /// Represents a 64K ROM memory.

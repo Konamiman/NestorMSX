@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using Konamiman.NestorMSX.Misc;
 using Konamiman.NestorMSX.Exceptions;
 using Konamiman.NestorMSX.Hardware;
+using Konamiman.NestorMSX.Misc;
 using Konamiman.Z80dotNet;
 using KeyEventArgs = Konamiman.NestorMSX.Hardware.KeyEventArgs;
 
-namespace Konamiman.NestorMSX.BuiltInPlugins.Extras
+namespace Konamiman.NestorMSX.Plugins
 {
     [NestorMSXPlugin("Copy and Paste")]
     public class CopyPastePlugin

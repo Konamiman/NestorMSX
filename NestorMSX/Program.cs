@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Windows.Forms;
 using Konamiman.NestorMSX.Emulator;
 using Konamiman.NestorMSX.Exceptions;

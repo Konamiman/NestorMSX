@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
+using Konamiman.NestorMSX.Hardware;
 using Konamiman.NestorMSX.Menus;
 using Konamiman.Z80dotNet;
-using KeyEventArgs = Konamiman.NestorMSX.Hardware.KeyEventArgs;
 
 namespace Konamiman.NestorMSX.BuiltInPlugins
 {
-    [NestorMSXPlugin("Debug form")]
-    public class DebugFormPlugin
+    [NestorMSXPlugin("Sandbox.Keylogger")]
+    public class KeyloggerFormPlugin
     {
         private readonly IZ80Processor z80;
         private readonly DebugForm debugForm;
@@ -14,7 +14,7 @@ namespace Konamiman.NestorMSX.BuiltInPlugins
         private PluginContext context;
         private int i = 1;
 
-        private DebugFormPlugin(PluginContext context, IDictionary<string, object> pluginConfig)
+        private KeyloggerFormPlugin(PluginContext context, IDictionary<string, object> pluginConfig)
         {
             this.context = context;
             this.z80 = context.Cpu;
@@ -40,9 +40,9 @@ namespace Konamiman.NestorMSX.BuiltInPlugins
             menuEntry.ChildEntries[1].IsVisible = !menuEntry.ChildEntries[1].IsVisible;
         }
 
-        public static DebugFormPlugin GetInstance(PluginContext context, IDictionary<string, object> pluginConfig)
+        public static KeyloggerFormPlugin GetInstance(PluginContext context, IDictionary<string, object> pluginConfig)
         {
-            return new DebugFormPlugin(context, pluginConfig);
+            return new KeyloggerFormPlugin(context, pluginConfig);
         }
 
         private void KeyEventSourceOnKeyPressed(object sender, KeyEventArgs keyEventArgs)

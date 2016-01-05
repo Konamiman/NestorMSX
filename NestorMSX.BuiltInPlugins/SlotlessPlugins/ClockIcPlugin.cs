@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Konamiman.Z80dotNet;
 
-namespace Konamiman.NestorMSX.BuiltInPlugins.Hardware
+namespace Konamiman.NestorMSX.Plugins
 {
     [NestorMSXPlugin("Clock IC")]
     public class ClockIcPlugin
@@ -22,7 +22,7 @@ namespace Konamiman.NestorMSX.BuiltInPlugins.Hardware
             return Instance;
         }
 
-        private void Cpu_MemoryAccess(object sender, Z80dotNet.MemoryAccessEventArgs e)
+        private void Cpu_MemoryAccess(object sender, MemoryAccessEventArgs e)
         {
             if(e.EventType == MemoryAccessEventType.BeforePortRead && e.Address == 0xB5)
             {

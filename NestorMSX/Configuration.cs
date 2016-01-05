@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Konamiman.NestorMSX.Misc;
 
 namespace Konamiman.NestorMSX
 {

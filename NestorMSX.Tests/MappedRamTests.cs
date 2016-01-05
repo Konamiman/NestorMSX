@@ -1,6 +1,6 @@
-﻿using NUnit.Framework;
-using System;
-using Konamiman.NestorMSX.Hardware;
+﻿using System;
+using Konamiman.NestorMSX.BuiltInPlugins.MemoryTypes;
+using NUnit.Framework;
 using Ploeh.AutoFixture;
 using Ploeh.AutoFixture.AutoMoq;
 

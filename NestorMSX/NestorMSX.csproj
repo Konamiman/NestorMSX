@@ -88,7 +88,6 @@
       <DependentUpon>MachineSelectionForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Misc\JsonParser.cs" />
-    <Compile Include="Misc\MandatoryAttribute.cs" />
     <Compile Include="Misc\FileUtils.cs" />
     <Compile Include="Misc\IniDeserializer.cs" />
     <Compile Include="Misc\KeyTestForm.cs">
@@ -130,7 +129,7 @@
     <Content Include="machines\Shared\JapaneseMsx1Bios.rom">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="machines\Spanish MSX1\machine.config">
+    <Content Include="machines\Spanish MSX1 with DiskBASIC\machine.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <SubType>Designer</SubType>
     </Content>

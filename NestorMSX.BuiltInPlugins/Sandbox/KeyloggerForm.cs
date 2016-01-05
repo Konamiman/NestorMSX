@@ -1,5 +1,4 @@
 ﻿using System;
-using System.CodeDom;
 using System.Windows.Forms;
 
 namespace Konamiman.NestorMSX.BuiltInPlugins

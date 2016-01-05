@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using Konamiman.Z80dotNet;
-using System.Diagnostics;
 
-namespace Konamiman.NestorMSX.Hardware
+namespace Konamiman.NestorMSX.BuiltInPlugins.MemoryTypes
 {
     public class Ascii8Rom : IMemory
     {

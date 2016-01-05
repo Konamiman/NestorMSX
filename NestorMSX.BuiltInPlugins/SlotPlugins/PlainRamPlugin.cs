@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
+using Konamiman.NestorMSX.BuiltInPlugins.MemoryTypes;
 using Konamiman.NestorMSX.Misc;
 using Konamiman.Z80dotNet;
-using Konamiman.NestorMSX.Hardware;
 
-namespace Konamiman.NestorMSX.BuiltInPlugins.MemoryTypes
+namespace Konamiman.NestorMSX.Plugins
 {
     [NestorMSXPlugin("RAM")]
     public class PlainRamPlugin

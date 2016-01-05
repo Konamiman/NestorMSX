@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using Konamiman.NestorMSX.Exceptions;
-using System.IO;
 
 namespace Konamiman.NestorMSX.Misc
 {

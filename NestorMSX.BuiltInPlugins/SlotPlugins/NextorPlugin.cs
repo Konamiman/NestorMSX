@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using Konamiman.NestorMSX.BuiltInPlugins.MemoryTypes;
 using Konamiman.NestorMSX.Hardware;
 using Konamiman.NestorMSX.Misc;
 using Konamiman.Z80dotNet;
 
-namespace Konamiman.NestorMSX.BuiltInPlugins.MemoryTypes
+namespace Konamiman.NestorMSX.Plugins
 {
     [NestorMSXPlugin("Nextor")]
     public class NextorPlugin : IDisposable

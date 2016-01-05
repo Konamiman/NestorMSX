@@ -6,7 +6,7 @@ using System.Text;
 using Konamiman.NestorMSX.Misc;
 using Konamiman.Z80dotNet;
 
-namespace Konamiman.NestorMSX.Host
+namespace Konamiman.NestorMSX.Plugins
 {
     /// <summary>
     /// This class executes MSX-DOS function calls.
