@@ -1,7 +1,8 @@
 ﻿using System;
-using System.Timers;
 using Konamiman.NestorMSX.Exceptions;
 using Konamiman.Z80dotNet;
+using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace Konamiman.NestorMSX.Hardware
 {
@@ -16,7 +17,8 @@ namespace Konamiman.NestorMSX.Hardware
         private readonly ITms9918DisplayRenderer displayRenderer;
         private PlainMemory Vram;
         private bool generateInterrupts;
-        
+        private Task interruptGenerationTask;
+
         private int _patternGeneratorTableAddress;
         private int patternGeneratorTableAddress
         {
@@ -34,7 +36,6 @@ namespace Konamiman.NestorMSX.Hardware
 
         private byte? valueWrittenToPort1;
         private byte readAheadBuffer;
-        private Timer interruptTimer;
         private byte statusRegisterValue;
         private int vramPointer;
         private Bit[] modeBits;
@@ -71,6 +72,7 @@ namespace Konamiman.NestorMSX.Hardware
             }
         }
 
+
         public Tms9918(ITms9918DisplayRenderer displayRenderer, Configuration config)
         {
             _PatternNameTableAddress = 0x1800;
@@ -86,9 +88,26 @@ namespace Konamiman.NestorMSX.Hardware
             if(config.VdpFrequencyMultiplier < 0.01M || config.VdpFrequencyMultiplier > 100)
                 throw new ConfigurationException("The VDP frequency multiplier must be a number between 0.01 and 100.");
 
-            interruptTimer = new Timer(TimeSpan.FromSeconds(((double)1)/60).TotalMilliseconds / (double)config.VdpFrequencyMultiplier);
-            interruptTimer.Elapsed += InterruptTimerOnElapsed;
-            interruptTimer.Start();
+            var interruptGenerationInterval = TimeSpan.FromSeconds(((double)1)/60).TotalMilliseconds/(double)config.VdpFrequencyMultiplier;
+            interruptGenerationTask = Task.Factory.StartNew(InterruptGenerationTaskProcess, interruptGenerationInterval);
+        }
+
+        private void InterruptGenerationTaskProcess(object interruptGenerationInterval)
+        {
+            var interval = (double)interruptGenerationInterval;
+            var sw = new Stopwatch();
+            sw.Start();
+
+            while(true)
+            {
+                if(sw.ElapsedMilliseconds < interval)
+                    continue;
+                
+                statusRegisterValue |= 0x80;
+                if(generateInterrupts)
+                    IntLineIsActive = true;
+                sw.Restart();
+            }
         }
 
         private void SetScreenMode(int mode)
@@ -102,13 +121,6 @@ namespace Konamiman.NestorMSX.Hardware
         {
             for(int i = 0; i < PatternNameTableSize; i++)
                 displayRenderer.WriteToNameTable(i, Vram[PatternNameTableAddress + i]);
-        }
-
-        private void InterruptTimerOnElapsed(object sender, ElapsedEventArgs args)
-        {
-            statusRegisterValue |= 0x80;
-            if(generateInterrupts)
-                IntLineIsActive = true;
         }
 
         public event EventHandler NmiInterruptPulse;
@@ -263,7 +275,7 @@ namespace Konamiman.NestorMSX.Hardware
 
         public void Dispose()
         {
-            interruptTimer.Dispose();
+            interruptGenerationTask.Dispose();
         }
     }
 }
