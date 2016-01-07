@@ -416,11 +416,35 @@ namespace Konamiman.NestorMSX.Tests
 
         #endregion
 
-        #region Interrupts
+        #region Interrupts and status register
+
+        [Test]
+        public void Reading_status_register_other_than_0_always_yields_0()
+        {
+            WriteControlRegister(15, 1);
+
+            bool bit7Set = false;
+            var sw = new Stopwatch();
+            sw.Start();
+            while (sw.ElapsedMilliseconds < 100)
+            {
+                if (Sut.ReadFromPort(1).GetBit(7) == 1)
+                {
+                    sw.Stop();
+                    bit7Set = true;
+                    break;
+                }
+                Thread.Sleep(1);
+            }
+
+            Assert.False(bit7Set);
+        }
 
         [Test]
         public void Sets_bit_7_of_status_Register_at_50Hz_and_clears_it_after_read()
         {
+            WriteControlRegister(15, 0);
+
             bool bit7Set = false;
             Bit nextBitValue = 0;
             var sw = new Stopwatch();

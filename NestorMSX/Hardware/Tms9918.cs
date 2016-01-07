@@ -23,6 +23,7 @@ namespace Konamiman.NestorMSX.Hardware
 
         private byte registerNumberForIndirectAccess;
         private bool autoIncrementRegisterNumberForIndirectAccess;
+        private byte statusRegisterNumberToRead;
 
         private int _patternGeneratorTableAddress;
         private int patternGeneratorTableAddress
@@ -220,6 +221,10 @@ namespace Konamiman.NestorMSX.Hardware
                     displayRenderer.SetTextColor((byte)(value >> 4));
                     break;
 
+                case 15:
+                    statusRegisterNumberToRead = (byte)(value & 0x0F);
+                    break;
+
                 case 17:
                     registerNumberForIndirectAccess = (byte)(value & 0x3F);
                     autoIncrementRegisterNumberForIndirectAccess = ((value & 0x80) == 0);
@@ -253,11 +258,14 @@ namespace Konamiman.NestorMSX.Hardware
                 readAheadBuffer = Vram[vramPointer];
                 return value;
             }
-            else {
+            else if(statusRegisterNumberToRead == 0) {
                 var value = statusRegisterValue;
                 statusRegisterValue &= 0x7F;
                 IntLineIsActive = false;
                 return value;
+            }
+            else {
+                return 0;
             }
         }
 
