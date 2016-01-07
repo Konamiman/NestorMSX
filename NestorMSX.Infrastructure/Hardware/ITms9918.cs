@@ -1,4 +1,5 @@
-﻿using Konamiman.Z80dotNet;
+﻿using Konamiman.NestorMSX.Misc;
+using Konamiman.Z80dotNet;
 
 namespace Konamiman.NestorMSX.Hardware
 {
@@ -12,13 +13,13 @@ namespace Konamiman.NestorMSX.Hardware
         /// </summary>
         /// <param name="portNumber">The port number to write</param>
         /// <param name="value">The value to be written</param>
-        void WriteToPort(Bit portNumber, byte value);
+        void WriteToPort(TwinBit portNumber, byte value);
 
         /// <summary>
         /// Reads a value from the specified port number
         /// </summary>
         /// <param name="portNumber">The port number to read</param>
         /// <returns>The value to be read</returns>
-        byte ReadFromPort(Bit portNumber);
+        byte ReadFromPort(TwinBit portNumber);
     }
 }

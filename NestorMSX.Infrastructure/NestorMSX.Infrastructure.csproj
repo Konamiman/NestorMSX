@@ -55,6 +55,7 @@
     <Compile Include="Hardware\KeyEventArgs.cs" />
     <Compile Include="Hardware\SecondarySlotSelectionRegisterWrittenEventArgs.cs" />
     <Compile Include="Hardware\SlotSelectionRegisterWrittenEventArgs.cs" />
+    <Compile Include="Hardware\VdpRegisterWrittenEventArgs.cs" />
     <Compile Include="Host\IKeyEventSource.cs" />
     <Compile Include="Menus\MenuEntry.cs" />
     <Compile Include="Misc\DictionaryUtils.cs" />

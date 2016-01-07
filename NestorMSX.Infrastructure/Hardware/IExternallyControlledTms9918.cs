@@ -1,4 +1,6 @@
-﻿namespace Konamiman.NestorMSX.Hardware
+﻿using System;
+
+namespace Konamiman.NestorMSX.Hardware
 {
     /// <summary>
     /// Represents a TMS9918 video display processor that can be controlled externally,
@@ -47,5 +49,10 @@
         /// <param name="length">Length of the contents array that will be copied. If null,
         /// the whole array is copied.</param>
         void SetVramContents(int startAddress, byte[] contents, int startIndex = 0, int? length = null);
+
+        /// <summary>
+        /// Event fired when a register is written to, either directly or indirectly.
+        /// </summary>
+        event EventHandler<VdpRegisterWrittenEventArgs> ControlRegisterWritten;
     }
 }

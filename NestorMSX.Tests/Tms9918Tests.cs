@@ -7,6 +7,7 @@ using Konamiman.Z80dotNet;
 using Moq;
 using NUnit.Framework;
 using Ploeh.AutoFixture;
+using System.Collections.Generic;
 
 namespace Konamiman.NestorMSX.Tests
 {
@@ -51,6 +52,83 @@ namespace Konamiman.NestorMSX.Tests
 
             WriteControlRegister(1, 0);
             Verify(m => m.SetScreenMode(0));
+        }
+
+        #endregion
+
+        #region Indirect register access
+
+        [Test]
+        public void Can_write_registers_with_autoincrement()
+        {
+            var registersWrittenTo = new List<byte>();
+            var valuesWritten = new List<byte>();
+
+            Sut.ControlRegisterWritten += (sender, eventArgs) =>
+            {
+                registersWrittenTo.Add(eventArgs.RegisterNumber);
+                valuesWritten.Add(eventArgs.Value);
+            };
+
+            WriteControlRegister(17, 10);
+
+            Sut.WriteToPort(3, 200);
+            Sut.WriteToPort(3, 201);
+            Sut.WriteToPort(3, 202);
+
+            var expectedRegistersWritten = new byte[] {17, 10, 11, 12};
+            var expectedValuesWritten = new byte[] {100, 200, 201, 202};
+
+            CollectionAssert.AreEqual(expectedValuesWritten, expectedValuesWritten);
+        }
+
+        [Test]
+        public void Can_write_registers_without_autoincrement()
+        {
+            var registersWrittenTo = new List<byte>();
+            var valuesWritten = new List<byte>();
+
+            Sut.ControlRegisterWritten += (sender, eventArgs) =>
+            {
+                registersWrittenTo.Add(eventArgs.RegisterNumber);
+                valuesWritten.Add(eventArgs.Value);
+            };
+
+            WriteControlRegister(17, 10 | 0x80);
+
+            Sut.WriteToPort(3, 200);
+            Sut.WriteToPort(3, 201);
+            Sut.WriteToPort(3, 202);
+
+            var expectedRegistersWritten = new byte[] { 17, 10, 10, 10 };
+            var expectedValuesWritten = new byte[] { 100, 200, 201, 202 };
+
+            CollectionAssert.AreEqual(expectedValuesWritten, expectedValuesWritten);
+        }
+
+        [Test]
+        public void Writing_registers_with_autoincrement_wraps_register_number()
+        {
+            var registersWrittenTo = new List<byte>();
+            var valuesWritten = new List<byte>();
+
+            Sut.ControlRegisterWritten += (sender, eventArgs) =>
+            {
+                registersWrittenTo.Add(eventArgs.RegisterNumber);
+                valuesWritten.Add(eventArgs.Value);
+            };
+
+            WriteControlRegister(17, 62);
+
+            Sut.WriteToPort(3, 200);
+            Sut.WriteToPort(3, 201);
+            Sut.WriteToPort(3, 202);
+            Sut.WriteToPort(3, 203);
+
+            var expectedRegistersWritten = new byte[] { 17, 62, 63, 0, 1 };
+            var expectedValuesWritten = new byte[] { 100, 200, 201, 202, 203 };
+
+            CollectionAssert.AreEqual(expectedValuesWritten, expectedValuesWritten);
         }
 
         #endregion
@@ -408,6 +486,8 @@ namespace Konamiman.NestorMSX.Tests
 
         #endregion
 
+        #region Helper methods
+
         private void SetupVramRead(int address)
         {
             SetupVramAccess(address, 0);
@@ -442,5 +522,6 @@ namespace Konamiman.NestorMSX.Tests
                 DisplayRenderer.ResetCalls();
         }
 
+        #endregion
     }
 }

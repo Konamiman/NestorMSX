@@ -3,6 +3,8 @@ using Konamiman.NestorMSX.Exceptions;
 using Konamiman.Z80dotNet;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using System.Windows.Forms;
+using Konamiman.NestorMSX.Misc;
 
 namespace Konamiman.NestorMSX.Hardware
 {
@@ -18,6 +20,9 @@ namespace Konamiman.NestorMSX.Hardware
         private PlainMemory Vram;
         private bool generateInterrupts;
         private Task interruptGenerationTask;
+
+        private byte registerNumberForIndirectAccess;
+        private bool autoIncrementRegisterNumberForIndirectAccess;
 
         private int _patternGeneratorTableAddress;
         private int patternGeneratorTableAddress
@@ -124,10 +129,12 @@ namespace Konamiman.NestorMSX.Hardware
         }
 
         public event EventHandler NmiInterruptPulse;
+        public event EventHandler<VdpRegisterWrittenEventArgs> ControlRegisterWritten;
+
         public bool IntLineIsActive { get; private set; }
         public byte? ValueOnDataBus { get; private set; }
 
-        public void WriteToPort(Bit portNumber, byte value)
+        public void WriteToPort(TwinBit portNumber, byte value)
         {
             if(portNumber == 0) {
                 WriteVram(vramPointer, value);
@@ -137,12 +144,19 @@ namespace Konamiman.NestorMSX.Hardware
                 return;
             }
 
-            if(valueWrittenToPort1 == null) {
+            if (portNumber == 3) {
+                WriteControlRegister(registerNumberForIndirectAccess, value);
+                if(autoIncrementRegisterNumberForIndirectAccess)
+                    registerNumberForIndirectAccess = (byte)((registerNumberForIndirectAccess++) & 0x3F);
+                return;
+            }
+            
+            if (valueWrittenToPort1 == null) {
                 valueWrittenToPort1 = value;
                 return;
             }
 
-            if((value & 0x80) == 0) {
+            if ((value & 0x80) == 0) {
                 SetVramAccess(valueWrittenToPort1.Value, value);
             } else {
                 WriteControlRegister(valueWrittenToPort1.Value, value);
@@ -163,7 +177,9 @@ namespace Konamiman.NestorMSX.Hardware
 
         private void WriteControlRegister(byte value, byte register)
         {
-            register &= 7;
+            ControlRegisterWritten?.Invoke(this, new VdpRegisterWrittenEventArgs(register, value));
+
+            register &= 63;
 
             switch(register) {
                 case 0:
@@ -203,6 +219,11 @@ namespace Konamiman.NestorMSX.Hardware
                     displayRenderer.SetBackdropColor((byte)(value & 0x0F));
                     displayRenderer.SetTextColor((byte)(value >> 4));
                     break;
+
+                case 17:
+                    registerNumberForIndirectAccess = (byte)(value & 0x3F);
+                    autoIncrementRegisterNumberForIndirectAccess = ((value & 0x80) == 0);
+                    break;
             }
         }
 
@@ -222,7 +243,7 @@ namespace Konamiman.NestorMSX.Hardware
             SetScreenMode(0);
         }
 
-        public byte ReadFromPort(Bit portNumber)
+        public byte ReadFromPort(TwinBit portNumber)
         {
             valueWrittenToPort1 = null;
 
