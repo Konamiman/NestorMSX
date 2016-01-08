@@ -8,6 +8,7 @@ using Moq;
 using NUnit.Framework;
 using Ploeh.AutoFixture;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Konamiman.NestorMSX.Tests
 {
@@ -596,6 +597,66 @@ namespace Konamiman.NestorMSX.Tests
 
             var expected = (0xBFC0) & mask;
             Assert.AreEqual(expected, Sut.ColorTableAddress);
+        }
+
+        #endregion
+
+        #region Expanded RAM
+
+        [Test]
+        public void Nothing_is_written_via_port_if_expansion_RAM_is_selected()
+        {
+            var value = Fixture.Create<byte>();
+            Sut.WriteToPort(0, value);
+
+            value = (byte)(~value);
+
+            WriteControlRegister(45, 64);
+            SetupVramWrite(0);
+            Sut.WriteToPort(0, value);
+
+            var vramContents = Sut.GetVramContents(0, 1).Single();
+            Assert.AreNotEqual(value, vramContents);
+        }
+
+        [Test]
+        public void Nothing_is_written_via_WriteRam_if_expansion_RAM_is_selected()
+        {
+            var value = Fixture.Create<byte>();
+            Sut.WriteVram(0, value);
+
+            value = (byte)(~value);
+
+            WriteControlRegister(45, 64);
+            Sut.WriteVram(0, value);
+
+            var vramContents = Sut.GetVramContents(0, 1).Single();
+            Assert.AreNotEqual(value, vramContents);
+        }
+
+        [Test]
+        public void Nothing_is_read_via_port_if_expansion_RAM_is_selected()
+        {
+            var value = Fixture.Create<byte>();
+            Sut.WriteToPort(0, value);
+
+            WriteControlRegister(45, 64);
+            SetupVramRead(0);
+            var vramContents = Sut.ReadFromPort(0);
+
+            Assert.AreEqual(0xFF, vramContents);
+        }
+
+        [Test]
+        public void Nothing_is_read_via_ReadVram_if_expansion_RAM_is_selected()
+        {
+            var value = Fixture.Create<byte>();
+            Sut.WriteToPort(0, value);
+
+            WriteControlRegister(45, 64);
+            var vramContents = Sut.ReadVram(0);
+
+            Assert.AreEqual(0xFF, vramContents);
         }
 
         #endregion

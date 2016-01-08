@@ -30,6 +30,7 @@ namespace Konamiman.NestorMSX.Hardware
         private byte vramAddressThreeHighBits;
         private byte colorTableLow;
         private byte colorTableHigh;
+        private bool expansionVramSelected;
 
         private int _patternGeneratorTableAddress;
         public int PatternGeneratorTableAddress
@@ -253,6 +254,10 @@ namespace Konamiman.NestorMSX.Hardware
                     registerNumberForIndirectAccess = (byte)(value & 0x3F);
                     autoIncrementRegisterNumberForIndirectAccess = ((value & 0x80) == 0);
                     break;
+
+                case 45:
+                    expansionVramSelected = (value & 64) != 0;
+                    break;
             }
         }
 
@@ -282,6 +287,9 @@ namespace Konamiman.NestorMSX.Hardware
             valueWrittenToPort1 = null;
 
             if(portNumber == 0) {
+                if(expansionVramSelected)
+                    return 0xFF;
+
                 var value = readAheadBuffer;
                 vramPointer = (vramPointer+1) & vramAddressMask;
                 readAheadBuffer = Vram[vramPointer];
@@ -300,6 +308,9 @@ namespace Konamiman.NestorMSX.Hardware
 
         public void WriteVram(int address, byte value)
         {
+            if (expansionVramSelected)
+                return;
+
             address &= vramAddressMask;
 
             Vram[address] = value;
@@ -316,7 +327,7 @@ namespace Konamiman.NestorMSX.Hardware
 
         public byte ReadVram(int address)
         {
-            return Vram[address & vramAddressMask];
+            return expansionVramSelected ? (byte)0xFF : Vram[address & vramAddressMask];
         }
 
         public byte[] GetVramContents(int startAddress, int length)
