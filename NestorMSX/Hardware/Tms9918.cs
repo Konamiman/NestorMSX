@@ -3,7 +3,7 @@ using Konamiman.NestorMSX.Exceptions;
 using Konamiman.Z80dotNet;
 using System.Threading.Tasks;
 using System.Diagnostics;
-using System.Windows.Forms;
+using System.Linq;
 using Konamiman.NestorMSX.Misc;
 
 namespace Konamiman.NestorMSX.Hardware
@@ -21,22 +21,28 @@ namespace Konamiman.NestorMSX.Hardware
         private bool generateInterrupts;
         private Task interruptGenerationTask;
 
+        private readonly int vramSize;
+        private readonly int vramAddressMask;
+
         private byte registerNumberForIndirectAccess;
         private bool autoIncrementRegisterNumberForIndirectAccess;
         private byte statusRegisterNumberToRead;
+        private byte vramAddressThreeHighBits;
+        private byte colorTableLow;
+        private byte colorTableHigh;
 
         private int _patternGeneratorTableAddress;
-        private int patternGeneratorTableAddress
+        public int PatternGeneratorTableAddress
         {
             get
             {
                 return _patternGeneratorTableAddress;
             }
-            set
+            private set
             {
                 _patternGeneratorTableAddress = value;
                 for(var position = 0; position < patternGeneratorTableLength; position++)
-                    displayRenderer.WriteToPatternGeneratorTable(position, Vram[patternGeneratorTableAddress + position]);
+                    displayRenderer.WriteToPatternGeneratorTable(position, Vram[PatternGeneratorTableAddress + position]);
             }
         }
 
@@ -64,13 +70,13 @@ namespace Konamiman.NestorMSX.Hardware
         }
 
         private int _colorTableAddress;
-        private int colorTableAddress
+        public int ColorTableAddress
         {
             get
             {
                 return _colorTableAddress;
             }
-            set
+            private set
             {
                 _colorTableAddress = value;
                 for(int i = 0; i < colorTableLength; i++)
@@ -78,13 +84,21 @@ namespace Konamiman.NestorMSX.Hardware
             }
         }
 
+        private static int[] allowedVramSizes = new[] {16, 64, 128};
 
-        public Tms9918(ITms9918DisplayRenderer displayRenderer, Configuration config)
+        public Tms9918(ITms9918DisplayRenderer displayRenderer, Configuration config, int vramSizeInKB = 16)
         {
+            if(!allowedVramSizes.Contains(vramSizeInKB))
+                throw new ArgumentException("VRAM size must be one of: " + 
+                    string.Join(", ", allowedVramSizes.Select(s => s.ToString()).ToArray()));
+
+            vramSize = vramSizeInKB * 1024;
+            vramAddressMask = vramSize - 1;
+
             _PatternNameTableAddress = 0x1800;
             _colorTableAddress = 0x2000;
 
-            Vram = new PlainMemory(16384);
+            Vram = new PlainMemory(vramSize);
             modeBits = new Bit[] {0, 0, 0};
 
             this.displayRenderer = displayRenderer;
@@ -139,7 +153,7 @@ namespace Konamiman.NestorMSX.Hardware
         {
             if(portNumber == 0) {
                 WriteVram(vramPointer, value);
-                vramPointer = (vramPointer+1) & 0x3FFF;
+                vramPointer = (vramPointer+1) & vramAddressMask;
                 readAheadBuffer = value;
                 valueWrittenToPort1 = null;
                 return;
@@ -158,7 +172,7 @@ namespace Konamiman.NestorMSX.Hardware
             }
 
             if ((value & 0x80) == 0) {
-                SetVramAccess(valueWrittenToPort1.Value, value);
+                SetVramAccess(valueWrittenToPort1.Value, value, vramAddressThreeHighBits);
             } else {
                 WriteControlRegister(valueWrittenToPort1.Value, value);
             }
@@ -166,13 +180,13 @@ namespace Konamiman.NestorMSX.Hardware
             valueWrittenToPort1 = null;
         }
 
-        private void SetVramAccess(byte firstByte, byte secondByte)
+        private void SetVramAccess(byte firstByte, byte secondByte, byte vramAddressThreeHighBits)
         {
-            vramPointer = firstByte | ((secondByte & 0x3F) << 8);
+            vramPointer = (firstByte | ((secondByte & 0x3F) << 8) | (vramAddressThreeHighBits << 14)) & vramAddressMask;
 
             if((secondByte & 0x40) == 0) {
                 readAheadBuffer = Vram[vramPointer];
-                vramPointer = (vramPointer++) & 0x3FFF;
+                vramPointer = (vramPointer++) & vramAddressMask;
             }
         }
 
@@ -205,20 +219,30 @@ namespace Konamiman.NestorMSX.Hardware
                     break;
 
                 case 2:
-                    PatternNameTableAddress = value << 10;
+                    PatternNameTableAddress = (value << 10) & vramAddressMask;
                     break;
 
                 case 3:
-                    colorTableAddress = value << 6;
+                    colorTableLow = value;
+                    SetColorTableAddress();
                     break;
 
                 case 4:
-                    patternGeneratorTableAddress = value << 11;
+                    PatternGeneratorTableAddress = (value << 11) & vramAddressMask;
                     break;
 
                 case 7:
                     displayRenderer.SetBackdropColor((byte)(value & 0x0F));
                     displayRenderer.SetTextColor((byte)(value >> 4));
+                    break;
+
+                case 10:
+                    colorTableHigh = (byte)(value & 7);
+                    SetColorTableAddress();
+                    break;
+
+                case 14:
+                    vramAddressThreeHighBits = (byte)(value & 7);
                     break;
 
                 case 15:
@@ -230,6 +254,11 @@ namespace Konamiman.NestorMSX.Hardware
                     autoIncrementRegisterNumberForIndirectAccess = ((value & 0x80) == 0);
                     break;
             }
+        }
+
+        private void SetColorTableAddress()
+        {
+            ColorTableAddress = ((colorTableLow << 6) + (colorTableHigh << 14)) & vramAddressMask;
         }
 
         private void SetModeBit(int mode, Bit value, bool changeScreenMode)
@@ -254,7 +283,7 @@ namespace Konamiman.NestorMSX.Hardware
 
             if(portNumber == 0) {
                 var value = readAheadBuffer;
-                vramPointer = (vramPointer+1) & 0x3FFF;
+                vramPointer = (vramPointer+1) & vramAddressMask;
                 readAheadBuffer = Vram[vramPointer];
                 return value;
             }
@@ -271,21 +300,23 @@ namespace Konamiman.NestorMSX.Hardware
 
         public void WriteVram(int address, byte value)
         {
+            address &= vramAddressMask;
+
             Vram[address] = value;
             if(address >= PatternNameTableAddress && address < PatternNameTableAddress + PatternNameTableSize) {
                 displayRenderer.WriteToNameTable(address - PatternNameTableAddress, value);
             }
-            if(address >= patternGeneratorTableAddress && address < patternGeneratorTableAddress + patternGeneratorTableLength) {
-                displayRenderer.WriteToPatternGeneratorTable(address - patternGeneratorTableAddress, value);
+            if(address >= PatternGeneratorTableAddress && address < PatternGeneratorTableAddress + patternGeneratorTableLength) {
+                displayRenderer.WriteToPatternGeneratorTable(address - PatternGeneratorTableAddress, value);
             }
-            if(screenMode != 1 && address >= colorTableAddress && address < colorTableAddress + colorTableLength) {
-                displayRenderer.WriteToColourTable(address - colorTableAddress, value);
+            if(screenMode != 1 && address >= ColorTableAddress && address < ColorTableAddress + colorTableLength) {
+                displayRenderer.WriteToColourTable(address - ColorTableAddress, value);
             }
         }
 
         public byte ReadVram(int address)
         {
-            return Vram[address];
+            return Vram[address & vramAddressMask];
         }
 
         public byte[] GetVramContents(int startAddress, int length)

@@ -41,6 +41,16 @@ namespace Konamiman.NestorMSX.Hardware
         int PatternNameTableSize { get; }
 
         /// <summary>
+        /// Returns the current size of the pattern generator table.
+        /// </summary>
+        int PatternGeneratorTableAddress { get; }
+
+        /// <summary>
+        /// Returns the current size of the color table.
+        /// </summary>
+        int ColorTableAddress { get; }
+
+        /// <summary>
         /// Sets the contents of a portion of VRAM
         /// </summary>
         /// <param name="startAddress">First VRAM address that will be set</param>
