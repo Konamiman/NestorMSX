@@ -8,9 +8,13 @@ namespace Konamiman.NestorMSX.Plugins
     public class ClockIcPlugin
     {
         private static ClockIcPlugin Instance;
+        private byte[][] data = new byte[4][];
 
         private ClockIcPlugin(PluginContext context, IDictionary<string, object> pluginConfig)
         {
+            for(int i=0; i<4; i++)
+                data[i] = new byte[13];
+
             context.Cpu.MemoryAccess += Cpu_MemoryAccess;
         }
 
@@ -54,6 +58,11 @@ namespace Konamiman.NestorMSX.Plugins
                 currentBlock = value & 0x03;
                 currentModeRegisterValue = (byte)(value & 0x0F);
             }
+            else if(registerNumber < 13)
+            {
+                
+                data[currentBlock][registerNumber] = (byte)(value & 0x0F);
+            }
         }
 
         private byte ReadData()
@@ -63,7 +72,7 @@ namespace Konamiman.NestorMSX.Plugins
             else if(currentBlock == 0)
                 return (byte)(ReadDataComponent(registerNumber) & 0x0F);
             else
-                return 0;
+                return data[currentBlock][registerNumber];
         }
 
         private int ReadDataComponent(int registerNumber)

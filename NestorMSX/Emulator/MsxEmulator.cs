@@ -47,6 +47,12 @@ namespace Konamiman.NestorMSX.Emulator
                 case 0x99:
                     hardware.Vdp.WriteToPort(1, args.Value);
                     break;
+                case 0x9A:
+                    hardware.Vdp.WriteToPort(2, args.Value);
+                    break;
+                case 0x9B:
+                    hardware.Vdp.WriteToPort(3, args.Value);
+                    break;
                 case 0xA8:
                     hardware.SlotsSystem.WriteToSlotSelectionRegister(args.Value);
                     break;

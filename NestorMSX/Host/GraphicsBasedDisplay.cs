@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
@@ -62,7 +63,8 @@ namespace Konamiman.NestorMSX.Host
 
         private void Transform(Graphics graphics)
         {
-            graphics.ScaleTransform((float)config.DisplayZoomLevel, (float)config.DisplayZoomLevel);
+            var horizontalStretch = doubleColumns ? 2 : 1;
+            graphics.ScaleTransform((float)config.DisplayZoomLevel / horizontalStretch, (float)config.DisplayZoomLevel);
             graphics.TranslateTransform(config.HorizontalMarginInPixels, config.VerticalMarginInPixels);
         }
 
@@ -145,6 +147,12 @@ namespace Konamiman.NestorMSX.Host
         public void SetCharacterWidth(int width)
         {
             characterWidth = width;
+        }
+
+        private bool doubleColumns = false;
+        public void SetColumns(int columns)
+        {
+            doubleColumns = (columns > 40);
         }
 
         public void NotifyScreenBufferContentsAddedOrChanged(Point coordinates)

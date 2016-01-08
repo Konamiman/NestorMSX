@@ -20,7 +20,8 @@
         /// Notifies of a change of the screen mode.
         /// </summary>
         /// <param name="mode">New screen mode, a number from 0 to 3.</param>
-        void SetScreenMode(byte mode);
+        /// <param name="columns">Screen width in columns</param>
+        void SetScreenMode(byte mode, byte columns);
 
         /// <summary>
         /// Notifies of a byte written in the pattern name table.

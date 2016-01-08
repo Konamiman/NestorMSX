@@ -15,7 +15,6 @@ namespace Konamiman.NestorMSX.Host
 
         private readonly ICharacterBasedDisplay display;
 
-        private int charWidth = 8;
         private int currentScreenMode = SCREEN_1;
         private int screenWidthInCharacters = 32;
         private readonly Dictionary<Point, byte> screenBuffer = new Dictionary<Point, byte>();
@@ -78,14 +77,15 @@ namespace Konamiman.NestorMSX.Host
             display.BlankScreen();
         }
 
-        public void SetScreenMode(byte mode)
+        public void SetScreenMode(byte mode, byte columns)
         {
             if(mode > 1)
                 return;
 
             currentScreenMode = mode;
-            SetScreenWidth(mode == SCREEN_0 ? 40 : 32);
+            SetScreenWidth(columns);
             display.SetCharacterWidth(mode == SCREEN_0 ? 6 : 8);
+            display.SetColumns(columns);
 
             SetAllCharsColors();
         }

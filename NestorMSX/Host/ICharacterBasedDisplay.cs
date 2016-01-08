@@ -42,6 +42,8 @@ namespace Konamiman.NestorMSX.Host
         /// <param name="width">New character width in pixels</param>
         void SetCharacterWidth(int width);
 
+        void SetColumns(int columns);
+
         /// <summary>
         /// Notifies that a new value has been added to the screen buffer,
         /// or that the value corresponding to a certain set of coordinates

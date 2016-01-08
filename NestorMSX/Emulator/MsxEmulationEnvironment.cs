@@ -199,7 +199,7 @@ namespace Konamiman.NestorMSX.Emulator
 
         private IExternallyControlledTms9918 CreateVdp(IDrawingSurface drawingSurface)
         {
-            return new Tms9918(new DisplayRenderer(new GraphicsBasedDisplay(drawingSurface, globalConfig), globalConfig), globalConfig);
+            return new Tms9918(new DisplayRenderer(new GraphicsBasedDisplay(drawingSurface, globalConfig), globalConfig), globalConfig, 128);
         }
 
         private void CreateSlotsSystem()
