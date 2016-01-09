@@ -41,7 +41,7 @@ namespace Konamiman.NestorMSX.Hardware
             }
             private set
             {
-                Debug.WriteLine($"Pattern generator table: x{value:X}");
+                //Debug.WriteLine($"Pattern generator table: x{value:X}");
                 _patternGeneratorTableAddress = value;
                 for(var position = 0; position < patternGeneratorTableLength; position++)
                     displayRenderer.WriteToPatternGeneratorTable(position, Vram[PatternGeneratorTableAddress + position]);
@@ -53,7 +53,6 @@ namespace Konamiman.NestorMSX.Hardware
         private byte statusRegisterValue;
         private int vramPointer;
         private Bit[] modeBits;
-        private int[] PatternNameTableSizes = { 768, 960 }; //TODO: Dictionary by columns
         
         private int screenMode = 0;
 
@@ -66,7 +65,7 @@ namespace Konamiman.NestorMSX.Hardware
             }
             private set
             {
-                Debug.WriteLine($"Pattern name table: x{value:X}");
+                //Debug.WriteLine($"Pattern name table: x{value:X}");
                 _PatternNameTableAddress = value;
                 ReprintAll();
             }
@@ -81,7 +80,7 @@ namespace Konamiman.NestorMSX.Hardware
             }
             private set
             {
-                Debug.WriteLine($"Color table: x{value:X}");
+                //Debug.WriteLine($"Color table: x{value:X}");
                 _colorTableAddress = value;
                 for(int i = 0; i < colorTableLength; i++)
                     displayRenderer.WriteToColourTable(i, Vram[_colorTableAddress + i]);
@@ -135,9 +134,11 @@ namespace Konamiman.NestorMSX.Hardware
             }
         }
 
+        bool currentlyIn80ColumnsMode = false;
         private void SetScreenMode(int mode, int columns)
         {
-            Debug.WriteLine($"Set mode: {mode}, {columns}");
+            currentlyIn80ColumnsMode = (columns == 80);
+            //Debug.WriteLine($"Set mode: {mode}, {columns}");
             screenMode = mode;
             displayRenderer.SetScreenMode((byte)mode, (byte)columns);
             PatternNameTableSize = columns * 24;
@@ -168,7 +169,9 @@ namespace Konamiman.NestorMSX.Hardware
             }
 
             if(portNumber == 3) {
-                WriteControlRegister(value, registerNumberForIndirectAccess);
+                //Debug.WriteLine($"Indirect: R#{registerNumberForIndirectAccess} = {value}");
+                if(registerNumberForIndirectAccess != 17)
+                    WriteControlRegister(value, registerNumberForIndirectAccess);
                 if(autoIncrementRegisterNumberForIndirectAccess)
                     registerNumberForIndirectAccess = (byte)((registerNumberForIndirectAccess+1) & 0x3F);
                 return;
@@ -193,9 +196,10 @@ namespace Konamiman.NestorMSX.Hardware
         {
             vramPointer = (firstByte | ((secondByte & 0x3F) << 8) | (vramAddressThreeHighBits << 14)) & vramAddressMask;
 
+            //Debug.WriteLine($"Set VRAM pointer: x{vramPointer:X} for {((secondByte & 0x40) == 0 ? "Read":"Write")}");
+
             if((secondByte & 0x40) == 0) {
                 readAheadBuffer = Vram[vramPointer];
-                vramPointer = (vramPointer+1) & vramAddressMask;
             }
         }
 
@@ -205,7 +209,7 @@ namespace Konamiman.NestorMSX.Hardware
 
             ControlRegisterWritten?.Invoke(this, new VdpRegisterWrittenEventArgs(register, value));
 
-            if(register==17) Debug.WriteLine($"R#{register} = 0x{value:X} {value}");
+            //if(register !=14) Debug.WriteLine($"R#{register} = 0x{value:X} {value}");
 
             switch(register) {
                 case 0:
@@ -232,6 +236,8 @@ namespace Konamiman.NestorMSX.Hardware
                     break;
 
                 case 2:
+                    if(currentlyIn80ColumnsMode)
+                        value &= 0xFC;
                     PatternNameTableAddress = (value << 10) & vramAddressMask;
                     break;
 
@@ -313,6 +319,7 @@ namespace Konamiman.NestorMSX.Hardware
                     return 0xFF;
 
                 var value = readAheadBuffer;
+                //Debug.WriteLine(Convert.ToString(value, 2).PadLeft(8,'0'));
                 vramPointer = (vramPointer + 1) & vramAddressMask;
                 readAheadBuffer = Vram[vramPointer];
                 return value;

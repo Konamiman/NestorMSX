@@ -62,6 +62,11 @@ namespace Konamiman.NestorMSX.Misc
             return Value;
         }
 
+        public override string ToString()
+        {
+            return Value.ToString();
+        }
+
         #endregion
     }
 }

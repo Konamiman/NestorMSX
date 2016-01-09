@@ -64,8 +64,9 @@ namespace Konamiman.NestorMSX.Host
         private void Transform(Graphics graphics)
         {
             var horizontalStretch = doubleColumns ? 2 : 1;
+            var horizontalMarginMultiplier = doubleColumns ? 2 : 1;
             graphics.ScaleTransform((float)config.DisplayZoomLevel / horizontalStretch, (float)config.DisplayZoomLevel);
-            graphics.TranslateTransform(config.HorizontalMarginInPixels, config.VerticalMarginInPixels);
+            graphics.TranslateTransform(config.HorizontalMarginInPixels * horizontalMarginMultiplier, config.VerticalMarginInPixels);
         }
 
         private void RepaintAll(Graphics graphics)
@@ -153,6 +154,11 @@ namespace Konamiman.NestorMSX.Host
         public void SetColumns(int columns)
         {
             doubleColumns = (columns > 40);
+            lock(syncObject) {
+                defaultGraphics.ResetTransform();
+                Transform(defaultGraphics);
+                RepaintAll(defaultGraphics);
+            }
         }
 
         public void NotifyScreenBufferContentsAddedOrChanged(Point coordinates)
