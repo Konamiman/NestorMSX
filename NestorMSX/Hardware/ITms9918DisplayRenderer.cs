@@ -1,4 +1,6 @@
-﻿namespace Konamiman.NestorMSX.Hardware
+﻿using System.Drawing;
+
+namespace Konamiman.NestorMSX.Hardware
 {
     /// <summary>
     /// Represents a device that can be connected to a TMS9918 processor
@@ -24,6 +26,8 @@
         void SetScreenMode(byte mode, byte columns);
 
         void SetNumberOfRows(int numberOfRows);
+
+        void SetPalette(byte colorIndex, Color value);
 
         /// <summary>
         /// Notifies of a byte written in the pattern name table.

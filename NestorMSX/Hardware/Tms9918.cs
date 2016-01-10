@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Diagnostics;
 using System.Linq;
 using Konamiman.NestorMSX.Misc;
+using System.Drawing;
 
 namespace Konamiman.NestorMSX.Hardware
 {
@@ -32,6 +33,8 @@ namespace Konamiman.NestorMSX.Hardware
         private byte colorTableHigh;
         private bool expansionVramSelected;
         private bool in27RowsMode;
+        private byte paletteRegisterValue;
+        private byte? valueWrittenToPort2;
 
         private int _patternGeneratorTableAddress;
         public int PatternGeneratorTableAddress
@@ -188,9 +191,22 @@ namespace Konamiman.NestorMSX.Hardware
                 return;
             }
 
-            if(portNumber != 1)
+            if(portNumber == 2) {
+                if(valueWrittenToPort2 == null) {
+                    valueWrittenToPort2 = value;
+                }
+                else {
+                    var r = (valueWrittenToPort2.Value >> 4) & 7;
+                    var b = (valueWrittenToPort2.Value) & 7;
+                    var g = value & 7;
+                    var color = Color.FromArgb(r, g, b);
+                    displayRenderer.SetPalette(paletteRegisterValue, color);
+                    valueWrittenToPort2 = null;
+                    paletteRegisterValue = (byte)((paletteRegisterValue + 1) & 0x0F);
+                }
                 return;
-
+            }
+                
             if(oldValueWrittenToPort1 == null) {
                 valueWrittenToPort1 = value;
                 return;
@@ -286,6 +302,10 @@ namespace Konamiman.NestorMSX.Hardware
 
                 case 15:
                     statusRegisterNumberToRead = (byte)(value & 0x0F);
+                    break;
+
+                case 16:
+                    paletteRegisterValue = (byte)(value & 0x0F);
                     break;
 
                 case 17:

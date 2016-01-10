@@ -180,5 +180,15 @@ namespace Konamiman.NestorMSX.Host
             this.numberOfRows = numberOfRows;
             display.SetNumberOfRows(numberOfRows);
         }
+
+        public void SetPalette(byte colorIndex, Color value)
+        {
+            Func<int, int> convertComponent = c => (int)(c * 36.5);
+
+            var color = Color.FromArgb(convertComponent(value.R), convertComponent(value.G), convertComponent(value.B));
+            Colors[colorIndex] = color;
+
+            SetAllCharsColors();
+        }
     }
 }
