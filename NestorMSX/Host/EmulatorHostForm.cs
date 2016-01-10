@@ -49,7 +49,7 @@ namespace Konamiman.NestorMSX.Host
             ValidateConfiguration(config);
 
             var width = (int)(((32 * 8) + config.HorizontalMarginInPixels * 2) * config.DisplayZoomLevel);
-            var height = (int)(((24 * 8) + config.VerticalMarginInPixels * 2) * config.DisplayZoomLevel);
+            var height = (int)(((26.5M * 8) + config.VerticalMarginInPixels * 2) * config.DisplayZoomLevel);
             ClientSize = new Size(width, height + mainMenu.Height);
         }
 

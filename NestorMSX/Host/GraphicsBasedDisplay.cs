@@ -78,7 +78,7 @@ namespace Konamiman.NestorMSX.Host
 
         private void DrawCharacter(Point coordinates, byte charIndex, Graphics graphics)
         {
-            if(!screenIsActive)
+            if(!screenIsActive || coordinates.Y >= numberOfRows)
                 return;
 
             lock(syncObject) {
@@ -180,6 +180,12 @@ namespace Konamiman.NestorMSX.Host
         {
             screenIsActive = true;
             RepaintAll(defaultGraphics);
+        }
+
+        private int numberOfRows = 24;
+        public void SetNumberOfRows(int numberOfRows)
+        {
+            this.numberOfRows = numberOfRows;
         }
     }
 }

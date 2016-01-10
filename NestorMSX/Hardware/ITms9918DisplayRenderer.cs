@@ -23,6 +23,8 @@
         /// <param name="columns">Screen width in columns</param>
         void SetScreenMode(byte mode, byte columns);
 
+        void SetNumberOfRows(int numberOfRows);
+
         /// <summary>
         /// Notifies of a byte written in the pattern name table.
         /// </summary>

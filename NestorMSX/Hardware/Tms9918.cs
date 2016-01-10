@@ -31,6 +31,7 @@ namespace Konamiman.NestorMSX.Hardware
         private byte colorTableLow;
         private byte colorTableHigh;
         private bool expansionVramSelected;
+        private bool in27RowsMode;
 
         private int _patternGeneratorTableAddress;
         public int PatternGeneratorTableAddress
@@ -135,13 +136,23 @@ namespace Konamiman.NestorMSX.Hardware
         }
 
         bool currentlyIn80ColumnsMode = false;
+        int columns;
         private void SetScreenMode(int mode, int columns)
         {
+            this.columns = columns;
             currentlyIn80ColumnsMode = (columns == 80);
             //Debug.WriteLine($"Set mode: {mode}, {columns}");
             screenMode = mode;
             displayRenderer.SetScreenMode((byte)mode, (byte)columns);
-            PatternNameTableSize = columns * 24;
+
+            UpdateNumberOfRows();
+        }
+
+        private void UpdateNumberOfRows()
+        {
+            var currentlyIn27RowsMode = currentlyIn80ColumnsMode && in27RowsMode;
+            displayRenderer.SetNumberOfRows(currentlyIn27RowsMode ? 27 : 24);
+            PatternNameTableSize = columns * (currentlyIn27RowsMode ? 27 : 24);
         }
 
         void ReprintAll()
@@ -253,6 +264,15 @@ namespace Konamiman.NestorMSX.Hardware
                 case 7:
                     displayRenderer.SetBackdropColor((byte)(value & 0x0F));
                     displayRenderer.SetTextColor((byte)(value >> 4));
+                    break;
+
+                case 9:
+                    var oldIn27RowsMode = in27RowsMode;
+                    in27RowsMode = (value & 0x80) != 0;
+                    if(in27RowsMode != oldIn27RowsMode) {
+                        UpdateNumberOfRows();
+                        ReprintAll();
+                    }
                     break;
 
                 case 10:

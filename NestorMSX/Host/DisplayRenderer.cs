@@ -23,7 +23,8 @@ namespace Konamiman.NestorMSX.Host
         private Color TextColor { get; set; }
         private Dictionary<byte, byte[]> characterPatterns = new Dictionary<byte, byte[]>();
         private readonly Dictionary<byte, Tuple<byte, byte>> CharacterColorsForScreen1 = new Dictionary<byte, Tuple<byte, byte>>();
-        
+        private int numberOfRows = 24;
+
         public DisplayRenderer(ICharacterBasedDisplay display, Configuration config)
         {
             this.display = display;
@@ -93,7 +94,7 @@ namespace Konamiman.NestorMSX.Host
         public void WriteToNameTable(int position, byte value)
         {
             var coordinates = new Point(position%screenWidthInCharacters, position/screenWidthInCharacters);
-            if(coordinates.X >= screenWidthInCharacters || coordinates.Y >= 24)
+            if(coordinates.X >= screenWidthInCharacters || coordinates.Y >= numberOfRows)
                 return;
 
             screenBuffer[coordinates] = value;
@@ -172,6 +173,12 @@ namespace Konamiman.NestorMSX.Host
 - Each line contains 3 color components, separated by spaces.
 - Each color component is an integer number in the range 0-255."
             ,exception);
+        }
+
+        public void SetNumberOfRows(int numberOfRows)
+        {
+            this.numberOfRows = numberOfRows;
+            display.SetNumberOfRows(numberOfRows);
         }
     }
 }
