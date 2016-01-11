@@ -24,5 +24,7 @@ namespace Konamiman.NestorMSX
         public IDictionary<string, object> GlobalPluginsConfig { get; set; }
 
         public IDictionary<string, object> SharedPluginsConfig { get; set; }
+
+        public int VramSizeInKb { get; set; }
     }
 }

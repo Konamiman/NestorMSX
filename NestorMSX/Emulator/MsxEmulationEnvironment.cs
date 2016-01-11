@@ -114,6 +114,7 @@ namespace Konamiman.NestorMSX.Emulator
             config.VerticalMarginInPixels = configDictionary.GetValueOrDefault("verticalMarginInPixels", 16);
             config.KeymapFile = configDictionary.GetValue<string>("keymapFile").AsApplicationFilePath();
             config.VdpFrequencyMultiplier = configDictionary.GetValueOrDefault<decimal>("vdpFrequencyMultiplier", 1);
+            config.VramSizeInKb = configDictionary.GetValueOrDefault<int>("vramSizeInKb", 128);
 
             return config;
         }
@@ -199,7 +200,7 @@ namespace Konamiman.NestorMSX.Emulator
 
         private IExternallyControlledTms9918 CreateVdp(IDrawingSurface drawingSurface)
         {
-            return new Tms9918(new DisplayRenderer(new GraphicsBasedDisplay(drawingSurface, globalConfig), globalConfig), globalConfig, 128);
+            return new Tms9918(new DisplayRenderer(new GraphicsBasedDisplay(drawingSurface, globalConfig), globalConfig), globalConfig, globalConfig.VramSizeInKb);
         }
 
         private void CreateSlotsSystem()
