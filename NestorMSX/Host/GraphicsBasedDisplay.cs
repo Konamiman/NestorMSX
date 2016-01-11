@@ -68,11 +68,6 @@ namespace Konamiman.NestorMSX.Host
         private Func<int, int> transfX, transfY;
         private void Transform(Graphics graphics)
         {
-            //var horizontalStretch = doubleColumns ? 2 : 1;
-            //var horizontalMarginMultiplier = doubleColumns ? 2 : 1;
-            //graphics.ScaleTransform((float)config.DisplayZoomLevel / horizontalStretch, (float)config.DisplayZoomLevel);
-            //graphics.TranslateTransform(config.HorizontalMarginInPixels * horizontalMarginMultiplier, config.VerticalMarginInPixels);
-
             var horizontalStretch = doubleColumns ? 2 : 1;
             var horizontalMarginMultiplier = doubleColumns ? 2 : 1;
             scX = (float)config.DisplayZoomLevel / horizontalStretch;
@@ -101,7 +96,7 @@ namespace Konamiman.NestorMSX.Host
                 return;
 
             lock(syncObject) {
-                var baseX = (coordinates.X*characterWidth) + (characterWidth == 6 ? 8 : 0);
+                var baseX = (coordinates.X*characterWidth) + (characterWidth == 8 ? 0 : doubleColumns ? 16 : 8);
                 var X = baseX;
                 var Y = coordinates.Y*8;
                 var point = new Point(X, Y);
@@ -127,6 +122,7 @@ namespace Konamiman.NestorMSX.Host
                     X = baseX;
                     Y++;
                 }
+
                 bg.Render(graphics);
             }
         }
