@@ -26,6 +26,7 @@ namespace Konamiman.NestorMSX.Host
         private IDictionary<byte, Tuple<Color, Color>> characterColors = new Dictionary<byte, Tuple<Color, Color>>();
         private IDictionary<byte, Tuple<Brush, Brush>> characterBrushes = new Dictionary<byte, Tuple<Brush, Brush>>();
         private readonly Configuration config;
+        private Tuple<Brush, Brush> blinkBrushes = new Tuple<Brush, Brush>(new SolidBrush(Color.Black), new SolidBrush(Color.Black));
 
         public GraphicsBasedDisplay(IDrawingSurface drawingSurface, Configuration config)
         {
@@ -85,7 +86,7 @@ namespace Konamiman.NestorMSX.Host
                 var baseX = (coordinates.X*characterWidth) + (characterWidth == 6 ? 8 : 0);
                 var X = baseX;
                 var Y = coordinates.Y*8;
-                var brushes = characterBrushes[charIndex];
+                var brushes = blinkEnabled && blinkPositions.Contains(coordinates) ? blinkBrushes : characterBrushes[charIndex];
                 var pattern = characterPatterns[charIndex];
                 graphics.FillRectangle(brushes.Item2, baseX, Y, characterWidth, 8);
                 for(int row = 0; row < 8; row++) {
@@ -192,6 +193,56 @@ namespace Konamiman.NestorMSX.Host
         public void SetNumberOfRows(int numberOfRows)
         {
             this.numberOfRows = numberOfRows;
+        }
+
+        public void SetBlinkColors(Color foreground, Color background)
+        {
+            if(blinkBrushes != null) {
+                blinkBrushes.Item1.Dispose();
+                blinkBrushes.Item2.Dispose();
+            }
+            blinkBrushes = new Tuple<Brush, Brush>(new SolidBrush(foreground), new SolidBrush(background));
+        }
+
+        private void ReprintAllBlinks()
+        {
+            foreach(var position in blinkPositions)
+                ReprintPosition(position);
+        }
+
+        private void ReprintPosition(Point position)
+        {
+            if(screenBuffer.ContainsKey(position))
+                DrawCharacter(position, screenBuffer[position], defaultGraphics);
+        }
+
+        private bool blinkEnabled;
+        public void EnableBlink()
+        {
+            blinkEnabled = true;
+            ReprintAllBlinks();
+        }
+
+        public void DisableBlink()
+        {
+            blinkEnabled = false;
+            ReprintAllBlinks();
+        }
+
+        private List<Point> blinkPositions = new List<Point>();
+
+        public void SetBlink(Point position, bool isBlink)
+        {
+            if(isBlink && !blinkPositions.Contains(position))
+            {
+                blinkPositions.Add(position);
+                ReprintPosition(position);
+            }
+            else if(!isBlink && blinkPositions.Contains(position))
+            {
+                blinkPositions.Remove(position);
+                ReprintPosition(position);
+            }
         }
     }
 }

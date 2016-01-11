@@ -61,5 +61,11 @@ namespace Konamiman.NestorMSX.Hardware
         /// </summary>
         /// <param name="colorIndex">Color index of the new backdrop color.</param>
         void SetBackdropColor(byte colorIndex);
+
+        void SetBlinkTextColor(byte colorIndex);
+
+        void SetBlinkBackdropColor(byte colorIndex);
+
+        void SetBlinkTimes(decimal onTimeInMs, decimal offTimeInMs);
     }
 }

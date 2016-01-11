@@ -36,6 +36,14 @@ namespace Konamiman.NestorMSX.Host
         /// <param name="background">New background color of the character</param>
         void SetCharacterColors(byte charIndex, Color foreground, Color background);
 
+        void SetBlinkColors(Color foreground, Color background);
+
+        void EnableBlink();
+
+        void DisableBlink();
+
+        void SetBlink(Point position, bool isBlink);
+
         /// <summary>
         /// Notifies that the character width has changed
         /// </summary>

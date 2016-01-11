@@ -24,6 +24,8 @@ namespace Konamiman.NestorMSX
         static void Main(string[] args)
         {
             Application.EnableVisualStyles();
+            Application.ThreadException += Application_ThreadException;
+            AppDomain.CurrentDomain.UnhandledException  += CurrentDomainOnUnhandledException;
 
             stateFilePath = "NestorMSX.state".AsApplicationFilePath();
 
@@ -49,6 +51,16 @@ namespace Konamiman.NestorMSX
             Application.ApplicationExit += Application_ApplicationExit;
 
             emulationEnvironment.Run();
+        }
+
+        private static void CurrentDomainOnUnhandledException(object sender, UnhandledExceptionEventArgs unhandledExceptionEventArgs)
+        {
+            throw new NotImplementedException();
+        }
+
+        private static void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)
+        {
+            throw new NotImplementedException();
         }
 
         private static void Application_ApplicationExit(object sender, EventArgs e)

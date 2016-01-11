@@ -5,6 +5,7 @@ using System.Linq;
 using Konamiman.NestorMSX.Exceptions;
 using Konamiman.NestorMSX.Hardware;
 using Konamiman.NestorMSX.Misc;
+using Konamiman.Z80dotNet;
 
 namespace Konamiman.NestorMSX.Host
 {
@@ -26,6 +27,8 @@ namespace Konamiman.NestorMSX.Host
         private int numberOfRows = 24;
         private int textColorIndex;
         private int backdropColorIndex;
+        private int blinkTextColorIndex;
+        private int blinkBackdropColorIndex;
 
         public DisplayRenderer(ICharacterBasedDisplay display, Configuration config)
         {
@@ -91,6 +94,11 @@ namespace Konamiman.NestorMSX.Host
             display.SetColumns(columns);
 
             SetAllCharsColors();
+
+            if(mode == SCREEN_0 && columns == 80 && blinkTimesAvailable)
+                display.EnableBlink();
+            else
+                display.DisableBlink();
         }
 
         public void WriteToNameTable(int position, byte value)
@@ -116,6 +124,14 @@ namespace Konamiman.NestorMSX.Host
 
         public void WriteToColourTable(int position, byte value)
         {
+            if(currentScreenMode == SCREEN_1)
+                WriteToColourTableForScreen1(position, value);
+            else if(currentScreenMode == SCREEN_0 && screenWidthInCharacters == 80)
+                WriteToColourTableForScreen0(position, value);
+        }
+
+        private void WriteToColourTableForScreen1(int position, byte value)
+        {
             var foregroundColorIndex = value >> 4;
             var backgroundColorIndex = value & 0x0F;
 
@@ -125,6 +141,17 @@ namespace Konamiman.NestorMSX.Host
                 CharacterColorsForScreen1[charIndex] = new Tuple<byte, byte>((byte)foregroundColorIndex, (byte)backgroundColorIndex);
                 if(currentScreenMode == SCREEN_1)
                     display.SetCharacterColors((byte)(firstCharIndex + i), Colors[foregroundColorIndex], Colors[backgroundColorIndex]);
+            }
+        }
+
+        private void WriteToColourTableForScreen0(int position, byte value)
+        {
+            var y = position / 10;
+            var x = (position - y * 10) * 8;
+            
+            for(var bitIndex = 7; bitIndex >=0; bitIndex--) {
+                display.SetBlink(new Point(x, y), value.GetBit(bitIndex));
+                x++;
             }
         }
 
@@ -166,7 +193,6 @@ namespace Konamiman.NestorMSX.Host
             if(currentScreenMode == SCREEN_0)
                 SetAllCharsColorsForScreen0();
         }
-
         
         private void ThrowParseColorsException(Exception exception)
         {
@@ -206,6 +232,36 @@ namespace Konamiman.NestorMSX.Host
                         Colors[CharacterColorsForScreen1[charIndex].Item1],
                         Colors[CharacterColorsForScreen1[charIndex].Item2]);
             }
+
+            if (currentScreenMode == SCREEN_0 && screenWidthInCharacters == 80 && (
+                colorIndex == blinkTextColorIndex || colorIndex == blinkBackdropColorIndex))
+            {
+                display.SetBlinkColors(Colors[blinkTextColorIndex], Colors[blinkBackdropColorIndex]);
+            }
+        }
+
+        public void SetBlinkTextColor(byte colorIndex)
+        {
+            this.blinkTextColorIndex = colorIndex;
+            display.SetBlinkColors(Colors[blinkTextColorIndex], Colors[blinkBackdropColorIndex]);
+        }
+
+        public void SetBlinkBackdropColor(byte colorIndex)
+        {
+            this.blinkBackdropColorIndex = colorIndex;
+            display.SetBlinkColors(Colors[blinkTextColorIndex], Colors[blinkBackdropColorIndex]);
+        }
+
+        private bool blinkTimesAvailable;
+        public void SetBlinkTimes(decimal onTimeInMs, decimal offTimeInMs)
+        {
+            blinkTimesAvailable = !(onTimeInMs == 0 && offTimeInMs == 0);
+
+            if(!blinkTimesAvailable) {
+                display.DisableBlink();
+            }
+            else if(screenWidthInCharacters == 80)
+                display.EnableBlink();
         }
     }
 }

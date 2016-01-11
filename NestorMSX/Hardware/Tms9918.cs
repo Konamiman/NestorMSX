@@ -14,7 +14,13 @@ namespace Konamiman.NestorMSX.Hardware
     /// </summary>
     public class Tms9918 : IExternallyControlledTms9918, IDisposable
     {
-        private const int colorTableLength = 32;
+        private static decimal[] blinkTimes =
+        {
+            0M, 166.9M, 333.8M, 500.6M, 667.5M, 834.4M, 1001.3M, 1168.2M,
+            1335.1M, 1509.9M, 1668.8M, 1835.7M, 2002.6M, 2169.5M, 2336.3M, 2503.2M
+        };
+
+        private int colorTableLength = 32;
         private const int patternGeneratorTableLength = 2048;
 
         private readonly ITms9918DisplayRenderer displayRenderer;
@@ -35,8 +41,10 @@ namespace Konamiman.NestorMSX.Hardware
         private bool in27RowsMode;
         private byte paletteRegisterValue;
         private byte? valueWrittenToPort2;
-        private byte oldTextColor;
-        private byte oldBackdropColor;
+        private byte textColor;
+        private byte backdropColor;
+        private byte blinkTextColor;
+        private byte blinkBackdropColor;
         private bool screenIsActive;
 
         private int _patternGeneratorTableAddress;
@@ -157,6 +165,7 @@ namespace Konamiman.NestorMSX.Hardware
 
             this.columns = columns;
             currentlyIn80ColumnsMode = (columns == 80);
+            colorTableLength = columns == 80 ? 270 : 32;
             //Debug.WriteLine($"Set mode: {mode}, {columns}");
             screenMode = mode;
             displayRenderer.SetScreenMode((byte)mode, (byte)columns);
@@ -284,6 +293,8 @@ namespace Konamiman.NestorMSX.Hardware
                     break;
 
                 case 3:
+                    if (currentlyIn80ColumnsMode)
+                        value &= 0xF8;
                     colorTableLow = value;
                     SetColorTableAddress();
                     break;
@@ -296,13 +307,13 @@ namespace Konamiman.NestorMSX.Hardware
                     var newTextColor = (byte)(value >> 4);
                     var newBackdropColor = (byte)(value & 0x0F);
 
-                    if (newBackdropColor != oldBackdropColor)
+                    if (newBackdropColor != backdropColor)
                         displayRenderer.SetBackdropColor(newBackdropColor);
-                    if(newTextColor != oldTextColor)
+                    if(newTextColor != textColor)
                         displayRenderer.SetTextColor(newTextColor);
 
-                    oldBackdropColor = newBackdropColor;
-                    oldTextColor = newTextColor;
+                    backdropColor = newBackdropColor;
+                    textColor = newTextColor;
                     break;
 
                 case 9:
@@ -317,6 +328,25 @@ namespace Konamiman.NestorMSX.Hardware
                 case 10:
                     colorTableHigh = (byte)(value & 7);
                     SetColorTableAddress();
+                    break;
+
+                case 12:
+                    var newBlinkTextColor = (byte)(value >> 4);
+                    var newBlinkBackdropColor = (byte)(value & 0x0F);
+
+                    if (newBlinkBackdropColor != blinkBackdropColor)
+                        displayRenderer.SetBlinkBackdropColor(newBlinkBackdropColor);
+                    if (newBlinkTextColor != blinkTextColor)
+                        displayRenderer.SetBlinkTextColor(newBlinkTextColor);
+
+                    blinkBackdropColor = newBlinkBackdropColor;
+                    blinkTextColor = newBlinkTextColor;
+                    break;
+
+                case 13:
+                    var onTime = blinkTimes[(value >> 4) & 0xF];
+                    var offTime = blinkTimes[value & 0xF];
+                    displayRenderer.SetBlinkTimes(onTime, offTime);
                     break;
 
                 case 14:
@@ -423,7 +453,7 @@ namespace Konamiman.NestorMSX.Hardware
                 displayRenderer.WriteToPatternGeneratorTable(address - PatternGeneratorTableAddress, value);
                 //Debug.WriteLine($"GENERATOR[x{address - PatternGeneratorTableAddress:X}] = {value}");
             }
-            if(screenMode != 1 && address >= ColorTableAddress && address < ColorTableAddress + colorTableLength) {
+            if(address >= ColorTableAddress && address < ColorTableAddress + colorTableLength) {
                 displayRenderer.WriteToColourTable(address - ColorTableAddress, value);
             }
         }
