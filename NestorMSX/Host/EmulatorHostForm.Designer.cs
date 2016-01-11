@@ -149,7 +149,7 @@
 
         #endregion
 
-        private System.Windows.Forms.PictureBox canvas;
+        private DoubleBufferedPictureBox canvas;
         private System.Windows.Forms.MenuStrip mainMenu;
         private System.Windows.Forms.ToolStripMenuItem emulationToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem resetCPUToolStripMenuItem;

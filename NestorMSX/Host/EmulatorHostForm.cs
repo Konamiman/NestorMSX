@@ -83,6 +83,23 @@ namespace Konamiman.NestorMSX.Host
                 RequiresPaint(this, paintEventArgs);
         }
 
+        public void SuspendCanvasLayout()
+        {
+            //this.Invoke(new Action(() => canvas.SuspendDrawing(this)));
+        }
+
+        public void ResumeCanvasLayout()
+        {
+            //if(this.InvokeRequired)
+            //{
+            //    this.Invoke(new Action(() => canvas.ResumeDrawing(this)));
+            //}
+            //else
+            //{
+            //    canvas.ResumeDrawing(this);
+            //}
+        }
+
         #endregion
 
         #region Keyboard management

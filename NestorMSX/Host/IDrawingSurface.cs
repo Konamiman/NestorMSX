@@ -20,5 +20,9 @@ namespace Konamiman.NestorMSX.Host
         /// </summary>
         /// <returns></returns>
         Graphics GetGraphics();
+
+        void SuspendCanvasLayout();
+
+        void ResumeCanvasLayout();
     }
 }

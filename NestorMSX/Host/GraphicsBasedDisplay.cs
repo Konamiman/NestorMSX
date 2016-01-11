@@ -33,6 +33,7 @@ namespace Konamiman.NestorMSX.Host
             ValidateConfiguration(config);
 
             this.config = config;
+            this.drawingSurface = drawingSurface;
 
             BackdropColor = Color.Blue;
 
@@ -62,12 +63,25 @@ namespace Konamiman.NestorMSX.Host
             }
         }
 
+        private int trX, trY;
+        private float scX, scY;
+        private Func<int, int> transfX, transfY;
         private void Transform(Graphics graphics)
         {
+            //var horizontalStretch = doubleColumns ? 2 : 1;
+            //var horizontalMarginMultiplier = doubleColumns ? 2 : 1;
+            //graphics.ScaleTransform((float)config.DisplayZoomLevel / horizontalStretch, (float)config.DisplayZoomLevel);
+            //graphics.TranslateTransform(config.HorizontalMarginInPixels * horizontalMarginMultiplier, config.VerticalMarginInPixels);
+
             var horizontalStretch = doubleColumns ? 2 : 1;
             var horizontalMarginMultiplier = doubleColumns ? 2 : 1;
-            graphics.ScaleTransform((float)config.DisplayZoomLevel / horizontalStretch, (float)config.DisplayZoomLevel);
-            graphics.TranslateTransform(config.HorizontalMarginInPixels * horizontalMarginMultiplier, config.VerticalMarginInPixels);
+            scX = (float)config.DisplayZoomLevel / horizontalStretch;
+            scY = (float)config.DisplayZoomLevel;
+            trX = config.HorizontalMarginInPixels * horizontalMarginMultiplier;
+            trY = config.VerticalMarginInPixels;
+
+            transfX = x => (int)((x + trX) * scX);
+            transfY = y => (int)((y + trY) * scY);
         }
 
         private void RepaintAll(Graphics graphics)
@@ -76,6 +90,10 @@ namespace Konamiman.NestorMSX.Host
             foreach(var item in screenBuffer)
                 DrawCharacter(item.Key, item.Value, graphics);
         }
+
+        private Dictionary<Point, BufferedGraphics> bufferedGraphicsWidth6 = new Dictionary<Point, BufferedGraphics>();
+        private Dictionary<Point, BufferedGraphics> bufferedGraphicsWidth8 = new Dictionary<Point, BufferedGraphics>();
+        private Dictionary<Point, BufferedGraphics> bufferedGraphics80columns = new Dictionary<Point, BufferedGraphics>();
 
         private void DrawCharacter(Point coordinates, byte charIndex, Graphics graphics)
         {
@@ -86,18 +104,30 @@ namespace Konamiman.NestorMSX.Host
                 var baseX = (coordinates.X*characterWidth) + (characterWidth == 6 ? 8 : 0);
                 var X = baseX;
                 var Y = coordinates.Y*8;
+                var point = new Point(X, Y);
+
+                var bufferedGraphics = characterWidth == 8 ? bufferedGraphicsWidth8 :
+                    doubleColumns ? bufferedGraphics80columns : bufferedGraphicsWidth6;
+                
+                if(!bufferedGraphics.ContainsKey(point))
+                    bufferedGraphics[point] = BufferedGraphicsManager.Current.Allocate(graphics,
+                        new Rectangle(transfX(X), transfY(Y), (int)(characterWidth*scX), (int)(8*scY)));
+                var bg = bufferedGraphics[point];
+                var g = bg.Graphics;
+
                 var brushes = blinkEnabled && blinkPositions.Contains(coordinates) ? blinkBrushes : characterBrushes[charIndex];
                 var pattern = characterPatterns[charIndex];
-                graphics.FillRectangle(brushes.Item2, baseX, Y, characterWidth, 8);
+                g.FillRectangle(brushes.Item2, transfX(baseX), transfY(Y), (int)(characterWidth * scX), (int)(8 * scY));
                 for(int row = 0; row < 8; row++) {
                     for(int column = 7; column >= 8 - characterWidth; column--) {
                         if(pattern[row].GetBit(column)) {
-                            graphics.FillRectangle(brushes.Item1, X + (7 - column), Y, 1, 1);
+                            g.FillRectangle(brushes.Item1,transfX(X + (7 - column)), transfY(Y), scX, scY);
                         }
                     }
                     X = baseX;
                     Y++;
                 }
+                bg.Render(graphics);
             }
         }
 
