@@ -121,7 +121,7 @@ namespace Konamiman.NestorMSX.Hardware
             vramSize = vramSizeInKB * 1024;
             vramAddressMask = vramSize - 1;
 
-            _PatternNameTableAddress = 0;// 0x1800;
+            _PatternNameTableAddress = 0x1800;
             _colorTableAddress = 0x2000;
             _patternGeneratorTableAddress = 0x800;
 
@@ -130,7 +130,7 @@ namespace Konamiman.NestorMSX.Hardware
 
             this.displayRenderer = displayRenderer;
             displayRenderer.BlankScreen();
-            SetScreenMode(1, 40);
+            //SetScreenMode(1, 40);
 
             if(config.VdpFrequencyMultiplier < 0.01M || config.VdpFrequencyMultiplier > 100)
                 throw new ConfigurationException("The VDP frequency multiplier must be a number between 0.01 and 100.");
@@ -379,17 +379,19 @@ namespace Konamiman.NestorMSX.Hardware
 
         private static Bit[] width80Bits = {1, 0, 0, 1, 0};
 
-        Bit[] previousModeBits = { 0, 0, 0, 0, 0 };
+        Bit[] previousModeBits = null;
         private void SetModeBit(int mode, Bit value, bool changeScreenMode)
         {
             modeBits[mode - 1] = value;
             if(!changeScreenMode)
                 return;
 
-            if(modeBits.SequenceEqual(previousModeBits))
+            if(previousModeBits == null)
+                previousModeBits = new Bit[] { 0, 0, 0, 0, 0 };
+            else if(modeBits.SequenceEqual(previousModeBits))
                 return;
 
-            if(modeBits.SequenceEqual(width80Bits)) {
+            if (modeBits.SequenceEqual(width80Bits)) {
                 SetScreenMode(1, 80);
                 return;
             }

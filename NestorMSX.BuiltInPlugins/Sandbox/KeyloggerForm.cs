@@ -12,7 +12,10 @@ namespace Konamiman.NestorMSX.BuiltInPlugins
 
         public void Append(string text)
         {
-            Invoke(new Action(() => { txtDebug.Text += text; } ));
+            if(InvokeRequired)
+                Invoke(new Action(() => { txtDebug.Text += text; } ));
+            else
+                txtDebug.Text += text;
         }
     }
 }

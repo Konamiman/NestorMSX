@@ -55,12 +55,14 @@ namespace Konamiman.NestorMSX
 
         private static void CurrentDomainOnUnhandledException(object sender, UnhandledExceptionEventArgs unhandledExceptionEventArgs)
         {
-            throw new NotImplementedException();
+            var ex = (Exception)unhandledExceptionEventArgs.ExceptionObject;
+            Tell($"Unexpected appdomain exception: ({ex.GetType().Name}) {ex.Message}\r\n{ex.StackTrace}");
         }
 
         private static void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)
         {
-            throw new NotImplementedException();
+            var ex = e.Exception;
+            Tell($"Unexpected thread exception: ({ex.GetType().Name}) {ex.Message}\r\n{ex.StackTrace}");
         }
 
         private static void Application_ApplicationExit(object sender, EventArgs e)

@@ -151,6 +151,9 @@ namespace Konamiman.NestorMSX.Host
         private void resetCPUToolStripMenuItem_Click(object sender, EventArgs e)
         {
             emulationEnvironment.SlotsSystem.EnableSlot(0, 0);
+            emulationEnvironment.SlotsSystem.EnableSlot(1, 0);
+            emulationEnvironment.SlotsSystem.EnableSlot(2, 0);
+            emulationEnvironment.SlotsSystem.EnableSlot(3, 0);
             emulationEnvironment.Z80.Reset();
         }
 
