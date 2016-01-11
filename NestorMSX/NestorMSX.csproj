@@ -163,6 +163,10 @@
     <None Include="machines\Shared\SpanishMsx2ExtendedBios.rom">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <Content Include="machines\Tons of RAM\machine.config">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="NestorMSX.config.old">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

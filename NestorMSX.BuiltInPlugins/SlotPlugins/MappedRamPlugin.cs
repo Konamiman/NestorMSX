@@ -13,7 +13,7 @@ namespace Konamiman.NestorMSX.Plugins
 
         public MappedRamPlugin(PluginContext context, IDictionary<string, object> pluginConfig)
         {
-            var sizeInKb = pluginConfig.GetValue<int>("sizeInKb");
+            var sizeInKb = pluginConfig.GetValueOrDefault<int>("sizeInKb", 4096);
             sizeInSegments = sizeInKb/16;
 
             this.mappedRam = new MappedRam(sizeInSegments);
