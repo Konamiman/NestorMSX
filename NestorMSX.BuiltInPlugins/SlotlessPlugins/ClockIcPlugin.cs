@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using Konamiman.Z80dotNet;
+using Konamiman.NestorMSX.Misc;
+using System.IO;
 
 namespace Konamiman.NestorMSX.Plugins
 {
@@ -8,12 +10,27 @@ namespace Konamiman.NestorMSX.Plugins
     public class ClockIcPlugin
     {
         private static ClockIcPlugin Instance;
-        private byte[][] data = new byte[4][];
+        private byte[] data;
+        private string dataFilePath;
 
         private ClockIcPlugin(PluginContext context, IDictionary<string, object> pluginConfig)
         {
-            for(int i=0; i<4; i++)
-                data[i] = new byte[13];
+            var machineName = pluginConfig.GetValue<string>("NestorMSX.machineName");
+            dataFilePath = $"$ApplicationData$/NestorMSX/{machineName}/clock-ic.dat".AsAbsolutePath();
+            
+            try {
+                var dataFileDirectory = Path.GetDirectoryName(dataFilePath);
+                if(!Directory.Exists(dataFileDirectory))
+                    Directory.CreateDirectory(dataFileDirectory);
+
+                data = File.ReadAllBytes(dataFilePath);
+            }
+            catch(IOException) {
+                data = new byte[4 * 13];
+            }
+            
+            if(data.Length != 4 * 13)
+                data = new byte[4 * 13];
 
             context.Cpu.MemoryAccess += Cpu_MemoryAccess;
         }
@@ -60,8 +77,11 @@ namespace Konamiman.NestorMSX.Plugins
             }
             else if(registerNumber < 13)
             {
-                
-                data[currentBlock][registerNumber] = (byte)(value & 0x0F);
+                data[currentBlock * 13 + registerNumber] = (byte)(value & 0x0F);
+                try {
+                    File.WriteAllBytes(dataFilePath, data);
+                } catch(IOException ex) {
+                }
             }
         }
 
@@ -72,7 +92,7 @@ namespace Konamiman.NestorMSX.Plugins
             else if(currentBlock == 0)
                 return (byte)(ReadDataComponent(registerNumber) & 0x0F);
             else
-                return data[currentBlock][registerNumber];
+                return data[currentBlock * 13 + registerNumber];
         }
 
         private int ReadDataComponent(int registerNumber)
