@@ -151,12 +151,18 @@ namespace Konamiman.NestorMSX.Host
         }
 
         private bool doubleColumns = false;
+        private int oldColumns;
         public void SetColumns(int columns)
         {
+            if(columns == oldColumns)
+                return;
+
+            oldColumns = columns;
             doubleColumns = (columns > 40);
             lock(syncObject) {
                 defaultGraphics.ResetTransform();
                 Transform(defaultGraphics);
+                ClearScreen(defaultGraphics);
                 RepaintAll(defaultGraphics);
             }
         }

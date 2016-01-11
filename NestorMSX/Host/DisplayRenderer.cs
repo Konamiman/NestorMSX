@@ -24,6 +24,8 @@ namespace Konamiman.NestorMSX.Host
         private Dictionary<byte, byte[]> characterPatterns = new Dictionary<byte, byte[]>();
         private readonly Dictionary<byte, Tuple<byte, byte>> CharacterColorsForScreen1 = new Dictionary<byte, Tuple<byte, byte>>();
         private int numberOfRows = 24;
+        private int textColorIndex;
+        private int backdropColorIndex;
 
         public DisplayRenderer(ICharacterBasedDisplay display, Configuration config)
         {
@@ -128,6 +130,7 @@ namespace Konamiman.NestorMSX.Host
 
         public void SetTextColor(byte colorIndex)
         {
+            textColorIndex = colorIndex;
             TextColor = Colors[colorIndex];
             if(currentScreenMode == SCREEN_0)
                 SetAllCharsColorsForScreen0();
@@ -157,6 +160,7 @@ namespace Konamiman.NestorMSX.Host
 
         public void SetBackdropColor(byte colorIndex)
         {
+            backdropColorIndex = colorIndex;
             display.SetBackdropColor(Colors[colorIndex]);
             BackdropColor = Colors[colorIndex];
             if(currentScreenMode == SCREEN_0)
@@ -188,7 +192,20 @@ namespace Konamiman.NestorMSX.Host
             var color = Color.FromArgb(convertComponent(value.R), convertComponent(value.G), convertComponent(value.B));
             Colors[colorIndex] = color;
 
-            SetAllCharsColors();
+            if(currentScreenMode == SCREEN_0 && colorIndex == textColorIndex)
+                SetTextColor((byte)textColorIndex);
+            else if(currentScreenMode == SCREEN_0 && colorIndex == backdropColorIndex)
+                SetBackdropColor((byte)backdropColorIndex);
+            else if (currentScreenMode == SCREEN_1)
+            {
+                var affectedChars = CharacterColorsForScreen1.Keys.Where(k =>
+                    CharacterColorsForScreen1[k].Item1 == colorIndex || CharacterColorsForScreen1[k].Item2 == colorIndex);
+
+                foreach(var charIndex in affectedChars)
+                    display.SetCharacterColors(charIndex, 
+                        Colors[CharacterColorsForScreen1[charIndex].Item1],
+                        Colors[CharacterColorsForScreen1[charIndex].Item2]);
+            }
         }
     }
 }

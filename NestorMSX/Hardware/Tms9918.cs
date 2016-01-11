@@ -35,6 +35,9 @@ namespace Konamiman.NestorMSX.Hardware
         private bool in27RowsMode;
         private byte paletteRegisterValue;
         private byte? valueWrittenToPort2;
+        private byte oldTextColor;
+        private byte oldBackdropColor;
+        private bool screenIsActive;
 
         private int _patternGeneratorTableAddress;
         public int PatternGeneratorTableAddress
@@ -45,10 +48,13 @@ namespace Konamiman.NestorMSX.Hardware
             }
             private set
             {
-                //Debug.WriteLine($"Pattern generator table: x{value:X}");
-                _patternGeneratorTableAddress = value;
-                for(var position = 0; position < patternGeneratorTableLength; position++)
-                    displayRenderer.WriteToPatternGeneratorTable(position, Vram[PatternGeneratorTableAddress + position]);
+                if(_patternGeneratorTableAddress != value) {
+                    //Debug.WriteLine($"Pattern generator table: x{value:X}");
+                    _patternGeneratorTableAddress = value;
+                    for(var position = 0; position < patternGeneratorTableLength; position++)
+                        displayRenderer.WriteToPatternGeneratorTable(position,
+                            Vram[PatternGeneratorTableAddress + position]);
+                }
             }
         }
 
@@ -70,8 +76,10 @@ namespace Konamiman.NestorMSX.Hardware
             private set
             {
                 //Debug.WriteLine($"Pattern name table: x{value:X}");
-                _PatternNameTableAddress = value;
-                ReprintAll();
+                if(_PatternNameTableAddress != value) {
+                    _PatternNameTableAddress = value;
+                    ReprintAll();
+                }
             }
         }
 
@@ -85,9 +93,12 @@ namespace Konamiman.NestorMSX.Hardware
             private set
             {
                 //Debug.WriteLine($"Color table: x{value:X}");
-                _colorTableAddress = value;
-                for(int i = 0; i < colorTableLength; i++)
-                    displayRenderer.WriteToColourTable(i, Vram[_colorTableAddress + i]);
+
+                if(_colorTableAddress != value) {
+                    _colorTableAddress = value;
+                    for(int i = 0; i < colorTableLength; i++)
+                        displayRenderer.WriteToColourTable(i, Vram[_colorTableAddress + i]);
+                }
             }
         }
 
@@ -142,6 +153,8 @@ namespace Konamiman.NestorMSX.Hardware
         int columns;
         private void SetScreenMode(int mode, int columns)
         {
+            previousModeBits = modeBits.ToArray();
+
             this.columns = columns;
             currentlyIn80ColumnsMode = (columns == 80);
             //Debug.WriteLine($"Set mode: {mode}, {columns}");
@@ -255,10 +268,12 @@ namespace Konamiman.NestorMSX.Hardware
                     else
                         IntLineIsActive = false;
 
-                    if(value.GetBit(6))
+                    var newScreenIsActive = value.GetBit(6);
+                    if(newScreenIsActive && !screenIsActive)
                         displayRenderer.ActivateScreen();
-                    else
+                    else if(!newScreenIsActive && screenIsActive)
                         displayRenderer.BlankScreen();
+                    screenIsActive = newScreenIsActive;
 
                     break;
 
@@ -278,8 +293,16 @@ namespace Konamiman.NestorMSX.Hardware
                     break;
 
                 case 7:
-                    displayRenderer.SetBackdropColor((byte)(value & 0x0F));
-                    displayRenderer.SetTextColor((byte)(value >> 4));
+                    var newTextColor = (byte)(value >> 4);
+                    var newBackdropColor = (byte)(value & 0x0F);
+
+                    if (newBackdropColor != oldBackdropColor)
+                        displayRenderer.SetBackdropColor(newBackdropColor);
+                    if(newTextColor != oldTextColor)
+                        displayRenderer.SetTextColor(newTextColor);
+
+                    oldBackdropColor = newBackdropColor;
+                    oldTextColor = newTextColor;
                     break;
 
                 case 9:
@@ -326,10 +349,14 @@ namespace Konamiman.NestorMSX.Hardware
 
         private static Bit[] width80Bits = {1, 0, 0, 1, 0};
 
+        Bit[] previousModeBits = { 0, 0, 0, 0, 0 };
         private void SetModeBit(int mode, Bit value, bool changeScreenMode)
         {
             modeBits[mode - 1] = value;
             if(!changeScreenMode)
+                return;
+
+            if(modeBits.SequenceEqual(previousModeBits))
                 return;
 
             if(modeBits.SequenceEqual(width80Bits)) {

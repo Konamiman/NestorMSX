@@ -28,7 +28,7 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(EmulatorHostForm));
-            this.canvas = new System.Windows.Forms.PictureBox();
+            this.canvas = new DoubleBufferedPictureBox();
             this.mainMenu = new System.Windows.Forms.MenuStrip();
             this.pluginsMenu = new System.Windows.Forms.ToolStripMenuItem();
             this.emulationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();

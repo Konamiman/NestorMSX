@@ -63,6 +63,9 @@
   <ItemGroup>
     <Compile Include="Configuration.cs" />
     <Compile Include="Exceptions\EmulationEnvironmentCreationException.cs" />
+    <Compile Include="Host\DoubleBufferedPictureBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Host\EmulatorHostForm.cs">
       <SubType>Form</SubType>
     </Compile>
