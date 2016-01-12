@@ -17,6 +17,17 @@ namespace Konamiman.NestorMSX.Menus
         public event EventHandler TitleChanged;
 
         /// <summary>
+        /// Creates a menu entry that will be rendered as a separator.
+        /// </summary>
+        /// <param name="isVisible">Initial value for the IsVisible property</param>
+        /// <param name="isEnabled">Initial value for the IsEnabled property</param>
+        /// <returns></returns>
+        public static MenuEntry CreateSeparator(bool isVisible = true, bool isEnabled = true)
+        {
+            return new MenuEntry("-", () => { }) { IsVisible = isVisible, IsEnabled = isEnabled };
+        }
+
+        /// <summary>
         /// Creates a new menu entry that has an associated action
         /// </summary>
         /// <param name="title">Title to display in the menu entry</param>

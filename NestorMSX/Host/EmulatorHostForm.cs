@@ -20,9 +20,9 @@ namespace Konamiman.NestorMSX.Host
         private const int WM_KEYUP = 0x101;
 
         private readonly List<Keys> PressedKeys = new List<Keys>();
-        private readonly IDictionary<object, ToolStripMenuItem> menuItemsByPlugin = new Dictionary<object, ToolStripMenuItem>();
-        private readonly IDictionary<MenuEntry, ToolStripMenuItem> menuItemsByMenuEntry = new Dictionary<MenuEntry, ToolStripMenuItem>();
-        private readonly IDictionary<ToolStripMenuItem, MenuEntry> menuEntriesByMenuItem = new Dictionary<ToolStripMenuItem, MenuEntry>();
+        private readonly IDictionary<object, ToolStripItem> menuItemsByPlugin = new Dictionary<object, ToolStripItem>();
+        private readonly IDictionary<MenuEntry, ToolStripItem> menuItemsByMenuEntry = new Dictionary<MenuEntry, ToolStripItem>();
+        private readonly IDictionary<ToolStripItem, MenuEntry> menuEntriesByMenuItem = new Dictionary<ToolStripItem, MenuEntry>();
 
         public void SetFormTitle(string title)
         {
@@ -215,7 +215,7 @@ namespace Konamiman.NestorMSX.Host
             }
         }
 
-        private void UnsubscribeFromEvents(ToolStripMenuItem oldMenuItem)
+        private void UnsubscribeFromEvents(ToolStripItem oldMenuItem)
         {
             var entry = menuEntriesByMenuItem[oldMenuItem];
             entry.EnableChanged -= Entry_EnableChanged;
@@ -226,25 +226,43 @@ namespace Konamiman.NestorMSX.Host
             menuItemsByMenuEntry.Remove(entry);
             menuEntriesByMenuItem.Remove(oldMenuItem);
 
-            foreach(var subMenu in oldMenuItem.DropDown.Items)
-                UnsubscribeFromEvents((ToolStripMenuItem)subMenu);
+            if(oldMenuItem is ToolStripMenuItem)
+                foreach(var subMenu in ((ToolStripMenuItem)oldMenuItem).DropDown.Items)
+                    UnsubscribeFromEvents((ToolStripMenuItem)subMenu);
         }
 
-        private ToolStripMenuItem GenerateMenuItem(MenuEntry entry)
+        private ToolStripItem GenerateMenuItem(MenuEntry entry)
         {
-            var newMenuItem = new ToolStripMenuItem(entry.Title);
+            ToolStripItem newMenuItem;
 
-            entry.EnableChanged += Entry_EnableChanged;
-            entry.VisibleChanged += Entry_VisibleChanged;
-            entry.TitleChanged += Entry_TitleChanged;
+            if(entry.Title == "-") {
+                newMenuItem = new ToolStripSeparator() {
+                    Visible = entry.IsVisible,
+                    Enabled = entry.IsEnabled
+                };
 
-            if(entry.Callback != null) {
-                newMenuItem.Click += (sender, args) => entry.Callback();
-                entry.CheckedChanged += Entry_CheckedChanged;
+                entry.EnableChanged += Entry_EnableChanged;
+                entry.VisibleChanged += Entry_VisibleChanged;
             }
             else {
-                var subMenuItems = entry.ChildEntries.Select(GenerateMenuItem).ToArray();
-                newMenuItem.DropDown.Items.AddRange(subMenuItems);
+                newMenuItem = new ToolStripMenuItem(entry.Title) {
+                    Visible = entry.IsVisible,
+                    Enabled = entry.IsEnabled,
+                    Checked = entry.IsChecked
+                };
+
+                entry.EnableChanged += Entry_EnableChanged;
+                entry.VisibleChanged += Entry_VisibleChanged;
+                entry.TitleChanged += Entry_TitleChanged;
+
+                if(entry.Callback != null) {
+                    newMenuItem.Click += (sender, args) => entry.Callback();
+                    entry.CheckedChanged += Entry_CheckedChanged;
+                }
+                else {
+                    var subMenuItems = entry.ChildEntries.Select(GenerateMenuItem).ToArray();
+                    ((ToolStripMenuItem)newMenuItem).DropDown.Items.AddRange(subMenuItems);
+                }
             }
 
             menuItemsByMenuEntry[entry] = newMenuItem;
@@ -267,7 +285,7 @@ namespace Konamiman.NestorMSX.Host
         private void Entry_CheckedChanged(object sender, EventArgs e)
         {
             var menuEntry = (MenuEntry)sender;
-            menuItemsByMenuEntry[menuEntry].Checked = menuEntry.IsChecked;
+            ((ToolStripMenuItem)menuItemsByMenuEntry[menuEntry]).Checked = menuEntry.IsChecked;
         }
 
         private void Entry_EnableChanged(object sender, EventArgs e)

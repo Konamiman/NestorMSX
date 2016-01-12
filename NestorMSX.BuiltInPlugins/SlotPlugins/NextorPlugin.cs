@@ -34,6 +34,8 @@ namespace Konamiman.NestorMSX.Plugins
         private MenuEntry[] menuEntries;
         private bool[] imageFilesChanged = new bool[maxDeviceNumber];
         private MenuEntry[] removeFileMenuEntries;
+        private MenuEntry removeFileMainMenuEntry;
+        private MenuEntry separatorBeforeRemoveFileMenuEntry;
 
         private IDictionary<ushort, Action> kernelRoutines;
 
@@ -50,6 +52,8 @@ namespace Konamiman.NestorMSX.Plugins
                 { 0x4166, DEV_STATUS },
                 { 0x4169, LUN_INFO  }
             };
+
+            this.slotNumber = new SlotNumber(pluginConfig.GetValue<byte>("slotNumber"));
 
             this.diskImageNames = new string[maxDeviceNumber];
             this.diskImageFileStreams = new FileStream[maxDeviceNumber];
@@ -69,10 +73,10 @@ namespace Konamiman.NestorMSX.Plugins
 
             this.kernelFilePath = pluginConfig.GetMachineFilePath(pluginConfig.GetValue<string>("kernelFile"));
 
-            var imageFiles = pluginConfig.GetValue<string[]>("diskImageFiles");
+            var imageFiles = pluginConfig.GetValueOrDefault<string[]>("diskImageFiles", new string[0]);
             for(int i = 0; i < imageFiles.Length; i++) {
                 var diskImageFilePath = imageFiles[i].AsAbsolutePath(basePathForDiskImages);
-                SetFile(diskImageFilePath, i+1);
+                SetFile(diskImageFilePath, i+1, Path.GetFileName(diskImageFilePath));
             }
             
             for(int i = 0; i < maxDeviceNumber; i++)
@@ -80,24 +84,35 @@ namespace Konamiman.NestorMSX.Plugins
 
             this.z80 = context.Cpu;
             this.memory = context.SlotsSystem;
-            this.slotNumber = new SlotNumber(pluginConfig.GetValue<byte>("slotNumber"));
-
+            
             z80.BeforeInstructionFetch += Z80_BeforeInstructionFetch;
 
             this.kernel = new Ascii8Rom(ReadKernelFile());
         }
 
-        private void SetFile(string fullPath, int deviceIndex)
+        private void SetFile(string fullPath, int deviceIndex, string displayName)
         {
+            FileStream fileStream;
+            try {
+                fileStream = File.Open(fullPath, FileMode.Open, FileAccess.ReadWrite);
+            } catch(Exception ex) {
+                var message = $"Can't open disk image file:\r\n{fullPath}\r\n\r\n{ex.Message}";
+                MessageBox.Show(message, $"NextorMSX - Nextor in slot {slotNumber}");
+                return;
+            }
+
             this.diskImageNames[deviceIndex-1] = Path.GetFileName(fullPath);
 
             RemoveDiskImageFile(deviceIndex);
+            this.diskImageFileStreams[deviceIndex - 1] = fileStream;
 
-            this.diskImageFileStreams[deviceIndex-1] = File.Open(fullPath, FileMode.Open, FileAccess.ReadWrite);
             this.maxSectorNumbers[deviceIndex-1] = ((new FileInfo(fullPath)).Length) / 512 - 1;
 
-            menuEntries[deviceIndex - 1].Title = $"{deviceIndex}: {openFileDialog.SafeFileName}";
+            menuEntries[deviceIndex - 1].Title = $"{deviceIndex}: {displayName}";
             removeFileMenuEntries[deviceIndex - 1].IsVisible = true;
+
+            removeFileMainMenuEntry.IsVisible = true;
+            separatorBeforeRemoveFileMenuEntry.IsVisible = true;
         }
 
         private void CreateMenu()
@@ -107,13 +122,15 @@ namespace Konamiman.NestorMSX.Plugins
                 () => AskAndSetFileForDevice(i)))
                 .ToList();
 
-            menuEntries.Add(new MenuEntry("-", () => { }));
+            separatorBeforeRemoveFileMenuEntry = MenuEntry.CreateSeparator(isVisible: false);
+            menuEntries.Add(separatorBeforeRemoveFileMenuEntry);
 
             removeFileMenuEntries = Enumerable.Range(1, 7).Select(i =>
                 new MenuEntry(i.ToString(), () => RemoveDiskImageFile(i)) {IsVisible = false})
                 .ToArray();
 
-            menuEntries.Add(new MenuEntry("Remove image file", removeFileMenuEntries));
+            removeFileMainMenuEntry = new MenuEntry("Remove image file", removeFileMenuEntries) { IsVisible = false };
+            menuEntries.Add(removeFileMainMenuEntry);
 
             var mainEntry = new MenuEntry($"Nextor in slot {slotNumber}", menuEntries);
 
@@ -130,6 +147,9 @@ namespace Konamiman.NestorMSX.Plugins
 
             menuEntries[deviceIndex - 1].Title = $"{deviceIndex}: (no file)";
             removeFileMenuEntries[deviceIndex - 1].IsVisible = false;
+
+            removeFileMainMenuEntry.IsVisible = 
+            separatorBeforeRemoveFileMenuEntry.IsVisible = removeFileMenuEntries.Any(m => m.IsVisible);
         }
 
         private void AskAndSetFileForDevice(int deviceIndex)
@@ -139,7 +159,7 @@ namespace Konamiman.NestorMSX.Plugins
                 return;
 
             var hadPreviousFile = diskImageFileStreams[deviceIndex - 1] != null;
-            SetFile(openFileDialog.FileName, deviceIndex);
+            SetFile(openFileDialog.FileName, deviceIndex, openFileDialog.SafeFileName);
             
             imageFilesChanged[deviceIndex - 1] = hadPreviousFile;
         }
