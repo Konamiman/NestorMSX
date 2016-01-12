@@ -303,6 +303,7 @@ namespace Konamiman.NestorMSX.Plugins
             var info = new byte[12];
 
             info[2] = 2; //sector size = 0x200
+            info[7] = 1; //removable
 
             var numberOfSectors = BitConverter.GetBytes(maxSectorNumbers[deviceIndex-1] + 1);
             if(BitConverter.IsLittleEndian) {
