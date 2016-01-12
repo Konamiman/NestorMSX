@@ -10,13 +10,26 @@ namespace Konamiman.NestorMSX.Plugins
     public class ClockIcPlugin
     {
         private static ClockIcPlugin Instance;
-        private byte[] data;
-        private string dataFilePath;
+        private readonly byte[] data;
+        private readonly string dataFilePath;
+        private readonly bool useDataFile;
 
         private ClockIcPlugin(PluginContext context, IDictionary<string, object> pluginConfig)
         {
-            var machineName = pluginConfig.GetValue<string>("NestorMSX.machineName");
-            dataFilePath = $"$ApplicationData$/NestorMSX/{machineName}/clock-ic.dat".AsAbsolutePath();
+            context.Cpu.MemoryAccess += Cpu_MemoryAccess;
+
+            useDataFile = pluginConfig.GetValueOrDefault<bool>("useDataFile", true);
+            if(!useDataFile) {
+                data = new byte[4 * 13];
+                return;
+            }
+
+            var dataFileName = pluginConfig.GetValueOrDefault<string>("dataFileName", "clock-ic.dat");
+            var singleDataFile = pluginConfig.GetValueOrDefault<bool>("useSingleDataFileForAllMachines", false);
+            var machineName = 
+                singleDataFile ? "" :
+                pluginConfig.GetValue<string>("NestorMSX.machineName") + "/";
+            dataFilePath = $"{machineName}{dataFileName}".AsAbsolutePath();
             
             try {
                 var dataFileDirectory = Path.GetDirectoryName(dataFilePath);
@@ -31,8 +44,6 @@ namespace Konamiman.NestorMSX.Plugins
             
             if(data.Length != 4 * 13)
                 data = new byte[4 * 13];
-
-            context.Cpu.MemoryAccess += Cpu_MemoryAccess;
         }
 
         public static ClockIcPlugin GetInstance(PluginContext context, IDictionary<string, object> pluginConfig)
@@ -78,10 +89,11 @@ namespace Konamiman.NestorMSX.Plugins
             else if(registerNumber < 13)
             {
                 data[currentBlock * 13 + registerNumber] = (byte)(value & 0x0F);
-                try {
-                    File.WriteAllBytes(dataFilePath, data);
-                } catch(IOException ex) {
-                }
+                if(useDataFile)
+                    try {
+                        File.WriteAllBytes(dataFilePath, data);
+                    } catch(IOException ex) {
+                    }
             }
         }
 
