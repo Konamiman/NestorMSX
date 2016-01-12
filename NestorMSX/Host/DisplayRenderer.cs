@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using System.Threading;
 using Konamiman.NestorMSX.Exceptions;
 using Konamiman.NestorMSX.Hardware;
 using Konamiman.NestorMSX.Misc;
 using Konamiman.Z80dotNet;
+using System.Threading.Tasks;
 
 namespace Konamiman.NestorMSX.Host
 {
@@ -96,9 +99,9 @@ namespace Konamiman.NestorMSX.Host
             SetAllCharsColors();
 
             if(mode == SCREEN_0 && columns == 80 && blinkTimesAvailable)
-                display.EnableBlink();
+                EnableBlink();
             else
-                display.DisableBlink();
+                DisableBlink();
         }
 
         public void WriteToNameTable(int position, byte value)
@@ -243,25 +246,98 @@ namespace Konamiman.NestorMSX.Host
         public void SetBlinkTextColor(byte colorIndex)
         {
             this.blinkTextColorIndex = colorIndex;
-            display.SetBlinkColors(Colors[blinkTextColorIndex], Colors[blinkBackdropColorIndex]);
+            RestartBlink();
         }
 
         public void SetBlinkBackdropColor(byte colorIndex)
         {
             this.blinkBackdropColorIndex = colorIndex;
+            RestartBlink();
+        }
+
+        private void RestartBlink()
+        {
             display.SetBlinkColors(Colors[blinkTextColorIndex], Colors[blinkBackdropColorIndex]);
+            SetBlinkTimes(blinkOnTimeInMs, blinkOffTimeInMs);
         }
 
         private bool blinkTimesAvailable;
+        private decimal blinkOnTimeInMs, blinkOffTimeInMs;
         public void SetBlinkTimes(decimal onTimeInMs, decimal offTimeInMs)
         {
-            blinkTimesAvailable = !(onTimeInMs == 0 && offTimeInMs == 0);
+            blinkTimesAvailable = onTimeInMs != 0;
+            blinkOnTimeInMs = onTimeInMs;
+            blinkOffTimeInMs = offTimeInMs;
 
             if(!blinkTimesAvailable) {
-                display.DisableBlink();
+                DisableBlink();
             }
             else if(screenWidthInCharacters == 80)
+                EnableBlink();
+        }
+
+        private void EnableBlink()
+        {
+            DisableBlink();
+
+            if(blinkOffTimeInMs == 0) {
                 display.EnableBlink();
+                return;
+            }
+
+            blinkTaskCancellationTokenSource = new CancellationTokenSource();
+            blinkTask = Task.Factory.StartNew(
+                blinkTaskProcess,
+                new decimal[] {blinkOnTimeInMs, blinkOffTimeInMs}, 
+                blinkTaskCancellationTokenSource.Token);
+        }
+
+        private void DisableBlink()
+        {
+            display.DisableBlink();
+            KillBlinkTask();           
+        }
+
+        private void KillBlinkTask()
+        {
+            if (blinkTask != null) {
+                blinkTaskCancellationTokenSource.Cancel();
+                blinkTask.ContinueWith(t => t.Dispose());
+                blinkTask = null;
+            }
+        }
+
+        private CancellationTokenSource blinkTaskCancellationTokenSource;
+        private Task blinkTask;
+
+        private void blinkTaskProcess(object timesInMs)
+        {
+            var times = (decimal[])timesInMs;
+            var onTime = times[0];
+            var offTime = times[1];
+            var currentlyOn = false;
+            var currentTime = offTime;
+
+            var sw = new Stopwatch();
+            sw.Start();
+
+            while(!blinkTaskCancellationTokenSource.IsCancellationRequested) {
+                if(sw.ElapsedMilliseconds < currentTime)
+                    continue;
+
+                if(currentlyOn) {
+                    display.DisableBlink();
+                    currentlyOn = false;
+                    currentTime = offTime;
+                }
+                else {
+                    display.EnableBlink();
+                    currentlyOn = true;
+                    currentTime = onTime;
+                }
+
+                sw.Restart();
+            }
         }
     }
 }

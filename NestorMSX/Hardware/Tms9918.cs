@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using Konamiman.NestorMSX.Misc;
 using System.Drawing;
+using System.Threading;
 
 namespace Konamiman.NestorMSX.Hardware
 {
@@ -136,16 +137,18 @@ namespace Konamiman.NestorMSX.Hardware
                 throw new ConfigurationException("The VDP frequency multiplier must be a number between 0.01 and 100.");
 
             var interruptGenerationInterval = TimeSpan.FromSeconds(((double)1)/60).TotalMilliseconds/(double)config.VdpFrequencyMultiplier;
-            interruptGenerationTask = Task.Factory.StartNew(InterruptGenerationTaskProcess, interruptGenerationInterval);
+            interruptGenerationTaskCancellatonTokenSource = new CancellationTokenSource();
+            interruptGenerationTask = Task.Factory.StartNew(InterruptGenerationTaskProcess, interruptGenerationInterval, interruptGenerationTaskCancellatonTokenSource.Token);
         }
 
+        private CancellationTokenSource interruptGenerationTaskCancellatonTokenSource;
         private void InterruptGenerationTaskProcess(object interruptGenerationInterval)
         {
             var interval = (double)interruptGenerationInterval;
             var sw = new Stopwatch();
             sw.Start();
 
-            while(true)
+            while(!interruptGenerationTaskCancellatonTokenSource.IsCancellationRequested)
             {
                 if(sw.ElapsedMilliseconds < interval)
                     continue;
@@ -481,7 +484,8 @@ namespace Konamiman.NestorMSX.Hardware
 
         public void Dispose()
         {
-            interruptGenerationTask.Dispose();
+            interruptGenerationTaskCancellatonTokenSource.Cancel();
+            interruptGenerationTask.ContinueWith(t => t.Dispose());
         }
     }
 }
