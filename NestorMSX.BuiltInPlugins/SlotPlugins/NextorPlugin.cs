@@ -33,6 +33,7 @@ namespace Konamiman.NestorMSX.Plugins
         private Action<object, MenuEntry> setMenuEntry;
         private MenuEntry[] menuEntries;
         private bool[] imageFilesChanged = new bool[maxDeviceNumber];
+        private MenuEntry[] removeFileMenuEntries;
 
         private IDictionary<ushort, Action> kernelRoutines;
 
@@ -57,6 +58,9 @@ namespace Konamiman.NestorMSX.Plugins
             this.basePathForDiskImages =
                 pluginConfig.GetValueOrDefault<string>("diskImagesDirectory", "").AsAbsolutePath();
 
+            this.setMenuEntry = context.SetMenuEntry;
+            CreateMenu();
+
             this.openFileDialog = new OpenFileDialog();
             openFileDialog.Title = "Select disk image file";
             openFileDialog.InitialDirectory = basePathForDiskImages.Replace('/', Path.DirectorySeparatorChar);
@@ -70,6 +74,9 @@ namespace Konamiman.NestorMSX.Plugins
                 var diskImageFilePath = imageFiles[i].AsAbsolutePath(basePathForDiskImages);
                 SetFile(diskImageFilePath, i+1);
             }
+            
+            for(int i = 0; i < maxDeviceNumber; i++)
+                removeFileMenuEntries[i].IsVisible = diskImageFileStreams[i] != null;
 
             this.z80 = context.Cpu;
             this.memory = context.SlotsSystem;
@@ -78,31 +85,51 @@ namespace Konamiman.NestorMSX.Plugins
             z80.BeforeInstructionFetch += Z80_BeforeInstructionFetch;
 
             this.kernel = new Ascii8Rom(ReadKernelFile());
-
-            this.setMenuEntry = context.SetMenuEntry;
-            CreateMenu();
         }
 
         private void SetFile(string fullPath, int deviceIndex)
         {
             this.diskImageNames[deviceIndex-1] = Path.GetFileName(fullPath);
 
-            if(diskImageFileStreams[deviceIndex-1] != null)
-                diskImageFileStreams[deviceIndex-1].Dispose();
+            RemoveDiskImageFile(deviceIndex);
 
             this.diskImageFileStreams[deviceIndex-1] = File.Open(fullPath, FileMode.Open, FileAccess.ReadWrite);
             this.maxSectorNumbers[deviceIndex-1] = ((new FileInfo(fullPath)).Length) / 512 - 1;
+
+            menuEntries[deviceIndex - 1].Title = $"{deviceIndex}: {openFileDialog.SafeFileName}";
+            removeFileMenuEntries[deviceIndex - 1].IsVisible = true;
         }
 
         private void CreateMenu()
         {
-            menuEntries = Enumerable.Range(1, 7).Select(i =>
+            var menuEntries = Enumerable.Range(1, 7).Select(i =>
                 new MenuEntry($"{i}: {(diskImageNames[i-1] == null ? "(no file)" : diskImageNames[i-1])}",
-                () => AskAndSetFileForDevice(i))).ToArray();
+                () => AskAndSetFileForDevice(i)))
+                .ToList();
+
+            menuEntries.Add(new MenuEntry("-", () => { }));
+
+            removeFileMenuEntries = Enumerable.Range(1, 7).Select(i =>
+                new MenuEntry(i.ToString(), () => RemoveDiskImageFile(i)) {IsVisible = false})
+                .ToArray();
+
+            menuEntries.Add(new MenuEntry("Remove image file", removeFileMenuEntries));
 
             var mainEntry = new MenuEntry($"Nextor in slot {slotNumber}", menuEntries);
 
+            this.menuEntries = menuEntries.ToArray();
             setMenuEntry(this, mainEntry);
+        }
+
+        private void RemoveDiskImageFile(int deviceIndex)
+        {
+            if(diskImageFileStreams[deviceIndex - 1] != null) {
+                diskImageFileStreams[deviceIndex - 1].Dispose();
+                diskImageFileStreams[deviceIndex - 1] = null;
+            }
+
+            menuEntries[deviceIndex - 1].Title = $"{deviceIndex}: (no file)";
+            removeFileMenuEntries[deviceIndex - 1].IsVisible = false;
         }
 
         private void AskAndSetFileForDevice(int deviceIndex)
@@ -113,7 +140,7 @@ namespace Konamiman.NestorMSX.Plugins
 
             var hadPreviousFile = diskImageFileStreams[deviceIndex - 1] != null;
             SetFile(openFileDialog.FileName, deviceIndex);
-            menuEntries[deviceIndex - 1].Title = $"{deviceIndex}: {openFileDialog.SafeFileName}";
+            
             imageFilesChanged[deviceIndex - 1] = hadPreviousFile;
         }
 
