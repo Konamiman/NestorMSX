@@ -69,7 +69,7 @@ namespace Konamiman.NestorMSX.Plugins
 
             this.slotNumber = new SlotNumber(pluginConfig.GetValue<byte>("slotNumber"));
 
-            var machineName = pluginConfig.GetValue<string>("NestorMSX.machineName") + "/";
+            var machineName = pluginConfig.GetValue<string>("NestorMSX.machineName");
             stateFileFullPath = $"{machineName}/Nextor in slot {slotNumber}.dat".AsAbsolutePath();
             if(File.Exists(stateFileFullPath))
                 filesListFromState = File.ReadAllLines(stateFileFullPath, Encoding.UTF8).WithEmptiesAsNulls();
