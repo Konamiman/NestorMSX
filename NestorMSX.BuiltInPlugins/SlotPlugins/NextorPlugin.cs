@@ -16,7 +16,9 @@ namespace Konamiman.NestorMSX.Plugins
     public class NextorPlugin : IDisposable
     {
         private const int _IDEVL = 0xB5;
+        private const int _WPROT = 0xF8;
         private const int _RNF = 0xF9;
+        private const int _DISK = 0xFD;
         private const int maxDeviceNumber = 7;
 
         private readonly string kernelFilePath;
@@ -33,6 +35,7 @@ namespace Konamiman.NestorMSX.Plugins
         private Action<object, MenuEntry> setMenuEntry;
         private MenuEntry[] menuEntries;
         private bool[] imageFilesChanged = new bool[maxDeviceNumber];
+        private bool[] readOnlyFiles = new bool[maxDeviceNumber];
         private MenuEntry[] removeFileMenuEntries;
         private MenuEntry removeFileMainMenuEntry;
         private MenuEntry separatorBeforeRemoveFileMenuEntry;
@@ -73,7 +76,7 @@ namespace Konamiman.NestorMSX.Plugins
 
             this.kernelFilePath = pluginConfig.GetMachineFilePath(pluginConfig.GetValue<string>("kernelFile"));
 
-            var imageFiles = pluginConfig.GetValueOrDefault<string[]>("diskImageFiles", new string[0]);
+            var imageFiles = pluginConfig.GetValueOrDefault("diskImageFiles", new string[0]);
             for(int i = 0; i < imageFiles.Length; i++) {
                 var diskImageFilePath = imageFiles[i].AsAbsolutePath(basePathForDiskImages);
                 SetFile(diskImageFilePath, i+1, Path.GetFileName(diskImageFilePath));
@@ -94,7 +97,9 @@ namespace Konamiman.NestorMSX.Plugins
         {
             FileStream fileStream;
             try {
-                fileStream = File.Open(fullPath, FileMode.Open, FileAccess.ReadWrite);
+                var fileAccess = new FileInfo(fullPath).IsReadOnly ? FileAccess.Read : FileAccess.ReadWrite;
+                fileStream = File.Open(fullPath, FileMode.Open, fileAccess);
+                readOnlyFiles[deviceIndex - 1] = fileAccess == FileAccess.Read;
             } catch(Exception ex) {
                 var message = $"Can't open disk image file:\r\n{fullPath}\r\n\r\n{ex.Message}";
                 MessageBox.Show(message, $"NextorMSX - Nextor in slot {slotNumber}");
@@ -243,15 +248,27 @@ namespace Konamiman.NestorMSX.Plugins
                 return;
             }
 
+            if(z80.Registers.CF && readOnlyFiles[deviceIndex - 1]) {
+                z80.Registers.A = _WPROT;
+                z80.Registers.B = 0;
+                return;
+            }
+
             diskImageFileStreams[deviceIndex-1].Seek(sectorNumber * 512, SeekOrigin.Begin);
 
-            if(z80.Registers.CF)
-                WriteSectors(sectorNumber, memoryAddress, numberOfSectors, diskImageFileStreams[deviceIndex - 1]);
-            else
-                ReadSectors(sectorNumber, memoryAddress, numberOfSectors, diskImageFileStreams[deviceIndex - 1]);
+            try {
+                if(z80.Registers.CF)
+                    WriteSectors(sectorNumber, memoryAddress, numberOfSectors, diskImageFileStreams[deviceIndex - 1]);
+                else
+                    ReadSectors(sectorNumber, memoryAddress, numberOfSectors, diskImageFileStreams[deviceIndex - 1]);
 
-            z80.Registers.B = numberOfSectors;
-            z80.Registers.A = 0;
+                z80.Registers.B = numberOfSectors;
+                z80.Registers.A = 0;
+            }
+            catch(Exception) {
+                z80.Registers.B = 0;
+                z80.Registers.A = _DISK;
+            }
         }
 
         private bool IsValidDevice(byte deviceIndex)
