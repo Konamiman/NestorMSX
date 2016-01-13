@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 
@@ -93,6 +94,21 @@ namespace Konamiman.NestorMSX.Misc
         public static string FormatWith(this string str, params object[] parameters)
         {
             return string.Format(str, parameters);
+        }
+
+        public static string[] WithEmptiesAsNulls(this string[] array)
+        {
+            return array.Select(s => string.IsNullOrWhiteSpace(s) ? null : s).ToArray();
+        }
+
+        public static string[] WithMinimumSizeOf(this string[] array, int minimumSize)
+        {
+            if(array.Length >= minimumSize)
+                return array.ToArray();
+
+            var extraItemsCount = minimumSize - array.Length;
+            var extraItems = Enumerable.Repeat<string>(null, extraItemsCount);
+            return array.Concat(extraItems).ToArray();
         }
     }
 }
