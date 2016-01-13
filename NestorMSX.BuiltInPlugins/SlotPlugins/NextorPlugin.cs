@@ -39,6 +39,7 @@ namespace Konamiman.NestorMSX.Plugins
         private MenuEntry[] removeFileMenuEntries;
         private MenuEntry removeFileMainMenuEntry;
         private MenuEntry separatorBeforeRemoveFileMenuEntry;
+        private string[] filesListInConfig;
 
         private IDictionary<ushort, Action> kernelRoutines;
 
@@ -56,14 +57,19 @@ namespace Konamiman.NestorMSX.Plugins
                 { 0x4169, LUN_INFO  }
             };
 
+            this.basePathForDiskImages =
+                pluginConfig.GetValueOrDefault<string>("diskImagesDirectory", "").AsAbsolutePath();
+
+            filesListInConfig = pluginConfig
+                .GetValueOrDefault("diskImageFiles", new string[0])
+                .Select(f => f.AsAbsolutePath(basePathForDiskImages))
+                .ToArray();
+
             this.slotNumber = new SlotNumber(pluginConfig.GetValue<byte>("slotNumber"));
 
             this.diskImageNames = new string[maxDeviceNumber];
             this.diskImageFileStreams = new FileStream[maxDeviceNumber];
             this.maxSectorNumbers = new long[maxDeviceNumber];
-
-            this.basePathForDiskImages =
-                pluginConfig.GetValueOrDefault<string>("diskImagesDirectory", "").AsAbsolutePath();
 
             this.setMenuEntry = context.SetMenuEntry;
             CreateMenu();
@@ -76,11 +82,7 @@ namespace Konamiman.NestorMSX.Plugins
 
             this.kernelFilePath = pluginConfig.GetMachineFilePath(pluginConfig.GetValue<string>("kernelFile"));
 
-            var imageFiles = pluginConfig.GetValueOrDefault("diskImageFiles", new string[0]);
-            for(int i = 0; i < imageFiles.Length; i++) {
-                var diskImageFilePath = imageFiles[i].AsAbsolutePath(basePathForDiskImages);
-                SetFile(diskImageFilePath, i+1, Path.GetFileName(diskImageFilePath));
-            }
+            SetAllFilesFromConfig();
             
             for(int i = 0; i < maxDeviceNumber; i++)
                 removeFileMenuEntries[i].IsVisible = diskImageFileStreams[i] != null;
@@ -91,6 +93,14 @@ namespace Konamiman.NestorMSX.Plugins
             z80.BeforeInstructionFetch += Z80_BeforeInstructionFetch;
 
             this.kernel = new Ascii8Rom(ReadKernelFile());
+        }
+
+        private void SetAllFilesFromConfig()
+        {
+            for(int i = 0; i < filesListInConfig.Length; i++) {
+                var diskImageFilePath = filesListInConfig[i].AsAbsolutePath(basePathForDiskImages);
+                SetFile(diskImageFilePath, i + 1, Path.GetFileName(diskImageFilePath));
+            }
         }
 
         private void SetFile(string fullPath, int deviceIndex, string displayName)
@@ -137,6 +147,9 @@ namespace Konamiman.NestorMSX.Plugins
             removeFileMainMenuEntry = new MenuEntry("Remove image file", removeFileMenuEntries) { IsVisible = false };
             menuEntries.Add(removeFileMainMenuEntry);
 
+            if(filesListInConfig.Length > 0) 
+                menuEntries.Add(new MenuEntry("Set all from config", SetAllFilesFromConfig));
+
             var mainEntry = new MenuEntry($"Nextor in slot {slotNumber}", menuEntries);
 
             this.menuEntries = menuEntries.ToArray();
@@ -153,8 +166,10 @@ namespace Konamiman.NestorMSX.Plugins
             menuEntries[deviceIndex - 1].Title = $"{deviceIndex}: (no file)";
             removeFileMenuEntries[deviceIndex - 1].IsVisible = false;
 
-            removeFileMainMenuEntry.IsVisible = 
-            separatorBeforeRemoveFileMenuEntry.IsVisible = removeFileMenuEntries.Any(m => m.IsVisible);
+            removeFileMainMenuEntry.IsVisible = removeFileMenuEntries.Any(m => m.IsVisible);
+            separatorBeforeRemoveFileMenuEntry.IsVisible =
+                removeFileMainMenuEntry.IsVisible ||
+                filesListInConfig.Length > 0;
         }
 
         private void AskAndSetFileForDevice(int deviceIndex)
