@@ -25,17 +25,11 @@ namespace Konamiman.NestorMSX.Plugins
         private IZ80Processor z80;
         private SlotNumber slotNumber;
         private IExternallyControlledSlotsSystem memory;
-        private string diskImageName;
-        private string[] diskImageNames;
-        private FileStream[] diskImageFileStreams;
-        private long[] maxSectorNumbers;
         private string basePathForDiskImages;
         private OpenFileDialog openFileDialog;
         private Form hostForm;
         private Action<object, MenuEntry> setMenuEntry;
-        private MenuEntry[] menuEntries;
-        private bool[] imageFilesChanged = new bool[maxDeviceNumber];
-        private bool[] readOnlyFiles = new bool[maxDeviceNumber];
+        private MenuEntry[] setFileMenuEntries;
         private MenuEntry[] removeFileMenuEntries;
         private MenuEntry removeFileMainMenuEntry;
         private MenuEntry separatorBeforeRemoveFileMenuEntry;
@@ -43,9 +37,20 @@ namespace Konamiman.NestorMSX.Plugins
         private string[] filesListFromState;
         private string stateFileFullPath;
 
+        private ImageFileInfo[] imageFiles;
+
         private IDictionary<ushort, Action> kernelRoutines;
 
         private Ascii8Rom kernel;
+
+        private class ImageFileInfo
+        {
+            public string FullPath { get; set; }
+            public FileStream Stream { get; set; }
+            public long MaxSectorNumber { get; set; }
+            public bool IsReadOnly { get; set; }
+            public bool HasChanged { get; set; }
+        }
 
         public NextorPlugin(PluginContext context, IDictionary<string, object> pluginConfig)
         {
@@ -76,9 +81,7 @@ namespace Konamiman.NestorMSX.Plugins
             else
                 filesListFromState = filesListInConfig.WithMinimumSizeOf(maxDeviceNumber);
 
-            this.diskImageNames = new string[maxDeviceNumber];
-            this.diskImageFileStreams = new FileStream[maxDeviceNumber];
-            this.maxSectorNumbers = new long[maxDeviceNumber];
+            imageFiles = new ImageFileInfo[maxDeviceNumber];
 
             this.setMenuEntry = context.SetMenuEntry;
             CreateMenu();
@@ -98,7 +101,7 @@ namespace Konamiman.NestorMSX.Plugins
             }
 
             for (int i = 0; i < maxDeviceNumber; i++)
-                removeFileMenuEntries[i].IsVisible = diskImageFileStreams[i] != null;
+                removeFileMenuEntries[i].IsVisible = imageFiles[i] != null;
 
             this.z80 = context.Cpu;
             this.memory = context.SlotsSystem;
@@ -123,28 +126,26 @@ namespace Konamiman.NestorMSX.Plugins
 
         private void SetFile(string fullPath, int deviceIndex, string displayName)
         {
-            FileStream fileStream;
+            var info = new ImageFileInfo();
+            info.FullPath = fullPath;
+
             try {
                 var fileAccess = new FileInfo(fullPath).IsReadOnly ? FileAccess.Read : FileAccess.ReadWrite;
-                fileStream = File.Open(fullPath, FileMode.Open, fileAccess);
-                readOnlyFiles[deviceIndex - 1] = fileAccess == FileAccess.Read;
+                info.Stream = File.Open(fullPath, FileMode.Open, fileAccess);
+                info.IsReadOnly = fileAccess == FileAccess.Read;
             } catch(Exception ex) {
                 var message = $"Can't open disk image file:\r\n{fullPath}\r\n\r\n{ex.Message}";
                 MessageBox.Show(message, $"NextorMSX - Nextor in slot {slotNumber}");
                 return;
             }
 
-            filesListFromState[deviceIndex - 1] = fullPath;
-            this.diskImageNames[deviceIndex-1] = Path.GetFileName(fullPath);
+            info.MaxSectorNumber = ((new FileInfo(fullPath)).Length) / 512 - 1;
 
             RemoveDiskImageFile(deviceIndex, false);
-            this.diskImageFileStreams[deviceIndex - 1] = fileStream;
+            imageFiles[deviceIndex - 1] = info;
 
-            this.maxSectorNumbers[deviceIndex-1] = ((new FileInfo(fullPath)).Length) / 512 - 1;
-
-            menuEntries[deviceIndex - 1].Title = $"{deviceIndex}: {displayName}";
+            setFileMenuEntries[deviceIndex - 1].Title = $"{deviceIndex}: {Path.GetFileName(fullPath)}";
             removeFileMenuEntries[deviceIndex - 1].IsVisible = true;
-
             removeFileMainMenuEntry.IsVisible = true;
             separatorBeforeRemoveFileMenuEntry.IsVisible = true;
         }
@@ -152,7 +153,7 @@ namespace Konamiman.NestorMSX.Plugins
         private void CreateMenu()
         {
             var menuEntries = Enumerable.Range(1, 7).Select(i =>
-                new MenuEntry($"{i}: {(diskImageNames[i-1] == null ? "(no file)" : diskImageNames[i-1])}",
+                new MenuEntry($"{i}: {(imageFiles[i-1] == null ? "(no file)" : Path.GetFileName(imageFiles[i-1].FullPath))}",
                 () => AskAndSetFileForDevice(i)))
                 .ToList();
 
@@ -171,19 +172,27 @@ namespace Konamiman.NestorMSX.Plugins
 
             var mainEntry = new MenuEntry($"Nextor in slot {slotNumber}", menuEntries);
 
-            this.menuEntries = menuEntries.ToArray();
+            this.setFileMenuEntries = menuEntries.ToArray();
             setMenuEntry(this, mainEntry);
         }
 
         private void RemoveDiskImageFile(int deviceIndex, bool updateStateFile)
         {
-            if(diskImageFileStreams[deviceIndex - 1] != null) {
-                diskImageFileStreams[deviceIndex - 1].Dispose();
-                diskImageFileStreams[deviceIndex - 1] = null;
+            var fileIndex = deviceIndex - 1;
+
+            if(imageFiles[fileIndex] != null) {
+                try
+                {
+                    imageFiles[fileIndex].Stream.Dispose();
+                }
+                catch
+                {
+                }
+                imageFiles[fileIndex] = null;
             }
 
-            menuEntries[deviceIndex - 1].Title = $"{deviceIndex}: (no file)";
-            removeFileMenuEntries[deviceIndex - 1].IsVisible = false;
+            setFileMenuEntries[fileIndex].Title = $"{deviceIndex}: (no file)";
+            removeFileMenuEntries[fileIndex].IsVisible = false;
 
             removeFileMainMenuEntry.IsVisible = removeFileMenuEntries.Any(m => m.IsVisible);
             separatorBeforeRemoveFileMenuEntry.IsVisible =
@@ -200,10 +209,10 @@ namespace Konamiman.NestorMSX.Plugins
             if(dialogResult != DialogResult.OK)
                 return;
 
-            var hadPreviousFile = diskImageFileStreams[deviceIndex - 1] != null;
+            var fileIndex = deviceIndex - 1;
+            var hadPreviousFile = imageFiles[fileIndex] != null;
             SetFile(openFileDialog.FileName, deviceIndex, openFileDialog.SafeFileName);
-            
-            imageFilesChanged[deviceIndex - 1] = hadPreviousFile;
+            imageFiles[fileIndex].HasChanged = hadPreviousFile;
 
             UpdateStateFile();
         }
@@ -289,25 +298,26 @@ namespace Konamiman.NestorMSX.Plugins
                 + 256 * 256 * memory[sectorAddress + 2]
                 + 256 * 256 * 256 * memory[sectorAddress + 3];
 
-            if(sectorNumber > maxSectorNumbers[deviceIndex-1]) {
+            var file = imageFiles[deviceIndex - 1];
+            if(sectorNumber > file.MaxSectorNumber) {
                 z80.Registers.A = _RNF;
                 z80.Registers.B = 0;
                 return;
             }
 
-            if(z80.Registers.CF && readOnlyFiles[deviceIndex - 1]) {
+            if(z80.Registers.CF && file.IsReadOnly) {
                 z80.Registers.A = _WPROT;
                 z80.Registers.B = 0;
                 return;
             }
 
-            diskImageFileStreams[deviceIndex-1].Seek(sectorNumber * 512, SeekOrigin.Begin);
+            file.Stream.Seek(sectorNumber * 512, SeekOrigin.Begin);
 
             try {
                 if(z80.Registers.CF)
-                    WriteSectors(sectorNumber, memoryAddress, numberOfSectors, diskImageFileStreams[deviceIndex - 1]);
+                    WriteSectors(sectorNumber, memoryAddress, numberOfSectors, file.Stream);
                 else
-                    ReadSectors(sectorNumber, memoryAddress, numberOfSectors, diskImageFileStreams[deviceIndex - 1]);
+                    ReadSectors(sectorNumber, memoryAddress, numberOfSectors, file.Stream);
 
                 z80.Registers.B = numberOfSectors;
                 z80.Registers.A = 0;
@@ -320,7 +330,7 @@ namespace Konamiman.NestorMSX.Plugins
 
         private bool IsValidDevice(byte deviceIndex)
         {
-            return deviceIndex >= 1 && deviceIndex <= maxDeviceNumber && diskImageFileStreams[deviceIndex - 1] != null;
+            return deviceIndex >= 1 && deviceIndex <= maxDeviceNumber && imageFiles[deviceIndex - 1] != null;
         }
 
         private void ReadSectors(int sectorNumber, ushort memoryAddress, byte numberOfSectors, FileStream stream)
@@ -353,6 +363,7 @@ namespace Konamiman.NestorMSX.Plugins
                 return;
             }
 
+            var file = imageFiles[deviceIndex - 1];
             string info = null;
 
             if(infoBlockIndex == 0) {
@@ -365,7 +376,7 @@ namespace Konamiman.NestorMSX.Plugins
                 info = "Konamiman";
             }
             else if(infoBlockIndex == 2) {
-                info = diskImageNames[deviceIndex-1];
+                info = Path.GetFileName(file.FullPath);
             }
             else if(infoBlockIndex == 3) {
                 info = "1";
@@ -392,9 +403,9 @@ namespace Konamiman.NestorMSX.Plugins
 
             if(!IsValidDevice(deviceIndex) || logicalUnit != 1)
                 z80.Registers.A = 0; //Invalid device/LUN
-            else if(imageFilesChanged[deviceIndex - 1]) {
+            else if(imageFiles[deviceIndex - 1].HasChanged) {
                 z80.Registers.A = 2; //Available and has changed
-                imageFilesChanged[deviceIndex - 1] = false;
+                imageFiles[deviceIndex - 1].HasChanged = false;
             }
             else
                 z80.Registers.A = 1; //Available and has not changed
@@ -411,12 +422,13 @@ namespace Konamiman.NestorMSX.Plugins
                 return;
             }
 
+            var file = imageFiles[deviceIndex - 1];
             var info = new byte[12];
 
             info[2] = 2; //sector size = 0x200
             info[7] = 1; //removable
 
-            var numberOfSectors = BitConverter.GetBytes(maxSectorNumbers[deviceIndex-1] + 1);
+            var numberOfSectors = BitConverter.GetBytes(file.MaxSectorNumber + 1);
             if(BitConverter.IsLittleEndian) {
                 Array.Copy(numberOfSectors, 0, info, 3, 4);
             }
@@ -434,9 +446,8 @@ namespace Konamiman.NestorMSX.Plugins
 
         public void Dispose()
         {
-            foreach(var fileStream in diskImageFileStreams)
-                if(fileStream != null)
-                    fileStream.Dispose();
+            foreach(var file in imageFiles.Where(f => f!=null))
+                file.Stream.Dispose();
         }
     }
 }
