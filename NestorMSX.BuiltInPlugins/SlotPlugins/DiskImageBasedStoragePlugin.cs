@@ -53,6 +53,8 @@ namespace Konamiman.NestorMSX.Plugins
 
         protected abstract string PluginDisplayName { get; }
 
+        protected abstract void ValidateKernelFileContents(byte[] kernelFileContents);
+
         public DiskImageBasedStoragePlugin(PluginContext context, IDictionary<string, object> pluginConfig)
         {
             this.basePathForDiskImages =
@@ -100,6 +102,7 @@ namespace Konamiman.NestorMSX.Plugins
             z80.BeforeInstructionFetch += (sender, args) => BeforeZ80InstructionFetch(z80.Registers.PC);
 
             this.kernelContents = File.ReadAllBytes(kernelFilePath);
+            ValidateKernelFileContents(kernelContents);
         }
 
         private void SetAllFilesFromConfig()

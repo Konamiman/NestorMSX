@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using Konamiman.NestorMSX.BuiltInPlugins.MemoryTypes;
 using Konamiman.Z80dotNet;
+using ConfigurationException = Konamiman.NestorMSX.Exceptions.ConfigurationException;
 
 namespace Konamiman.NestorMSX.Plugins
 {
@@ -40,6 +42,13 @@ namespace Konamiman.NestorMSX.Plugins
         }
 
         protected override string PluginDisplayName { get { return "Nextor"; } }
+
+        protected override void ValidateKernelFileContents(byte[] kernelFileContents)
+        {
+            if(kernelFileContents.Length < 112*1024)
+                throw new ConfigurationException(
+                    "Invalid kernel file: a Nextor kernel always has a size of at least 112K.");
+        }
 
         protected override void BeforeZ80InstructionFetch(ushort instructionAddress)
         {
