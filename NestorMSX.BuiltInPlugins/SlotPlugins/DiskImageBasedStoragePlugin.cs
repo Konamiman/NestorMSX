@@ -146,7 +146,7 @@ namespace Konamiman.NestorMSX.Plugins
 
         private void CreateMenu()
         {
-            var menuEntries = Enumerable.Range(1, 7).Select(i =>
+            var menuEntries = Enumerable.Range(1, MaxNumberOfDevices).Select(i =>
                 new MenuEntry($"{i}: {(imageFiles[i-1] == null ? "(no file)" : Path.GetFileName(imageFiles[i-1].FullPath))}",
                     () => AskAndSetFileForDevice(i)))
                 .ToList();
@@ -154,7 +154,7 @@ namespace Konamiman.NestorMSX.Plugins
             separatorBeforeRemoveFileMenuEntry = MenuEntry.CreateSeparator(isVisible: false);
             menuEntries.Add(separatorBeforeRemoveFileMenuEntry);
 
-            removeFileMenuEntries = Enumerable.Range(1, 7).Select(i =>
+            removeFileMenuEntries = Enumerable.Range(1, MaxNumberOfDevices).Select(i =>
                 new MenuEntry(i.ToString(), () => RemoveDiskImageFile(i, true)) {IsVisible = false})
                 .ToArray();
 

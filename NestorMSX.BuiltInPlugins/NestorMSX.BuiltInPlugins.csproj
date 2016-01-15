@@ -62,6 +62,7 @@
     <Compile Include="MemoryTypes\Ascii8Rom.cs" />
     <Compile Include="MemoryTypes\MappedRam.cs" />
     <Compile Include="SlotPlugins\MappedRamPlugin.cs" />
+    <Compile Include="SlotPlugins\MsxDosPlugin.cs" />
     <Compile Include="SlotPlugins\NextorPlugin.cs" />
     <Compile Include="MemoryTypes\PlainRam.cs" />
     <Compile Include="MemoryTypes\PlainRom.cs" />
