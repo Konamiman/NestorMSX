@@ -47,6 +47,7 @@ namespace Konamiman.NestorMSX.Plugins
             public long MaxSectorNumber { get; set; }
             public bool IsReadOnly { get; set; }
             public bool HasChanged { get; set; }
+            public byte[] Dpb { get; set; }
         }
 
         protected abstract IMemory GetMemory(byte[] kernelFileContents);
@@ -55,8 +56,13 @@ namespace Konamiman.NestorMSX.Plugins
 
         protected abstract void ValidateKernelFileContents(byte[] kernelFileContents);
 
+        protected virtual void ApplyConfiguration(IDictionary<string, object> pluginConfig)
+        { }
+
         public DiskImageBasedStoragePlugin(PluginContext context, IDictionary<string, object> pluginConfig)
         {
+            ApplyConfiguration(pluginConfig);
+
             this.basePathForDiskImages =
                 pluginConfig.GetValueOrDefault<string>("diskImagesDirectory", "").AsAbsolutePath();
 
@@ -137,7 +143,7 @@ namespace Konamiman.NestorMSX.Plugins
 
             RemoveDiskImageFile(deviceIndex, false);
             imageFiles[deviceIndex - 1] = info;
-
+            
             setFileMenuEntries[deviceIndex - 1].Title = $"{deviceIndex}: {Path.GetFileName(fullPath)}";
             removeFileMenuEntries[deviceIndex - 1].IsVisible = true;
             removeFileMainMenuEntry.IsVisible = true;
@@ -206,7 +212,7 @@ namespace Konamiman.NestorMSX.Plugins
             var fileIndex = deviceIndex - 1;
             var hadPreviousFile = imageFiles[fileIndex] != null;
             SetFile(openFileDialog.FileName, deviceIndex, openFileDialog.SafeFileName);
-            imageFiles[fileIndex].HasChanged = hadPreviousFile;
+            imageFiles[fileIndex].HasChanged = true;// hadPreviousFile;
 
             UpdateStateFile();
         }
@@ -214,7 +220,9 @@ namespace Konamiman.NestorMSX.Plugins
         private void UpdateStateFile()
         {
             try {
-                File.WriteAllLines(stateFileFullPath, filesListFromState);
+                var filesList = imageFiles.Select(f => f == null ? "" : f.FullPath).ToArray();
+                File.WriteAllLines(stateFileFullPath, filesList);
+                filesListFromState = filesList;
             }
             catch { }
         }
@@ -233,7 +241,7 @@ namespace Konamiman.NestorMSX.Plugins
 
         protected abstract void BeforeZ80InstructionFetch(ushort instructionAddress);
         
-        protected bool IsValidDevice(byte deviceIndex)
+        protected bool IsValidDevice(int deviceIndex)
         {
             return deviceIndex >= 1 && deviceIndex <= MaxNumberOfDevices && imageFiles[deviceIndex - 1] != null;
         }
