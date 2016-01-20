@@ -47,6 +47,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MemoryTypes\MsxDos2Rom.cs" />
+    <Compile Include="MemoryTypes\Ascii16Rom.cs" />
     <Compile Include="Sandbox\KeyloggerForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -56,6 +58,7 @@
     <Compile Include="Sandbox\KeyloggerFormPlugin.cs" />
     <Compile Include="SlotlessPlugins\CopyPastePlugin.cs" />
     <Compile Include="SlotlessPlugins\ClockIcPlugin.cs" />
+    <Compile Include="SlotPlugins\MsxDos2Plugin.cs" />
     <Compile Include="SlotPlugins\DiskImageBasedStoragePlugin.cs" />
     <Compile Include="SlotPlugins\DosFunctionCallExecutor.cs" />
     <Compile Include="MemoryTypes\IMappedRam.cs" />
@@ -67,6 +70,7 @@
     <Compile Include="MemoryTypes\PlainRam.cs" />
     <Compile Include="MemoryTypes\PlainRom.cs" />
     <Compile Include="SlotPlugins\PlainRamPlugin.cs" />
+    <Compile Include="SlotPlugins\Ascii16RomPlugin.cs" />
     <Compile Include="SlotPlugins\PlainRomPlugin.cs" />
     <Compile Include="SlotPlugins\SpecialDiskRomPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

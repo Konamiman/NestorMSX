@@ -150,6 +150,9 @@
     <None Include="machines\Shared\MSX2EXT.rom">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="machines\Shared\MSXDOS22.ROM">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="machines\Shared\Nextor-2.0.4.StandaloneASCII8.ROM">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

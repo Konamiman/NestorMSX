@@ -37,7 +37,7 @@ namespace Konamiman.NestorMSX.Tests
         {
             CreateSut();
             Verify(m => m.BlankScreen());
-            Verify(m => m.SetScreenMode(0));
+            Verify(m => m.SetScreenMode(0, 0));
         }
 
         #region Setting screen mode
@@ -46,18 +46,18 @@ namespace Konamiman.NestorMSX.Tests
         public void Screen_mode_is_set_properly()
         {
             WriteControlRegister(0, 2);
-            Verify(m => m.SetScreenMode(2));
+            Verify(m => m.SetScreenMode(2, 0));
 
             WriteControlRegister(0, 0);
             DisplayRenderer.ResetCalls();
             WriteControlRegister(1, 0x10);
-            Verify(m => m.SetScreenMode(1));
+            Verify(m => m.SetScreenMode(1, 0));
 
             WriteControlRegister(1, 0x08);
-            Verify(m => m.SetScreenMode(3));
+            Verify(m => m.SetScreenMode(3, 0));
 
             WriteControlRegister(1, 0);
-            Verify(m => m.SetScreenMode(0));
+            Verify(m => m.SetScreenMode(0, 0));
         }
 
         #endregion
