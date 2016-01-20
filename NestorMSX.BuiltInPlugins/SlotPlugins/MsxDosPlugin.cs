@@ -14,6 +14,8 @@ namespace Konamiman.NestorMSX.Plugins
     public class MsxDosPlugin : DiskImageBasedStoragePlugin
     {
         private IDictionary<ushort, Action> kernelRoutines;
+        private ushort addressOfCallInihrd;
+        private ushort addressOfCallDrives;
 
         public MsxDosPlugin(PluginContext context, IDictionary<string, object> pluginConfig) 
             : base(context, pluginConfig)
@@ -34,6 +36,9 @@ namespace Konamiman.NestorMSX.Plugins
             maxNumberOfDevices = pluginConfig.GetValueOrDefault("numberOfDrives", 2);
             if(maxNumberOfDevices < 1 || maxNumberOfDevices > 8)
                 throw new ConfigurationException("numberOfDrives must be a number between 1 and 8");
+
+            addressOfCallInihrd = pluginConfig.GetValueOrDefault<ushort>("addressOfCallInihrd", 0x176F);
+            addressOfCallDrives = pluginConfig.GetValueOrDefault<ushort>("addressOfCallDrives", 0x1850); 
         }
 
         private int maxNumberOfDevices;
@@ -42,6 +47,11 @@ namespace Konamiman.NestorMSX.Plugins
         protected override string PluginDisplayName
         {
             get { return "MSX-DOS"; }
+        }
+
+        protected override string defaultKernelFileName
+        {
+            get { return "MsxDosKernel.rom"; }
         }
 
         protected override void BeforeZ80InstructionFetch(ushort instructionAddress)
@@ -59,16 +69,17 @@ namespace Konamiman.NestorMSX.Plugins
 
         protected override IMemory GetMemory(byte[] kernelFileContents)
         {
-            kernelFileContents[0x176F] = 0; //Patch call to INIHRD with NOPs
-            kernelFileContents[0x1770] = 0;
-            kernelFileContents[0x1771] = 0;
+            if(addressOfCallInihrd != 0) {
+                kernelFileContents[addressOfCallInihrd] = 0; //Patch call to INIHRD with NOPs
+                kernelFileContents[addressOfCallInihrd + 1] = 0;
+                kernelFileContents[addressOfCallInihrd + 2] = 0;
+            }
 
-            kernelFileContents[0x1850] = 0x2E; //Patch call to DRIVES with LD L,drives
-            kernelFileContents[0x1851] = (byte)maxNumberOfDevices;
-            kernelFileContents[0x1852] = 0;
-
-            //kernelFileContents[0x17E8] = 0x3E;
-            //kernelFileContents[0x17E9] = 255-2; //Simulate CTRL press
+            if(addressOfCallDrives != 0) {
+                kernelFileContents[addressOfCallDrives] = 0x2E; //Patch call to DRIVES with LD L,drives
+                kernelFileContents[addressOfCallDrives + 1] = (byte)maxNumberOfDevices;
+                kernelFileContents[addressOfCallDrives + 2] = 0;
+            }
 
             return new PlainRom(kernelFileContents, 1);
         }
@@ -77,7 +88,7 @@ namespace Konamiman.NestorMSX.Plugins
         {
             if(kernelFileContents.Length != 16*1024)
                 throw new ConfigurationException(
-                    "Invalid kernel file: a MSX-DOS kernel always has a size of exactly 16K.");
+                    "Invalid kernel file: a MSX-DOS kernel always has a size of exactly 16K. If you want to use MSX-DOS 2, configure a standalone MSX-DOS 2.20 kernel in ahother slot (with memory type Ascii16).");
         }
 
         void DSKIO()
@@ -85,7 +96,11 @@ namespace Konamiman.NestorMSX.Plugins
             var driveNumber = z80.Registers.A;
             var numberOfSectors = z80.Registers.B;
             var memoryAddress = z80.Registers.HL.ToUShort();
-            var sectorNumber = z80.Registers.DE.ToUShort();
+            var sectorNumber = (int)z80.Registers.DE.ToUShort();
+
+            var mediaId = z80.Registers.C;
+            if(mediaId < 128)
+                sectorNumber += mediaId * 65536;
 
             bool isWrite = z80.Registers.CF;
             z80.Registers.CF = 1;

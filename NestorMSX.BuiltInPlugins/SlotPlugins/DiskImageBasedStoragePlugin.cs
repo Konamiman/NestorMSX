@@ -54,6 +54,8 @@ namespace Konamiman.NestorMSX.Plugins
 
         protected abstract string PluginDisplayName { get; }
 
+        protected abstract string defaultKernelFileName { get; } 
+
         protected abstract void ValidateKernelFileContents(byte[] kernelFileContents);
 
         protected virtual void ApplyConfiguration(IDictionary<string, object> pluginConfig)
@@ -68,6 +70,7 @@ namespace Konamiman.NestorMSX.Plugins
 
             filesListInConfig = pluginConfig
                 .GetValueOrDefault("diskImageFiles", new string[0])
+                .Take(MaxNumberOfDevices)
                 .Select(f => StringExtensions.AsAbsolutePath(f, basePathForDiskImages))
                 .ToArray();
 
@@ -76,7 +79,10 @@ namespace Konamiman.NestorMSX.Plugins
             var machineName = pluginConfig.GetValue<string>("NestorMSX.machineName");
             stateFileFullPath = $"{machineName}/{PluginDisplayName} in slot {slotNumber}.dat".AsAbsolutePath();
             if(File.Exists(stateFileFullPath))
-                filesListFromState = File.ReadAllLines(stateFileFullPath, Encoding.UTF8).WithEmptiesAsNulls();
+                filesListFromState = File.ReadAllLines(stateFileFullPath, Encoding.UTF8)
+                    .Take(MaxNumberOfDevices)
+                    .ToArray()
+                    .WithEmptiesAsNulls();
             else
                 filesListFromState = filesListInConfig.WithMinimumSizeOf(MaxNumberOfDevices);
 
@@ -91,7 +97,7 @@ namespace Konamiman.NestorMSX.Plugins
             openFileDialog.Filter = "Disk image files|*.dsk;*.img|All files|*.*";
             this.hostForm = context.HostForm;
 
-            this.kernelFilePath = pluginConfig.GetMachineFilePath(pluginConfig.GetValue<string>("kernelFile"));
+            this.kernelFilePath = pluginConfig.GetMachineFilePath(pluginConfig.GetValueOrDefault("kernelFile", defaultKernelFileName));
 
             for (int i = 0; i < filesListFromState.Length; i++) {
                 if(filesListFromState[i] == null) continue;

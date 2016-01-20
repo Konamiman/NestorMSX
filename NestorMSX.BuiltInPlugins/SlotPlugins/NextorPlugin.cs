@@ -42,6 +42,9 @@ namespace Konamiman.NestorMSX.Plugins
 
         protected override string PluginDisplayName { get { return "Nextor"; } }
 
+        protected override string defaultKernelFileName { get { return "NextorKernel.rom"; }
+        }
+
         protected override void ValidateKernelFileContents(byte[] kernelFileContents)
         {
             if(kernelFileContents.Length < 112*1024)
