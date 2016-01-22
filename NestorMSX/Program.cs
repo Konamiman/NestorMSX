@@ -6,18 +6,31 @@ using System.Windows.Forms;
 using Konamiman.NestorMSX.Emulator;
 using Konamiman.NestorMSX.Exceptions;
 using Konamiman.NestorMSX.Misc;
+using System.Diagnostics;
+using System.Threading;
+using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 
 namespace Konamiman.NestorMSX
 {
     public class Program
     {
+        [DllImport("kernel32.dll", EntryPoint = "AllocConsole", SetLastError = true, CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall)]
+        static extern bool AllocConsole();
+
+        [DllImport("kernel32.dll")]
+        static extern bool FreeConsole();
+
         private const string BasePathInDevelopmentEnvironment = @"c:\VS\Projects\Z80dotNet\NestorMSX\";
-        private static Configuration config;
         private static MsxEmulationEnvironment emulationEnvironment;
         private static string machineName;
         private static string stateFilePath;
+        private static bool consoleAllocated;
 
-        /// <summary>
+        private static Func<string, string, bool> argIs =
+            (s1, s2) => s1.Equals(s2, StringComparison.InvariantCultureIgnoreCase);
+
+            /// <summary>
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
@@ -27,16 +40,29 @@ namespace Konamiman.NestorMSX
             Application.ThreadException += Application_ThreadException;
             AppDomain.CurrentDomain.UnhandledException  += CurrentDomainOnUnhandledException;
 
+            var waitForDebugger = false;
+            var allocateConsole = false;
+
             stateFilePath = "NestorMSX.state".AsApplicationFilePath();
 
-            if (args.Length > 0 && args[0].ToLower() == "keytest") {
-                Application.Run(new KeyTestForm());
-                return;
+            foreach(var arg in args) {
+                if(argIs(arg, "keytest")) {
+                    Application.Run(new KeyTestForm());
+                    return;
+                }
+                else if(argIs(arg, "sc")) {
+                    allocateConsole = true;
+                }
+                else if(argIs(arg, "wd")) {
+                    allocateConsole = true;
+                    waitForDebugger = true;
+                }
+                else if(arg.StartsWith("machine=", StringComparison.InvariantCultureIgnoreCase)) {
+                    machineName = arg.Substring("machine=".Length);
+                }
             }
 
-            if(args.Length > 0)
-                machineName = args[0].Trim();
-            else
+            if(machineName == null)
                 machineName = GetMachineName();
 
             if(machineName == null)
@@ -44,13 +70,52 @@ namespace Konamiman.NestorMSX
 
             SaveMachineNameAsState(machineName);
 
+            if(allocateConsole)
+                CreateDebugConsole();
+
+            if(waitForDebugger)
+                WaitForDebuggerAttachment();
+
+            if(consoleAllocated) {
+                Trace.Listeners.Add(new ConsoleTraceListener());
+                Trace.WriteLine($"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] Starting NestorMSX, machine name: {machineName}\r\n");
+            }
+
             emulationEnvironment = CreateEmulationEnvironment(args);
-            if(emulationEnvironment == null)
+            if(emulationEnvironment == null) {
+                FreeConsoleIfAllocated();
                 return;
+            }
 
             Application.ApplicationExit += Application_ApplicationExit;
 
             emulationEnvironment.Run();
+        }
+
+        private static void CreateDebugConsole()
+        {
+            if(consoleAllocated) return;
+
+            consoleAllocated = AllocConsole();
+            Console.Title = "NestorMSX - " + machineName;
+        }
+
+        private static void WaitForDebuggerAttachment()
+        {
+            Console.WriteLine("Waiting for a debugger to attach (or press any key to skip)");
+            Console.WriteLine($"My PID is: {Process.GetCurrentProcess().Id}");
+
+            while (!Debugger.IsAttached)
+            {
+                if (Console.KeyAvailable)
+                {
+                    Console.ReadKey(true);
+                    break;
+                }
+                Thread.Sleep(100);
+            }
+
+            Console.WriteLine("Ok, let's go!\r\n");
         }
 
         private static void CurrentDomainOnUnhandledException(object sender, UnhandledExceptionEventArgs unhandledExceptionEventArgs)
@@ -59,7 +124,7 @@ namespace Konamiman.NestorMSX
             Tell($"Unexpected appdomain exception: ({ex.GetType().Name}) {ex.Message}\r\n{ex.StackTrace}");
         }
 
-        private static void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)
+        private static void Application_ThreadException(object sender, ThreadExceptionEventArgs e)
         {
             var ex = e.Exception;
             Tell($"Unexpected thread exception: ({ex.GetType().Name}) {ex.Message}\r\n{ex.StackTrace}");
@@ -67,7 +132,16 @@ namespace Konamiman.NestorMSX
 
         private static void Application_ApplicationExit(object sender, EventArgs e)
         {
-           emulationEnvironment.DisposePlugins();
+            if(consoleAllocated)
+                Trace.WriteLine($"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] NestorMSX is closing\r\n");
+
+            FreeConsoleIfAllocated();
+            emulationEnvironment.DisposePlugins();
+        }
+
+        private static void FreeConsoleIfAllocated()
+        {
+            if(consoleAllocated) FreeConsole();
         }
 
         private static MsxEmulationEnvironment CreateEmulationEnvironment(string[] args)

@@ -10,6 +10,8 @@ using Konamiman.NestorMSX.Hardware;
 using Konamiman.NestorMSX.Host;
 using Konamiman.NestorMSX.Misc;
 using Konamiman.Z80dotNet;
+using System.Diagnostics;
+using System.Threading;
 
 namespace Konamiman.NestorMSX.Emulator
 {
@@ -306,7 +308,7 @@ namespace Konamiman.NestorMSX.Emulator
 
             loadedPlugins.Clear();
         }
-        
+
         public void Run()
         {
             pluginContext.LoadedPlugins = loadedPlugins.ToArray();

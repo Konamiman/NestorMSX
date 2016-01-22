@@ -28,7 +28,6 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(EmulatorHostForm));
-            this.canvas = new DoubleBufferedPictureBox();
             this.mainMenu = new System.Windows.Forms.MenuStrip();
             this.pluginsMenu = new System.Windows.Forms.ToolStripMenuItem();
             this.emulationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -38,19 +37,10 @@
             this.restartAsADifferentMachineToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            ((System.ComponentModel.ISupportInitialize)(this.canvas)).BeginInit();
+            this.canvas = new Konamiman.NestorMSX.Host.DoubleBufferedPictureBox();
             this.mainMenu.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.canvas)).BeginInit();
             this.SuspendLayout();
-            // 
-            // canvas
-            // 
-            this.canvas.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.canvas.Location = new System.Drawing.Point(0, 28);
-            this.canvas.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.canvas.Name = "canvas";
-            this.canvas.Size = new System.Drawing.Size(669, 408);
-            this.canvas.TabIndex = 0;
-            this.canvas.TabStop = false;
             // 
             // mainMenu
             // 
@@ -124,6 +114,16 @@
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
+            // canvas
+            // 
+            this.canvas.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.canvas.Location = new System.Drawing.Point(0, 28);
+            this.canvas.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.canvas.Name = "canvas";
+            this.canvas.Size = new System.Drawing.Size(669, 408);
+            this.canvas.TabIndex = 0;
+            this.canvas.TabStop = false;
+            // 
             // EmulatorHostForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -139,9 +139,9 @@
             this.Name = "EmulatorHostForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "NestorMSX";
-            ((System.ComponentModel.ISupportInitialize)(this.canvas)).EndInit();
             this.mainMenu.ResumeLayout(false);
             this.mainMenu.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.canvas)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
