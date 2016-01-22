@@ -9,13 +9,15 @@ namespace Konamiman.NestorMSX.Host
         {
             InitializeComponent();
 
-            webAbout.DocumentText = @"
+            var header = @"
 <html>
 <head><style type=""text/css"">
 body { font-family: sans-serif; font-size: x-small; }
 a { text-decoration: none }
 </style></head>
-<body>
+<body>";
+
+            webAbout.DocumentText = header + @"
 <h4>NestorMSX 2.0</h4>
 <p>(c) 2015, 2016 Konamiman - <a target=""_blank"" href=""http://www.konamiman.com"">http://www.konamiman.com</a></p>
 <br/>
@@ -26,6 +28,13 @@ a { text-decoration: none }
 </body></html>
 ";
 
+            webCommandLine.DocumentText = header + @"
+<p>NestorMSX accepts the following command line arguments:</p>
+<p><b>keytest</b>: Run in key test mode. Useful if you want to create a key mappings file or modify a existing one.</p>
+<p><b>machine=""<em>name</em>""</b>: Start the emulator with the specified machine.</p>
+<p><b>sc</b>: Show the debug console. Useful to debug plugins.</p>
+<p><b>wd</b>: Wait until a debugger is attached before starting emulation. Useful to debug plugins.</p>
+";
         }
     }
 }
