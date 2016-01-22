@@ -142,6 +142,10 @@ namespace Konamiman.NestorMSX.Host
         #endregion
 
         #region Form menu
+        private void helpToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            (new HelpForm()).ShowDialog(this);
+        }
 
         private void emulationToolStripMenuItem_Click(object sender, EventArgs e)
         {
