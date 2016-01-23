@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
@@ -10,6 +11,7 @@ using System.Diagnostics;
 using System.Threading;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
+using ConfigurationException = Konamiman.NestorMSX.Exceptions.ConfigurationException;
 
 namespace Konamiman.NestorMSX
 {
@@ -43,7 +45,9 @@ namespace Konamiman.NestorMSX
             var waitForDebugger = false;
             var allocateConsole = false;
 
-            stateFilePath = "NestorMSX.state".AsApplicationFilePath();
+            stateFilePath = Path.Combine(
+                ConfigurationManager.AppSettings["stateFileDirectory"].AsApplicationFilePath(), 
+                "NestorMSX.state");
 
             foreach(var arg in args) {
                 if(argIs(arg, "keytest")) {
@@ -210,10 +214,15 @@ namespace Konamiman.NestorMSX
         {
             var availableMachineNames = GetAvailableMachineNames();
 
-            if(File.Exists(stateFilePath)) {
-                var previousMachineName = File.ReadAllText(stateFilePath);
-                if(availableMachineNames.Contains(previousMachineName))
-                    return previousMachineName;
+            if (File.Exists(stateFilePath)) {
+                try {
+                    var previousMachineName = File.ReadAllText(stateFilePath);
+                    if (availableMachineNames.Contains(previousMachineName))
+                        return previousMachineName;
+                }
+                catch (Exception ex) {
+                    Tell($"Could not read state file: {ex.Message}\r\n\r\nPlease review the stateFileDirectory setting in NestorMSX.exe.config");
+                }
             }
 
             return ShowMachineSelectionDialog(availableMachineNames);
@@ -221,7 +230,12 @@ namespace Konamiman.NestorMSX
 
         public static void SaveMachineNameAsState(string machineName)
         {
-            File.WriteAllText(stateFilePath, machineName);
+            try {
+                File.WriteAllText(stateFilePath, machineName);
+            }
+            catch (Exception ex) {
+                Tell($"Could not create state file: {ex.Message}\r\n\r\nPlease review the stateFileDirectory setting in NestorMSX.exe.config");
+            }
         }
 
         public static string ShowMachineSelectionDialog(string[] availableMachineNames = null)
