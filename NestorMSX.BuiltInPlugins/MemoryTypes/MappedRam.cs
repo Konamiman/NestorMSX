@@ -14,7 +14,10 @@ namespace Konamiman.NestorMSX.BuiltInPlugins.MemoryTypes
         private readonly byte segmentMask;
 
         private readonly IDictionary<ushort, int> addressOffsetsPerEachPage;
-        
+        private readonly byte[] segmentsInEachPage = new byte[4];
+
+        public event EventHandler<BankValueChangedEventArgs> BankValueChanged;
+
         public MappedRam(int sizeInSegments)
         {
             if(!allowedSizes.Contains(sizeInSegments))
@@ -53,6 +56,12 @@ namespace Konamiman.NestorMSX.BuiltInPlugins.MemoryTypes
             }
         }
 
+        public int AddressOfFirstBank => 0;
+
+        public int NumberOfBanks => 4;
+
+        public int BankSize => 16384;
+
         public byte[] GetContents(int startAddress, int length)
         {
             return memory.Skip(startAddress).Take(length).ToArray();
@@ -66,7 +75,30 @@ namespace Konamiman.NestorMSX.BuiltInPlugins.MemoryTypes
         public void WriteToSegmentSelectionRegister(Z80Page page, byte segmentNumber)
         {
             segmentNumber &= segmentMask;
+            if(segmentsInEachPage[page] == segmentNumber)
+                return;
+
             addressOffsetsPerEachPage[page.AddressMask] = segmentNumber * segmentSize;
+            segmentsInEachPage[page] = segmentNumber;
+            BankValueChanged?.Invoke(this, new BankValueChangedEventArgs(page, segmentNumber));
+        }
+
+        public void SetBankValue(int bankNumber, byte value)
+        {
+            CheckBankNumber(bankNumber);
+            WriteToSegmentSelectionRegister(bankNumber, value);
+        }
+
+        private static void CheckBankNumber(int bankNumber)
+        {
+            if(bankNumber < 0 || bankNumber > 3)
+                throw new InvalidOperationException("Bank number must be a value between 0 and 3");
+        }
+
+        public int GetBlockInBank(int bankNumber)
+        {
+            CheckBankNumber(bankNumber);
+            return segmentsInEachPage[bankNumber];
         }
     }
 }

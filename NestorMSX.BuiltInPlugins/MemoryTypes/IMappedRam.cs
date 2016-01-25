@@ -1,9 +1,8 @@
 ﻿using Konamiman.NestorMSX.Misc;
-using Konamiman.Z80dotNet;
 
 namespace Konamiman.NestorMSX.BuiltInPlugins.MemoryTypes
 {
-    public interface IMappedRam : IMemory
+    public interface IMappedRam : IBankedMemory
     {
         void WriteToSegmentSelectionRegister(Z80Page page, byte segmentNumber);
     }
