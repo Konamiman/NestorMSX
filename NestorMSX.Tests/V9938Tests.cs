@@ -37,7 +37,7 @@ namespace Konamiman.NestorMSX.Tests
         {
             CreateSut();
             Verify(m => m.BlankScreen());
-            Verify(m => m.SetScreenMode(0, 0));
+            Assert.AreEqual(ScreenMode.Graphic1, Sut.CurrentScreenMode);
         }
 
         #region Setting screen mode
@@ -46,18 +46,25 @@ namespace Konamiman.NestorMSX.Tests
         public void Screen_mode_is_set_properly()
         {
             WriteControlRegister(0, 2);
-            Verify(m => m.SetScreenMode(2, 0));
+            Verify(m => m.SetScreenMode(ScreenMode.Graphic2));
 
             WriteControlRegister(0, 0);
             DisplayRenderer.ResetCalls();
             WriteControlRegister(1, 0x10);
-            Verify(m => m.SetScreenMode(1, 0));
+            Verify(m => m.SetScreenMode(ScreenMode.Text1));
 
-            WriteControlRegister(1, 0x08);
-            Verify(m => m.SetScreenMode(3, 0));
-
+            WriteControlRegister(0, 0);
+            WriteControlRegister(0, 4);
             WriteControlRegister(1, 0);
-            Verify(m => m.SetScreenMode(0, 0));
+            DisplayRenderer.ResetCalls();
+            WriteControlRegister(1, 0x010);
+            Verify(m => m.SetScreenMode(ScreenMode.Text2));
+
+            WriteControlRegister(1, 2);
+            WriteControlRegister(1, 0);
+            DisplayRenderer.ResetCalls();
+            WriteControlRegister(0, 0);
+            Verify(m => m.SetScreenMode(ScreenMode.Graphic1));
         }
 
         #endregion
@@ -363,13 +370,13 @@ namespace Konamiman.NestorMSX.Tests
         [Test]
         public void Notifies_renderer_of_blank_or_active_screen()
         {
-            var value = Fixture.Create<byte>().WithBit(6, 0);
-            WriteControlRegister(1, value);
-            Verify(m => m.BlankScreen(), true);
-
-            value = value.WithBit(6, 1);
+            var value = Fixture.Create<byte>().WithBit(6, 1);
             WriteControlRegister(1, value);
             Verify(m => m.ActivateScreen(), true);
+
+            value = value.WithBit(6, 0);
+            WriteControlRegister(1, value);
+            Verify(m => m.BlankScreen(), true);
         }
 
         [Test]
