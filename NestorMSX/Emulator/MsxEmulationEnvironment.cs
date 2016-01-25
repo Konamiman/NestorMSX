@@ -37,7 +37,7 @@ namespace Konamiman.NestorMSX.Emulator
         public IKeyEventSource KeyboardEventSource { get; private set; }
         public EmulatorHostForm HostForm { get; }
         public IExternallyControlledSlotsSystem SlotsSystem { get; private set; }
-        public IExternallyControlledTms9918 Vdp { get; set; }
+        public IExternallyControlledV9938 Vdp { get; set; }
         public IZ80Processor Z80 { get; private set; }
         public IKeyboardController KeyboardController { get; private set; }
         public PluginsLoader PluginsLoader { get; private set; }
@@ -206,9 +206,9 @@ namespace Konamiman.NestorMSX.Emulator
             return new KeyboardController(keyEventSource, FileUtils.ReadAllText(globalConfig.KeymapFile));
         }
 
-        private IExternallyControlledTms9918 CreateVdp(IDrawingSurface drawingSurface)
+        private IExternallyControlledV9938 CreateVdp(IDrawingSurface drawingSurface)
         {
-            return new Tms9918(new DisplayRenderer(new GraphicsBasedDisplay(drawingSurface, globalConfig), globalConfig), globalConfig, globalConfig.VramSizeInKb);
+            return new V9938(new DisplayRenderer(new GraphicsBasedDisplay(drawingSurface, globalConfig), globalConfig), globalConfig, globalConfig.VramSizeInKb);
         }
 
         private void CreateSlotsSystem()

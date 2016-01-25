@@ -31,7 +31,7 @@ namespace Konamiman.NestorMSX.Plugins
         private readonly Keys PasteKey;
         private readonly Encoding Encoding;
 
-        public IExternallyControlledTms9918 Vdp { get; set; }
+        public IExternallyControlledV9938 Vdp { get; set; }
 
         private CopyPastePlugin(PluginContext context, IDictionary<string, object> pluginConfig)
         {

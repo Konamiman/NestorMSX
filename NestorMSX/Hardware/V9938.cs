@@ -11,9 +11,9 @@ using System.Threading;
 namespace Konamiman.NestorMSX.Hardware
 {
     /// <summary>
-    /// Represents a TMS9918 video display processor (text mode only supported)
+    /// Represents a V9938 video display processor (text mode only supported)
     /// </summary>
-    public class Tms9918 : IExternallyControlledTms9918, IDisposable
+    public class V9938 : IExternallyControlledV9938, IDisposable
     {
         private static decimal[] blinkTimes =
         {
@@ -24,7 +24,7 @@ namespace Konamiman.NestorMSX.Hardware
         private int colorTableLength = 32;
         private const int patternGeneratorTableLength = 2048;
 
-        private readonly ITms9918DisplayRenderer displayRenderer;
+        private readonly IV9938DisplayRenderer displayRenderer;
         private PlainMemory Vram;
         private bool generateInterrupts;
         private Task interruptGenerationTask;
@@ -58,7 +58,6 @@ namespace Konamiman.NestorMSX.Hardware
             private set
             {
                 if(_patternGeneratorTableAddress != value) {
-                    //Debug.WriteLine($"Pattern generator table: x{value:X}");
                     _patternGeneratorTableAddress = value;
                     for(var position = 0; position < patternGeneratorTableLength; position++)
                         displayRenderer.WriteToPatternGeneratorTable(position,
@@ -84,7 +83,6 @@ namespace Konamiman.NestorMSX.Hardware
             }
             private set
             {
-                //Debug.WriteLine($"Pattern name table: x{value:X}");
                 if(_PatternNameTableAddress != value) {
                     _PatternNameTableAddress = value;
                     ReprintAll();
@@ -101,8 +99,6 @@ namespace Konamiman.NestorMSX.Hardware
             }
             private set
             {
-                //Debug.WriteLine($"Color table: x{value:X}");
-
                 if(_colorTableAddress != value) {
                     _colorTableAddress = value;
                     for(int i = 0; i < colorTableLength; i++)
@@ -113,7 +109,7 @@ namespace Konamiman.NestorMSX.Hardware
 
         private static int[] allowedVramSizes = new[] {16, 64, 128};
 
-        public Tms9918(ITms9918DisplayRenderer displayRenderer, Configuration config, int vramSizeInKB = 16)
+        public V9938(IV9938DisplayRenderer displayRenderer, Configuration config, int vramSizeInKB = 16)
         {
             if(!allowedVramSizes.Contains(vramSizeInKB))
                 throw new ArgumentException("VRAM size must be one of: " + 
@@ -131,7 +127,6 @@ namespace Konamiman.NestorMSX.Hardware
 
             this.displayRenderer = displayRenderer;
             displayRenderer.BlankScreen();
-            //SetScreenMode(1, 40);
 
             if(config.VdpFrequencyMultiplier < 0.01M || config.VdpFrequencyMultiplier > 100)
                 throw new ConfigurationException("The VDP frequency multiplier must be a number between 0.01 and 100.");
@@ -169,7 +164,6 @@ namespace Konamiman.NestorMSX.Hardware
             this.columns = columns;
             currentlyIn80ColumnsMode = (columns == 80);
             colorTableLength = columns == 80 ? 270 : 32;
-            //Debug.WriteLine($"Set mode: {mode}, {columns}");
             screenMode = mode;
             displayRenderer.SetScreenMode((byte)mode, (byte)columns);
 
@@ -208,7 +202,6 @@ namespace Konamiman.NestorMSX.Hardware
             }
 
             if(portNumber == 3) {
-                //Debug.WriteLine($"Indirect: R#{registerNumberForIndirectAccess} = {value}");
                 if(registerNumberForIndirectAccess != 17)
                     WriteControlRegister(value, registerNumberForIndirectAccess);
                 if(autoIncrementRegisterNumberForIndirectAccess)
@@ -248,8 +241,6 @@ namespace Konamiman.NestorMSX.Hardware
         {
             vramPointer = (firstByte | ((secondByte & 0x3F) << 8) | (vramAddressThreeHighBits << 14)) & vramAddressMask;
 
-            //Debug.WriteLine($"Set VRAM pointer: x{vramPointer:X} for {((secondByte & 0x40) == 0 ? "Read":"Write")}");
-
             if((secondByte & 0x40) == 0) {
                 readAheadBuffer = Vram[vramPointer];
             }
@@ -260,8 +251,6 @@ namespace Konamiman.NestorMSX.Hardware
             register &= 63;
 
             ControlRegisterWritten?.Invoke(this, new VdpRegisterWrittenEventArgs(register, value));
-
-            //if(register !=14) Debug.WriteLine($"R#{register} = 0x{value:X} {value}");
 
             switch(register) {
                 case 0:
@@ -421,7 +410,6 @@ namespace Konamiman.NestorMSX.Hardware
                     return 0xFF;
 
                 var value = readAheadBuffer;
-                //Debug.WriteLine(Convert.ToString(value, 2).PadLeft(8,'0'));
                 vramPointer = (vramPointer + 1) & vramAddressMask;
                 readAheadBuffer = Vram[vramPointer];
                 return value;
@@ -451,12 +439,10 @@ namespace Konamiman.NestorMSX.Hardware
 
             Vram[address] = value;
             if(address >= PatternNameTableAddress && address < PatternNameTableAddress + PatternNameTableSize) {
-                //Debug.WriteLine($"NAME[x{address - PatternNameTableAddress:X}] = {value}");
                 displayRenderer.WriteToNameTable(address - PatternNameTableAddress, value);
             }
             if(address >= PatternGeneratorTableAddress && address < PatternGeneratorTableAddress + patternGeneratorTableLength) {
                 displayRenderer.WriteToPatternGeneratorTable(address - PatternGeneratorTableAddress, value);
-                //Debug.WriteLine($"GENERATOR[x{address - PatternGeneratorTableAddress:X}] = {value}");
             }
             if(address >= ColorTableAddress && address < ColorTableAddress + colorTableLength) {
                 displayRenderer.WriteToColourTable(address - ColorTableAddress, value);

@@ -48,10 +48,10 @@
   <ItemGroup>
     <Compile Include="Exceptions\ConfigurationException.cs" />
     <Compile Include="Hardware\IExternallyControlledSlotsSystem.cs" />
-    <Compile Include="Hardware\IExternallyControlledTms9918.cs" />
+    <Compile Include="Hardware\IExternallyControlledV9938.cs" />
     <Compile Include="Hardware\IKeyboardController.cs" />
     <Compile Include="Hardware\ISlotsSystem.cs" />
-    <Compile Include="Hardware\ITms9918.cs" />
+    <Compile Include="Hardware\IV9938.cs" />
     <Compile Include="Hardware\KeyEventArgs.cs" />
     <Compile Include="Hardware\SecondarySlotSelectionRegisterWrittenEventArgs.cs" />
     <Compile Include="Hardware\SlotSelectionRegisterWrittenEventArgs.cs" />

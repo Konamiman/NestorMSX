@@ -74,11 +74,11 @@
       <DependentUpon>EmulatorHostForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Emulator\MsxHardwareSet.cs" />
-    <Compile Include="Hardware\ITms9918DisplayRenderer.cs" />
+    <Compile Include="Hardware\IV9938DisplayRenderer.cs" />
     <Compile Include="Hardware\KeyboardController.cs" />
     <Compile Include="Hardware\NotConnectedMemory.cs" />
     <Compile Include="Hardware\SlotsSystem.cs" />
-    <Compile Include="Hardware\Tms9918.cs" />
+    <Compile Include="Hardware\V9938.cs" />
     <Compile Include="Host\DisplayRenderer.cs" />
     <Compile Include="Host\GraphicsBasedDisplay.cs" />
     <Compile Include="Host\HelpForm.cs">

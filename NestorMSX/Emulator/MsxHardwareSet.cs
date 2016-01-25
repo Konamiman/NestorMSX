@@ -12,7 +12,7 @@ namespace Konamiman.NestorMSX.Emulator
 
         public ISlotsSystem SlotsSystem { get; set; }
 
-        public ITms9918 Vdp { get; set; }
+        public IV9938 Vdp { get; set; }
 
         public IKeyboardController KeyboardController { get; set; }
     }

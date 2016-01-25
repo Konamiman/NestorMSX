@@ -3,10 +3,10 @@
 namespace Konamiman.NestorMSX.Hardware
 {
     /// <summary>
-    /// Represents a TMS9918 video display processor that can be controlled externally,
+    /// Represents a V9938 video display processor that can be controlled externally,
     /// that is, by explicit screen mode selection and VRAM access methods.
     /// </summary>
-    public interface IExternallyControlledTms9918 : ITms9918
+    public interface IExternallyControlledV9938 : IV9938
     {
         /// <summary>
         /// Writes one byte to VRAM.

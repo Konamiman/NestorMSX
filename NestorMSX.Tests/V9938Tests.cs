@@ -12,24 +12,24 @@ using System.Linq;
 
 namespace Konamiman.NestorMSX.Tests
 {
-    public class Tms9918Tests
+    public class V9938Tests
     {
         Fixture Fixture { get; set; }
-        Tms9918 Sut { get; set; }
-        Mock<ITms9918DisplayRenderer> DisplayRenderer { get; set; }
+        V9938 Sut { get; set; }
+        Mock<IV9938DisplayRenderer> DisplayRenderer { get; set; }
 
         [SetUp]
         public void Setup()
         {
             Fixture = new Fixture();
-            DisplayRenderer = new Mock<ITms9918DisplayRenderer>();
+            DisplayRenderer = new Mock<IV9938DisplayRenderer>();
             CreateSut();
             DisplayRenderer.ResetCalls();
         }
 
         private void CreateSut(int vramSizeInKb = 16)
         {
-            Sut = new Tms9918(DisplayRenderer.Object, new Configuration {VdpFrequencyMultiplier = 1.2M}, vramSizeInKb);
+            Sut = new V9938(DisplayRenderer.Object, new Configuration {VdpFrequencyMultiplier = 1.2M}, vramSizeInKb);
         }
 
         [Test]
@@ -789,7 +789,7 @@ namespace Konamiman.NestorMSX.Tests
             Sut.WriteToPort(1, (byte)(register | 0x80));
         }
 
-        void Verify(Expression<Action<ITms9918DisplayRenderer>> expression, bool resetCalls = false)
+        void Verify(Expression<Action<IV9938DisplayRenderer>> expression, bool resetCalls = false)
         {
             DisplayRenderer.Verify(expression, Times.Once);
             if(resetCalls)

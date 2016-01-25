@@ -26,7 +26,7 @@ namespace Konamiman.NestorMSX
         /// <summary>
         /// The emulated VDP.
         /// </summary>
-        public IExternallyControlledTms9918 Vdp { get; set; }
+        public IExternallyControlledV9938 Vdp { get; set; }
 
         /// <summary>
         /// The form that displays the emulator screen.

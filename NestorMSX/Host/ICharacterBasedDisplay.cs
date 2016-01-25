@@ -36,22 +36,46 @@ namespace Konamiman.NestorMSX.Host
         /// <param name="background">New background color of the character</param>
         void SetCharacterColors(byte charIndex, Color foreground, Color background);
 
+        /// <summary>
+        /// Notifies that the colors for the blink in TEXT1 mode have changed.
+        /// </summary>
+        /// <param name="foreground">New blink foreground color</param>
+        /// <param name="background">New blink background color</param>
         void SetBlinkColors(Color foreground, Color background);
 
+        /// <summary>
+        /// Enables the blink mode in TEXT1
+        /// </summary>
         void EnableBlink();
 
+        /// <summary>
+        /// Disables the blink mode in TEXT1
+        /// </summary>
         void DisableBlink();
 
+        /// <summary>
+        /// Sets or resets blink for a certain character position in TEXT1
+        /// </summary>
+        /// <param name="position">Position to change</param>
+        /// <param name="isBlink">True to set the character in that position as blink, false to set it as normal</param>
         void SetBlink(Point position, bool isBlink);
 
         /// <summary>
         /// Notifies that the character width has changed
         /// </summary>
-        /// <param name="width">New character width in pixels</param>
+        /// <param name="width">New character width in pixels, 6 or 8</param>
         void SetCharacterWidth(int width);
 
+        /// <summary>
+        /// Sets the number of character columns
+        /// </summary>
+        /// <param name="columns">Number of character columns: 32, 40 or 80</param>
         void SetColumns(int columns);
 
+        /// <summary>
+        /// Sets the number of character rows
+        /// </summary>
+        /// <param name="numberOfRows">Number of character rows, 24 or 27</param>
         void SetNumberOfRows(int numberOfRows);
 
         /// <summary>

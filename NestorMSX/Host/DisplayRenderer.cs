@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Konamiman.NestorMSX.Host
 {
-    public class DisplayRenderer : ITms9918DisplayRenderer
+    public class DisplayRenderer : IV9938DisplayRenderer
     {
         private const int SCREEN_1 = 0;
         private const int SCREEN_0 = 1;
