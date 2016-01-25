@@ -9,6 +9,11 @@ namespace Konamiman.NestorMSX.Hardware
     public interface IExternallyControlledV9938 : IV9938
     {
         /// <summary>
+        /// Gets the current screen mode.
+        /// </summary>
+        ScreenMode CurrentScreenMode { get; }
+
+        /// <summary>
         /// Writes one byte to VRAM.
         /// </summary>
         /// <param name="address">VRAM address</param>
@@ -64,5 +69,10 @@ namespace Konamiman.NestorMSX.Hardware
         /// Event fired when a register is written to, either directly or indirectly.
         /// </summary>
         event EventHandler<VdpRegisterWrittenEventArgs> ControlRegisterWritten;
+
+        /// <summary>
+        /// Event fired when the screen mode changes.
+        /// </summary>
+        event EventHandler ScreenModeChanged;
     }
 }

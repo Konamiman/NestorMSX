@@ -21,9 +21,8 @@ namespace Konamiman.NestorMSX.Hardware
         /// <summary>
         /// Notifies of a change of the screen mode.
         /// </summary>
-        /// <param name="mode">New screen mode, a number from 0 to 3.</param>
-        /// <param name="columns">Screen width in columns</param>
-        void SetScreenMode(byte mode, byte columns);
+        /// <param name="mode">New screen mode</param>
+        void SetScreenMode(ScreenMode mode);
 
         /// <summary>
         /// Notifies a change of the number of rows for the TEXT1 mode.

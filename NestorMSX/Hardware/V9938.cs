@@ -47,6 +47,8 @@ namespace Konamiman.NestorMSX.Hardware
         private byte blinkTextColor;
         private byte blinkBackdropColor;
         private bool screenIsActive;
+        private bool currentlyIn80ColumnsMode = false;
+        private int currentColumnsCount;
 
         private int _patternGeneratorTableAddress;
         public int PatternGeneratorTableAddress
@@ -72,8 +74,6 @@ namespace Konamiman.NestorMSX.Hardware
         private int vramPointer;
         private Bit[] modeBits;
         
-        private int screenMode = 0;
-
         private int _PatternNameTableAddress;
         public int PatternNameTableAddress
         {
@@ -124,6 +124,7 @@ namespace Konamiman.NestorMSX.Hardware
 
             Vram = new PlainMemory(vramSize);
             modeBits = new Bit[] {0, 0, 0, 0, 0};
+            CurrentScreenMode = ScreenMode.Graphic1;
 
             this.displayRenderer = displayRenderer;
             displayRenderer.BlankScreen();
@@ -155,26 +156,27 @@ namespace Konamiman.NestorMSX.Hardware
             }
         }
 
-        bool currentlyIn80ColumnsMode = false;
-        int columns;
-        private void SetScreenMode(int mode, int columns)
+        private void SetScreenMode(ScreenMode screenMode)
         {
+            CurrentScreenMode = screenMode;
+
             previousModeBits = modeBits.ToArray();
 
-            this.columns = columns;
-            currentlyIn80ColumnsMode = (columns == 80);
-            colorTableLength = columns == 80 ? 270 : 32;
-            screenMode = mode;
-            displayRenderer.SetScreenMode((byte)mode, (byte)columns);
+            currentColumnsCount = screenMode == ScreenMode.Text1 ? 40 : screenMode == ScreenMode.Text2 ? 80 : 32;
+            currentlyIn80ColumnsMode = (screenMode == ScreenMode.Text2);
+            colorTableLength = screenMode == ScreenMode.Text2 ? 270 : 32;
+            displayRenderer.SetScreenMode(screenMode);
 
             UpdateNumberOfRows();
+
+            ScreenModeChanged?.Invoke(this, EventArgs.Empty);
         }
 
         private void UpdateNumberOfRows()
         {
             var currentlyIn27RowsMode = currentlyIn80ColumnsMode && in27RowsMode;
             displayRenderer.SetNumberOfRows(currentlyIn27RowsMode ? 27 : 24);
-            PatternNameTableSize = columns * (currentlyIn27RowsMode ? 27 : 24);
+            PatternNameTableSize = currentColumnsCount * (currentlyIn27RowsMode ? 27 : 24);
         }
 
         void ReprintAll()
@@ -185,6 +187,7 @@ namespace Konamiman.NestorMSX.Hardware
 
         public event EventHandler NmiInterruptPulse;
         public event EventHandler<VdpRegisterWrittenEventArgs> ControlRegisterWritten;
+        public event EventHandler ScreenModeChanged;
 
         public bool IntLineIsActive { get; private set; }
         public byte? ValueOnDataBus { get; private set; }
@@ -254,14 +257,14 @@ namespace Konamiman.NestorMSX.Hardware
 
             switch(register) {
                 case 0:
-                    SetModeBit(2, value.GetBit(1), false);
+                    SetModeBit(3, value.GetBit(1), false);
                     SetModeBit(4, value.GetBit(2), false);
                     SetModeBit(5, value.GetBit(3), true);
                     break;
 
                 case 1:
                     SetModeBit(1, value.GetBit(4), false);
-                    SetModeBit(3, value.GetBit(3), true);
+                    SetModeBit(2, value.GetBit(3), true);
 
                     generateInterrupts = value.GetBit(5);
                     if(generateInterrupts && statusRegisterValue.GetBit(7))
@@ -372,9 +375,9 @@ namespace Konamiman.NestorMSX.Hardware
         private static Bit[] width80Bits = {1, 0, 0, 1, 0};
 
         Bit[] previousModeBits = null;
-        private void SetModeBit(int mode, Bit value, bool changeScreenMode)
+        private void SetModeBit(int modeBitNumber, Bit value, bool changeScreenMode)
         {
-            modeBits[mode - 1] = value;
+            modeBits[modeBitNumber - 1] = value;
             if(!changeScreenMode)
                 return;
 
@@ -383,19 +386,14 @@ namespace Konamiman.NestorMSX.Hardware
             else if(modeBits.SequenceEqual(previousModeBits))
                 return;
 
-            if (modeBits.SequenceEqual(width80Bits)) {
-                SetScreenMode(1, 80);
-                return;
-            }
+            var newScreenMode = 
+                modeBits[0] + 
+                2*modeBits[1] + 
+                4*modeBits[2] + 
+                8*modeBits[3] + 
+                16*modeBits[4];
 
-            for(byte i = 0; i <= 2; i++) {
-                if(modeBits[i]) {
-                    SetScreenMode((byte)(i + 1), i == 0 ? 40 : 0);
-                    return;
-                }
-            }
-
-            SetScreenMode(0, 32);
+            SetScreenMode((ScreenMode)newScreenMode);
         }
 
         private byte lastValueOfS2;
@@ -460,6 +458,8 @@ namespace Konamiman.NestorMSX.Hardware
         }
 
         public int PatternNameTableSize { get; private set; }
+
+        public ScreenMode CurrentScreenMode { get; private set; }
 
         public void SetVramContents(int startAddress, byte[] contents, int startIndex = 0, int? length = null)
         {

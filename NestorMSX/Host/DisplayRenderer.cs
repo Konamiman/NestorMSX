@@ -14,12 +14,9 @@ namespace Konamiman.NestorMSX.Host
 {
     public class DisplayRenderer : IV9938DisplayRenderer
     {
-        private const int SCREEN_1 = 0;
-        private const int SCREEN_0 = 1;
-
         private readonly ICharacterBasedDisplay display;
 
-        private int currentScreenMode = SCREEN_1;
+        private ScreenMode currentScreenMode = ScreenMode.Graphic1;
         private int screenWidthInCharacters = 32;
         private readonly Dictionary<Point, byte> screenBuffer = new Dictionary<Point, byte>();
         private Color[] Colors { get; set; }
@@ -32,6 +29,8 @@ namespace Konamiman.NestorMSX.Host
         private int backdropColorIndex;
         private int blinkTextColorIndex;
         private int blinkBackdropColorIndex;
+        private bool inScreen0;
+        private bool inScreen1 = true;
 
         public DisplayRenderer(ICharacterBasedDisplay display, Configuration config)
         {
@@ -86,19 +85,23 @@ namespace Konamiman.NestorMSX.Host
             display.BlankScreen();
         }
 
-        public void SetScreenMode(byte mode, byte columns)
+        public void SetScreenMode(ScreenMode mode)
         {
-            if(mode > 1)
+            if(mode != ScreenMode.Text1 && mode != ScreenMode.Text2 && mode != ScreenMode.Graphic1)
                 return;
 
             currentScreenMode = mode;
+            inScreen0 = mode == ScreenMode.Text1 || mode == ScreenMode.Text2;
+            inScreen1 = mode == ScreenMode.Graphic1;
+
+            var columns = mode == ScreenMode.Text1 ? 40 : mode == ScreenMode.Text2 ? 80 : 32;
             SetScreenWidth(columns);
-            display.SetCharacterWidth(mode == SCREEN_0 ? 6 : 8);
+            display.SetCharacterWidth(inScreen1 ? 8 : 6);
             display.SetColumns(columns);
 
             SetAllCharsColors();
 
-            if(mode == SCREEN_0 && columns == 80 && blinkTimesAvailable)
+            if(mode == ScreenMode.Text2 && blinkTimesAvailable)
                 EnableBlink();
             else
                 DisableBlink();
@@ -127,9 +130,9 @@ namespace Konamiman.NestorMSX.Host
 
         public void WriteToColourTable(int position, byte value)
         {
-            if(currentScreenMode == SCREEN_1)
+            if(inScreen1)
                 WriteToColourTableForScreen1(position, value);
-            else if(currentScreenMode == SCREEN_0 && screenWidthInCharacters == 80)
+            else if(currentScreenMode == ScreenMode.Text2)
                 WriteToColourTableForScreen0(position, value);
         }
 
@@ -142,7 +145,7 @@ namespace Konamiman.NestorMSX.Host
             for(byte i = 0; i < 8; i++) {
                 var charIndex = (byte)(firstCharIndex + i);
                 CharacterColorsForScreen1[charIndex] = new Tuple<byte, byte>((byte)foregroundColorIndex, (byte)backgroundColorIndex);
-                if(currentScreenMode == SCREEN_1)
+                if(inScreen1)
                     display.SetCharacterColors((byte)(firstCharIndex + i), Colors[foregroundColorIndex], Colors[backgroundColorIndex]);
             }
         }
@@ -162,13 +165,13 @@ namespace Konamiman.NestorMSX.Host
         {
             textColorIndex = colorIndex;
             TextColor = Colors[colorIndex];
-            if(currentScreenMode == SCREEN_0)
+            if(inScreen0)
                 SetAllCharsColorsForScreen0();
         }
 
         private void SetAllCharsColors()
         {
-            if(currentScreenMode == SCREEN_0)
+            if(inScreen0)
                 SetAllCharsColorsForScreen0();
             else
                 SetAllCharsColorsForScreen1();
@@ -193,7 +196,7 @@ namespace Konamiman.NestorMSX.Host
             backdropColorIndex = colorIndex;
             display.SetBackdropColor(Colors[colorIndex]);
             BackdropColor = Colors[colorIndex];
-            if(currentScreenMode == SCREEN_0)
+            if(inScreen0)
                 SetAllCharsColorsForScreen0();
         }
         
@@ -221,11 +224,11 @@ namespace Konamiman.NestorMSX.Host
             var color = Color.FromArgb(convertComponent(value.R), convertComponent(value.G), convertComponent(value.B));
             Colors[colorIndex] = color;
 
-            if(currentScreenMode == SCREEN_0 && colorIndex == textColorIndex)
+            if(inScreen0 && colorIndex == textColorIndex)
                 SetTextColor((byte)textColorIndex);
-            else if(currentScreenMode == SCREEN_0 && colorIndex == backdropColorIndex)
+            else if(inScreen0 && colorIndex == backdropColorIndex)
                 SetBackdropColor((byte)backdropColorIndex);
-            else if (currentScreenMode == SCREEN_1)
+            else if(inScreen1)
             {
                 var affectedChars = CharacterColorsForScreen1.Keys.Where(k =>
                     CharacterColorsForScreen1[k].Item1 == colorIndex || CharacterColorsForScreen1[k].Item2 == colorIndex);
@@ -236,7 +239,7 @@ namespace Konamiman.NestorMSX.Host
                         Colors[CharacterColorsForScreen1[charIndex].Item2]);
             }
 
-            if (currentScreenMode == SCREEN_0 && screenWidthInCharacters == 80 && (
+            if (inScreen0 && screenWidthInCharacters == 80 && (
                 colorIndex == blinkTextColorIndex || colorIndex == blinkBackdropColorIndex))
             {
                 display.SetBlinkColors(Colors[blinkTextColorIndex], Colors[blinkBackdropColorIndex]);
