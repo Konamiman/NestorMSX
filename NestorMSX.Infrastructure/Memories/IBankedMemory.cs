@@ -1,7 +1,7 @@
 ﻿using System;
 using Konamiman.Z80dotNet;
 
-namespace Konamiman.NestorMSX.BuiltInPlugins.MemoryTypes
+namespace Konamiman.NestorMSX.Memories
 {
     /// <summary>
     /// Represents a banked memory, that is, a memory whose content is larger than 64K

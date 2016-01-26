@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace Konamiman.NestorMSX.BuiltInPlugins.MemoryTypes
+namespace Konamiman.NestorMSX.Memories
 {
     public class MsxDos2Rom : IBankedMemory
     {

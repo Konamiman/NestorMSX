@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using Konamiman.NestorMSX.BuiltInPlugins.MemoryTypes;
+using Konamiman.NestorMSX.Memories;
 using Konamiman.NestorMSX.Misc;
 using Konamiman.Z80dotNet;
 

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Konamiman.NestorMSX.Misc;
 
-namespace Konamiman.NestorMSX.BuiltInPlugins.MemoryTypes
+namespace Konamiman.NestorMSX.Memories
 {
     public class MappedRam : IMappedRam
     {

@@ -1,5 +1,5 @@
 ﻿using System;
-using Konamiman.NestorMSX.BuiltInPlugins.MemoryTypes;
+using Konamiman.NestorMSX.Memories;
 using NUnit.Framework;
 using Ploeh.AutoFixture;
 using Ploeh.AutoFixture.AutoMoq;

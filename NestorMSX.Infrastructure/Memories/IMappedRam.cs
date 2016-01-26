@@ -1,6 +1,6 @@
 ﻿using Konamiman.NestorMSX.Misc;
 
-namespace Konamiman.NestorMSX.BuiltInPlugins.MemoryTypes
+namespace Konamiman.NestorMSX.Memories
 {
     public interface IMappedRam : IBankedMemory
     {

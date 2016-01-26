@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using Konamiman.NestorMSX.BuiltInPlugins.MemoryTypes;
 using NUnit.Framework;
 
 namespace Konamiman.NestorMSX.Tests

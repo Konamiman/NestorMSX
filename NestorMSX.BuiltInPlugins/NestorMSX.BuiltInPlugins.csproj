@@ -47,10 +47,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MemoryTypes\Ascii16Rom.cs" />
-    <Compile Include="MemoryTypes\BankValueChangedEventArgs.cs" />
-    <Compile Include="MemoryTypes\IBankedMemory.cs" />
-    <Compile Include="MemoryTypes\MsxDos2Rom.cs" />
     <Compile Include="Sandbox\KeyloggerForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -63,14 +59,9 @@
     <Compile Include="SlotPlugins\MsxDos2Plugin.cs" />
     <Compile Include="SlotPlugins\DiskImageBasedStoragePlugin.cs" />
     <Compile Include="SlotPlugins\DosFunctionCallExecutor.cs" />
-    <Compile Include="MemoryTypes\IMappedRam.cs" />
-    <Compile Include="MemoryTypes\Ascii8Rom.cs" />
-    <Compile Include="MemoryTypes\MappedRam.cs" />
     <Compile Include="SlotPlugins\MappedRamPlugin.cs" />
     <Compile Include="SlotPlugins\MsxDosPlugin.cs" />
     <Compile Include="SlotPlugins\NextorPlugin.cs" />
-    <Compile Include="MemoryTypes\PlainRam.cs" />
-    <Compile Include="MemoryTypes\PlainRom.cs" />
     <Compile Include="SlotPlugins\PlainRamPlugin.cs" />
     <Compile Include="SlotPlugins\Ascii16RomPlugin.cs" />
     <Compile Include="SlotPlugins\PlainRomPlugin.cs" />

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Konamiman.NestorMSX.BuiltInPlugins.MemoryTypes
+namespace Konamiman.NestorMSX.Memories
 {
     public class Ascii16Rom : IBankedMemory
     {

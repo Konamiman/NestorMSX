@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using Konamiman.NestorMSX.Memories;
 using Konamiman.Z80dotNet;
-using Konamiman.NestorMSX.BuiltInPlugins.MemoryTypes;
 using Konamiman.NestorMSX.Misc;
 using ConfigurationException = Konamiman.NestorMSX.Exceptions.ConfigurationException;
 

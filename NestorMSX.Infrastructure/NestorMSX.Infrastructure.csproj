@@ -58,6 +58,15 @@
     <Compile Include="Hardware\SlotSelectionRegisterWrittenEventArgs.cs" />
     <Compile Include="Hardware\VdpRegisterWrittenEventArgs.cs" />
     <Compile Include="Host\IKeyEventSource.cs" />
+    <Compile Include="Memories\Ascii16Rom.cs" />
+    <Compile Include="Memories\Ascii8Rom.cs" />
+    <Compile Include="Memories\BankValueChangedEventArgs.cs" />
+    <Compile Include="Memories\IBankedMemory.cs" />
+    <Compile Include="Memories\IMappedRam.cs" />
+    <Compile Include="Memories\MappedRam.cs" />
+    <Compile Include="Memories\MsxDos2Rom.cs" />
+    <Compile Include="Memories\PlainRam.cs" />
+    <Compile Include="Memories\PlainRom.cs" />
     <Compile Include="Menus\MenuEntry.cs" />
     <Compile Include="Misc\DictionaryUtils.cs" />
     <Compile Include="Misc\SlotNumber.cs" />

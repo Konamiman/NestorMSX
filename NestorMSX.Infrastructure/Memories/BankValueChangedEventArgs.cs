@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Konamiman.NestorMSX.BuiltInPlugins.MemoryTypes
+namespace Konamiman.NestorMSX.Memories
 {
     public class BankValueChangedEventArgs : EventArgs
     {

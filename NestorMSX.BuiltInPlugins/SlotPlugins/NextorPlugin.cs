@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using Konamiman.NestorMSX.BuiltInPlugins.MemoryTypes;
+using Konamiman.NestorMSX.Memories;
 using Konamiman.Z80dotNet;
 using ConfigurationException = Konamiman.NestorMSX.Exceptions.ConfigurationException;
 
