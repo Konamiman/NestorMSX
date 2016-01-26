@@ -9,7 +9,7 @@ namespace Konamiman.NestorMSX.Tests
         private const int bankSize = 16 * 1024;
 
         private byte[] contents;
-        private Ascii16Rom Sut;
+        private Ascii16Rom_old Sut;
 
         [SetUp]
         public void Setup()
@@ -23,7 +23,7 @@ namespace Konamiman.NestorMSX.Tests
             contents[bankSize + 1] = 19;
             contents[2*bankSize + 1] = 29;
 
-            Sut = new Ascii16Rom(contents);
+            Sut = new Ascii16Rom_old(contents);
         }
 
         [Test]
@@ -81,7 +81,7 @@ namespace Konamiman.NestorMSX.Tests
         public void Rounds_memory_size_to_16K()
         {
             var contents = Enumerable.Repeat((byte)0, 10000).ToArray();
-            Sut = new Ascii16Rom(contents);
+            Sut = new Ascii16Rom_old(contents);
 
             Sut[0x7000] = 1;
 

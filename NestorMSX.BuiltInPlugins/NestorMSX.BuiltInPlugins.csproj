@@ -47,10 +47,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MemoryTypes\Ascii16Rom.cs" />
     <Compile Include="MemoryTypes\BankValueChangedEventArgs.cs" />
     <Compile Include="MemoryTypes\IBankedMemory.cs" />
     <Compile Include="MemoryTypes\MsxDos2Rom.cs" />
-    <Compile Include="MemoryTypes\Ascii16Rom.cs" />
     <Compile Include="Sandbox\KeyloggerForm.cs">
       <SubType>Form</SubType>
     </Compile>

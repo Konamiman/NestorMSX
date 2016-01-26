@@ -73,7 +73,7 @@ namespace Konamiman.NestorMSX.Tests
                 sut[0x3FFF] = (byte)~segment;
             }
 
-            for (var segment = 0; segment < 256; segment++)
+            for(var segment = 0; segment < 256; segment++)
             {
                 sut.WriteToSegmentSelectionRegister(0, (byte)segment);
                 Assert.AreEqual(segment, sut[0x0000]);

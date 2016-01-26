@@ -14,7 +14,7 @@ namespace Konamiman.NestorMSX.BuiltInPlugins.MemoryTypes
         private readonly byte segmentMask;
 
         private readonly IDictionary<ushort, int> addressOffsetsPerEachPage;
-        private readonly byte[] segmentsInEachPage = new byte[4];
+        private readonly byte[] segmentsInEachPage = new byte[] {3, 2, 1, 0};
 
         public event EventHandler<BankValueChangedEventArgs> BankValueChanged;
 

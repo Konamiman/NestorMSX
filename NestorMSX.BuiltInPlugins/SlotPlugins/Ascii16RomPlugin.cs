@@ -22,7 +22,7 @@ namespace Konamiman.NestorMSX.Plugins
 
         public IMemory GetMemory()
         {
-            return new Ascii16Rom(File.ReadAllBytes(fileName));
+            return new Ascii16Rom_old(File.ReadAllBytes(fileName));
         }
     }
 }
