@@ -46,6 +46,7 @@ namespace Konamiman.NestorMSX.BuiltInPlugins.MemoryTypes
 
         public int GetBlockInBank(int bankNumber)
         {
+            CheckBankNumber(bankNumber);
             return blockNumbersInEachBank[bankNumber];
         }
 
