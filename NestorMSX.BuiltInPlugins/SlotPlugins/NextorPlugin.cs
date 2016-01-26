@@ -57,7 +57,7 @@ namespace Konamiman.NestorMSX.Plugins
             if (memory.GetCurrentSlot(1) != slotNumber)
                 return;
 
-            if (kernelMemory.CurrentBlockInBank(1) != 14)
+            if (kernelMemory.GetBlockInBank(0) != 14)
                 return;
 
             if (kernelRoutines.ContainsKey(z80.Registers.PC))
