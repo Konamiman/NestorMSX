@@ -159,6 +159,7 @@ namespace Konamiman.NestorMSX.Host
             emulationEnvironment.SlotsSystem.EnableSlot(2, 0);
             emulationEnvironment.SlotsSystem.EnableSlot(3, 0);
             emulationEnvironment.Z80.Reset();
+            emulationEnvironment.Z80.Registers.PC = 0; //TODO: Investigate why a simple reset is often not enough!
         }
 
         private void restartEmulationToolStripMenuItem_Click(object sender, EventArgs e)

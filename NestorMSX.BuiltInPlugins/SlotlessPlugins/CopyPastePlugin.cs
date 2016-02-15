@@ -5,6 +5,7 @@ using System.Text;
 using System.Windows.Forms;
 using Konamiman.NestorMSX.Exceptions;
 using Konamiman.NestorMSX.Hardware;
+using Konamiman.NestorMSX.Menus;
 using Konamiman.NestorMSX.Misc;
 using Konamiman.Z80dotNet;
 using KeyEventArgs = Konamiman.NestorMSX.Hardware.KeyEventArgs;
@@ -22,14 +23,15 @@ namespace Konamiman.NestorMSX.Plugins
 
         private const int LF = 10;
 
-        private const int ScreenLines = 24;
-
         private readonly IZ80Processor processor;
         private readonly List<Keys> PressedKeys = new List<Keys>();
         private readonly List<byte> PastedText = new List<byte>();
         private readonly Keys CopyKey;
         private readonly Keys PasteKey;
         private readonly Encoding Encoding;
+        private int ScreenColumns = 40;
+        private MenuEntry CopyMenuEntry;
+        private MenuEntry PasteMenuEntry;
 
         public IExternallyControlledV9938 Vdp { get; set; }
 
@@ -37,8 +39,8 @@ namespace Konamiman.NestorMSX.Plugins
         {
             var defaultConfig = new Dictionary<string, object>
             {
-                { "copyKey", "F11"},
-                { "pasteKey", "F12"},
+                { "copyKey", null},
+                { "pasteKey", null},
                 { "encoding", "ASCII" }
             };
 
@@ -59,15 +61,48 @@ namespace Konamiman.NestorMSX.Plugins
                     $"Encoding '{encodingName}' is not supported by this system", ex);
             }
 
-            context.KeyEventSource.KeyReleased += KeyEventSourceOnKeyReleased;
+            if(CopyKey != Keys.None || PasteKey != Keys.None)
+                context.KeyEventSource.KeyReleased += KeyEventSourceOnKeyReleased;
 
             this.Vdp = context.Vdp;
             this.processor = context.Cpu;
             processor.BeforeInstructionFetch += Cpu_BeforeInstructionFetch;
+
+            context.Vdp.ScreenModeChanged += VdpOnScreenModeChanged;
+
+            CopyMenuEntry = new MenuEntry($"Copy{(CopyKey == Keys.None ? "" : " (" + CopyKey + ")")}", CopyScreenAsText) { IsEnabled = false };
+            PasteMenuEntry = new MenuEntry($"Paste{(PasteKey == Keys.None ? "" : " (" + PasteKey + ")")}", PasteTextAsKeyboardData) { IsEnabled = false };
+            var mainMenuEntry = new MenuEntry("Copy && Paste", new[] {CopyMenuEntry, PasteMenuEntry});
+            context.SetMenuEntry(this, mainMenuEntry);
+        }
+
+        private void VdpOnScreenModeChanged(object sender, EventArgs eventArgs)
+        {
+            switch(Vdp.CurrentScreenMode)
+            {
+                case ScreenMode.Graphic1:
+                    ScreenColumns = 32;
+                    break;
+                case ScreenMode.Text1:
+                    ScreenColumns = 40;
+                    break;
+                case ScreenMode.Text2:
+                    ScreenColumns = 80;
+                    break;
+                default:
+                    ScreenColumns = 0;
+                    break;
+            }
+
+            CopyMenuEntry.IsEnabled = PasteMenuEntry.IsEnabled =
+                ScreenColumns != 0;
         }
 
         private Keys ParseKey(string name)
         {
+            if(name == null)
+                return Keys.None;
+
             try
             {
                 return (Keys)Enum.Parse(typeof(Keys), name);
@@ -108,14 +143,20 @@ namespace Konamiman.NestorMSX.Plugins
         {
             var sb = new StringBuilder();
             var screenBytes = Vdp.GetVramContents(Vdp.PatternNameTableAddress, Vdp.PatternNameTableSize);
-            var lineWidth = screenBytes.Length / ScreenLines;
-            for (int i = 0; i < ScreenLines; i++)
+            var lines = Vdp.PatternNameTableSize/ScreenColumns;
+            for (int i = 0; i < lines; i++)
             {
                 var lineBytes =
                     screenBytes
-                        .Skip(lineWidth * i)
-                        .Take(lineWidth)
+                        .Skip(ScreenColumns * i)
+                        .Take(ScreenColumns)
                         .ToArray();
+
+                //A 0 will ruin the entire copy operation,
+                //so let's get rid of these with a not-very-clean-but-works solution...
+                for(int b=0; b<ScreenColumns; b++)
+                    if(lineBytes[b] == 0) lineBytes[b] = 1;
+
                 sb.AppendLine(Encoding.GetString(lineBytes));
             }
 
