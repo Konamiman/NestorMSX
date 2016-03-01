@@ -188,6 +188,7 @@ namespace Konamiman.NestorMSX.Hardware
         public event EventHandler NmiInterruptPulse;
         public event EventHandler<VdpRegisterWrittenEventArgs> ControlRegisterWritten;
         public event EventHandler ScreenModeChanged;
+        public event EventHandler<MemoryWrittenEventArgs> VramWritten;
 
         public bool IntLineIsActive { get; private set; }
         public byte? ValueOnDataBus { get; private set; }
@@ -445,6 +446,8 @@ namespace Konamiman.NestorMSX.Hardware
             if(address >= ColorTableAddress && address < ColorTableAddress + colorTableLength) {
                 displayRenderer.WriteToColourTable(address - ColorTableAddress, value);
             }
+
+            VramWritten?.Invoke(this, new MemoryWrittenEventArgs(address, value));
         }
 
         public byte ReadVram(int address)

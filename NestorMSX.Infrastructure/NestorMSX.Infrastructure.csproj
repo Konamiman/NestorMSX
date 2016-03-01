@@ -57,6 +57,7 @@
     <Compile Include="Hardware\SecondarySlotSelectionRegisterWrittenEventArgs.cs" />
     <Compile Include="Hardware\SlotSelectionRegisterWrittenEventArgs.cs" />
     <Compile Include="Hardware\VdpRegisterWrittenEventArgs.cs" />
+    <Compile Include="Hardware\MemoryWrittenEventArgs.cs" />
     <Compile Include="Host\IKeyEventSource.cs" />
     <Compile Include="Memories\Ascii16Rom.cs" />
     <Compile Include="Memories\Ascii8Rom.cs" />

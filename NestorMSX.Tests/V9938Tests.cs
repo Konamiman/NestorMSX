@@ -363,6 +363,25 @@ namespace Konamiman.NestorMSX.Tests
             Assert.AreEqual(value3, actual);
         }
 
+        [Test]
+        public void Event_is_fired_when_vram_is_written_to()
+        {
+            var address = Fixture.Create<int>();
+            var value = Fixture.Create<byte>();
+            int actualAddress = 0;
+            int actualValue = 0;
+
+            Sut.VramWritten += (sender, args) => {
+                actualAddress = args.Address;
+                actualValue = args.Value;
+            };
+
+            Sut.WriteVram(address, value);
+
+            Assert.AreEqual(actualAddress, address);
+            Assert.AreEqual(actualValue, value);
+        }
+
         #endregion
 
         #region Screen on/off

@@ -74,5 +74,10 @@ namespace Konamiman.NestorMSX.Hardware
         /// Event fired when the screen mode changes.
         /// </summary>
         event EventHandler ScreenModeChanged;
+
+        /// <summary>
+        /// Event fired when the VRAM is written to.
+        /// </summary>
+        event EventHandler<MemoryWrittenEventArgs> VramWritten;
     }
 }
