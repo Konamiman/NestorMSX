@@ -415,6 +415,8 @@ namespace Konamiman.NestorMSX.Tests
         [Test]
         public void Notifies_write_to_pattern_name_table()
         {
+            WriteControlRegister(1, ((byte)0).WithBit(4, 1));
+
             var nameTableBaseAddressHighBits = Fixture.Create<byte>() & 0x0F;
             var nameTableBaseAddress = nameTableBaseAddressHighBits << 10;
             var offset = Fixture.Create<byte>();
@@ -433,8 +435,7 @@ namespace Konamiman.NestorMSX.Tests
         [TestCase(1, 960)]
         public void Does_not_notify_write_outside_pattern_name_table(int screenMode, int nameTableSize)
         {
-            if(screenMode == 1)
-                WriteControlRegister(1, ((byte)0).WithBit(4, 1));
+            WriteControlRegister(1, ((byte)0).WithBit(4, screenMode));
 
             var nameTableBaseAddressHighBits = Fixture.Create<byte>() & 0x0F;
             var nameTableBaseAddress = nameTableBaseAddressHighBits << 10;
@@ -524,6 +525,8 @@ namespace Konamiman.NestorMSX.Tests
         [Test]
         public void Notifies_writing_name_table_on_bulk_vram_write()
         {
+            WriteControlRegister(1, ((byte)0).WithBit(4, 1));
+
             var nameTableBaseAddressHighBits = Fixture.Create<byte>() & 0x0F;
             var nameTableBaseAddress = nameTableBaseAddressHighBits << 10;
             var offset = Fixture.Create<byte>();

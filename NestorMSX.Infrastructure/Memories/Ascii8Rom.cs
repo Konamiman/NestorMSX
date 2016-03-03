@@ -4,6 +4,10 @@ using System.Linq;
 
 namespace Konamiman.NestorMSX.Memories
 {
+    /// <summary>
+    /// MegaROM memory that uses an ASCII8 mapper.
+    /// </summary>
+
     public class Ascii8Rom : IBankedMemory
     {
         private static readonly IDictionary<int, int> bankStartAddressBySelectionAddress =

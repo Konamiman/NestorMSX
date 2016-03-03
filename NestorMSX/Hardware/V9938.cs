@@ -124,8 +124,7 @@ namespace Konamiman.NestorMSX.Hardware
 
             Vram = new PlainMemory(vramSize);
             modeBits = new Bit[] {0, 0, 0, 0, 0};
-            CurrentScreenMode = ScreenMode.Graphic1;
-
+            
             this.displayRenderer = displayRenderer;
             displayRenderer.BlankScreen();
 
@@ -135,6 +134,8 @@ namespace Konamiman.NestorMSX.Hardware
             var interruptGenerationInterval = TimeSpan.FromSeconds(((double)1)/60).TotalMilliseconds/(double)config.VdpFrequencyMultiplier;
             interruptGenerationTaskCancellatonTokenSource = new CancellationTokenSource();
             interruptGenerationTask = Task.Factory.StartNew(InterruptGenerationTaskProcess, interruptGenerationInterval, interruptGenerationTaskCancellatonTokenSource.Token);
+
+            SetScreenMode(ScreenMode.Graphic1);
         }
 
         private CancellationTokenSource interruptGenerationTaskCancellatonTokenSource;

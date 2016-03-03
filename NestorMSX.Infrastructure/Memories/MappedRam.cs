@@ -5,6 +5,10 @@ using Konamiman.NestorMSX.Misc;
 
 namespace Konamiman.NestorMSX.Memories
 {
+    /// <summary>
+    /// Standard mapped RAM memory.
+    /// </summary>
+
     public class MappedRam : IMappedRam
     {
         private const int segmentSize = 16*1024;

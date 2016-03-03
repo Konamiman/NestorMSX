@@ -4,6 +4,9 @@ using System.Linq;
 
 namespace Konamiman.NestorMSX.Memories
 {
+    /// <summary>
+    /// MegaROM memory that uses an ASCII16 mapper.
+    /// </summary>
     public class Ascii16Rom : IBankedMemory
     {
         private static readonly IDictionary<int, int> bankStartAddressBySelectionAddress =
@@ -68,7 +71,7 @@ namespace Konamiman.NestorMSX.Memories
                 var bankStartAddress = bankStartAddressBySelectionAddress[address];
                 var contentsOffset = value*bankSize;
 
-                var bankNumber = (bankStartAddress-AddressOfFirstBank) >> 13;
+                var bankNumber = (bankStartAddress-AddressOfFirstBank) >> 14;
                 SetBankValueCore(bankNumber, value);
             }
         }

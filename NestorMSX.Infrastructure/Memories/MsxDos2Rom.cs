@@ -3,6 +3,10 @@ using System.Linq;
 
 namespace Konamiman.NestorMSX.Memories
 {
+    /// <summary>
+    /// MegaROM memory that uses the MSX-DOS 2 mapper.
+    /// </summary>
+
     public class MsxDos2Rom : IBankedMemory
     {
         private const int bankSize = 16*1024;
