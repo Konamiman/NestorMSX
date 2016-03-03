@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.AccessControl;
 using System.Text;
 using System.Windows.Forms;
 using Konamiman.NestorMSX.Hardware;
@@ -127,7 +128,8 @@ namespace Konamiman.NestorMSX.Plugins
                 SetFile(diskImageFilePath, i + 1, Path.GetFileName(diskImageFilePath));
             }
 
-            File.Delete(stateFileFullPath);
+            if(File.Exists(stateFileFullPath))
+                File.Delete(stateFileFullPath);
         }
 
         private void SetFile(string fullPath, int deviceIndex, string displayName)
@@ -154,6 +156,8 @@ namespace Konamiman.NestorMSX.Plugins
             removeFileMenuEntries[deviceIndex - 1].IsVisible = true;
             removeFileMainMenuEntry.IsVisible = true;
             separatorBeforeRemoveFileMenuEntry.IsVisible = true;
+
+            UpdateStateFile();
         }
 
         private void CreateMenu()
@@ -226,11 +230,15 @@ namespace Konamiman.NestorMSX.Plugins
         private void UpdateStateFile()
         {
             try {
+                var directory = Path.GetDirectoryName(stateFileFullPath);
+                if(!Directory.Exists(directory))
+                    Directory.CreateDirectory(directory);
+
                 var filesList = imageFiles.Select(f => f == null ? "" : f.FullPath).ToArray();
                 File.WriteAllLines(stateFileFullPath, filesList);
-                filesListFromState = filesList;
+                filesListFromState = filesList.WithEmptiesAsNulls();
             }
-            catch { }
+            catch(Exception ex) { }
         }
 
         protected byte[] PaddedArrayFromString(string theString, int totalLength)

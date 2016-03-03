@@ -40,6 +40,11 @@ namespace Konamiman.NestorMSX.Misc
             if(basePath == null)
                 basePath = DefaultBasePath.AsAbsolutePath("");
 
+            path = path.Replace(
+                "$NestorMSX$",
+                Path.GetDirectoryName(Assembly.GetEntryAssembly().Location),
+                StringComparison.InvariantCultureIgnoreCase);
+
             var specialFolderNames = Enum.GetNames(typeof(Environment.SpecialFolder));
             foreach(var name in specialFolderNames) {
                 var namePlaceholder = "$" + name + "$";

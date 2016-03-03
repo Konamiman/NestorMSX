@@ -154,6 +154,13 @@
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="machines\MSX2 with MSX-DOS 2\machine.config">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <None Include="DiskImages\NextorAndMsxDos.dsk">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="machines\Shared\MSX2.rom">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
