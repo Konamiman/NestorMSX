@@ -1,0 +1,22 @@
+﻿<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>$author$</authors>
+    <owners>$author$</owners>
+    <licenseUrl>https://bitbucket.org/konamiman/nestormsx/src/default/LICENSE.txt</licenseUrl>
+    <projectUrl>https://bitbucket.org/konamiman/nestormsx</projectUrl>
+    <iconUrl>https://bytebucket.org/konamiman/nestormsx/raw/b062605e3b72e13501d81cbafe035efc9fcb6e1d/NestorMSX.Infrastructure/NuGetIcon.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <summary>$description$</summary>
+    <description>Infrastructure package needed to develop plugins for NestorMSX.</description>
+    <releaseNotes>First version.</releaseNotes>
+    <copyright>Copyright 2016 Konamiman</copyright>
+    <tags>MSX</tags>
+    <dependencies>
+      <dependency id="Z80dotNet" version="1.0.5" />
+    </dependencies>
+  </metadata>
+</package>

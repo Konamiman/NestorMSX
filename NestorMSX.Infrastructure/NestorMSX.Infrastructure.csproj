@@ -79,6 +79,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="NestorMSX.Infrastructure.Nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
