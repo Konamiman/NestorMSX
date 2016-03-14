@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("NestorMSX.Infrastructure")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Infrastructure package needed to develop plugins for NestorMSX.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Konamiman")]
 [assembly: AssemblyProduct("NestorMSX.Infrastructure")]
-[assembly: AssemblyCopyright("Copyright © Konamiman 2015")]
+[assembly: AssemblyCopyright("Copyright © Konamiman 2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
