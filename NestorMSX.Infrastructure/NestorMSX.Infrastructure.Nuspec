@@ -8,7 +8,7 @@
     <owners>$author$</owners>
     <licenseUrl>https://bitbucket.org/konamiman/nestormsx/src/default/LICENSE.txt</licenseUrl>
     <projectUrl>https://bitbucket.org/konamiman/nestormsx</projectUrl>
-    <iconUrl>https://bytebucket.org/konamiman/nestormsx/raw/b062605e3b72e13501d81cbafe035efc9fcb6e1d/NestorMSX.Infrastructure/NuGetIcon.png</iconUrl>
+    <iconUrl>https://bytebucket.org/konamiman/nestormsx/raw/61238da861f610fe9025ae6ed7ed79bc3acafd36/NestorMSX.Infrastructure/NuGetIcon.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <summary>$description$</summary>
     <description>Infrastructure package needed to develop plugins for NestorMSX.</description>
