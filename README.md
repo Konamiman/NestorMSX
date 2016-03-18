@@ -42,7 +42,10 @@ Notice how the different memory types are implemented via plugins. Actually, the
     * "pasteKey": The key used for paste (optional)
     * "encoding": The encoding used to convert from bytes to text and viceversa (optional, default: "ASCII")
 
-This plugins copies the MSX screen context to the clipboard (copy) and the other way around (paste). It only works in text modes.
+This plugin only works in text modes. It copies the MSX screen context to the clipboard (copy) and the other way around (paste):
+
+- Copy just converts the contents of the pattern name table in VRAM to text and inserts it in the clipboard, adding one line break at the end of each physical line (each 40 or 80 characters in SCREEN 0, 32 in SCREEN 1).
+- Paste converts the clipboard text contents into bytes and inserts these in the keyboard buffer, so the emulated system acts as if the user had effectively typed the text.
 
 The possible values for "copyKey" and "pasteKey" are the members of the [.NET's Keys enumeration](https://msdn.microsoft.com/en-us/library/system.windows.forms.keys). If no keys are provided, copy & paste is only available via menu entry.
 
@@ -61,6 +64,34 @@ This plugins emulates the MSX Clock IC that maintains the current date and time 
 Note that a MSX2 machine will not boot if this plugin is not active.
 
 
+### Plain RAM ###
+
+* _Friendly name_: "RAM"
+* _Full class name_: "Konamiman.NestorMSX.Plugins.PlainRamPlugin"
+* _Configuration keys_:
+    * "baseAddress": The address where the memory will start (optional)
+    * "size": The size of the memory (optional)
+
+This plugin is intended to be inserted in a slot and emulates a plain, non-mapped RAM with any size from 1 byte to 64K bytes. You have three options for the configuration:
+
+1. Specify only base address: the size will then be 64K - base address.
+2. Specify only size: the base address will then be 64K - size.
+3. Don't specify either: it will be a 64K memory.
+
+
+### Plain ROM ###
+
+* _Friendly name_: "ROM"
+* _Full class name_: "Konamiman.NestorMSX.Plugins.PlainRomPlugin"
+* _Configuration keys_:
+    * "page": The Z80 page where the memory will start (optional, default: 0)
+    * "file": The name of the file with the ROM contents
+
+This plugin is intended to be inserted in a slot and emulates a plain, non-mapped ROM with any size from 1 byte to 64K bytes.
+
+
+
+
 WIP...
 
 ## Host filesystem integration ##
@@ -72,15 +103,6 @@ You can load and save files (LOAD/SAVE, BLOAD/BSAVE) and use BASIC commands for 
 Oh, and you can also do `SAVE"$MyDocuments$\My amazing program.bas"`. See the explanation in `NestorMSX.config` for more details.
 
 
-## Copy & Paste ##
-
-NestorMSX has support for Copy & Paste operations. It works the following way:
-
-- Copy just converts the contents of the pattern name table in VRAM to text and inserts it in the clipboard, adding one line break at the end of each physical line (each 40 characters in SCREEN 0, or 32 in SCREEN 1).
-
-- Paste converts the clipboard text contents into bytes and inserts these in the keyboard buffer, so the emulated system acts as if the user had effectively typed the text.
-
-The default keys are `F11` for Copy and `F12` for Paste, but you can change this in the configuration file. You can also configure the text encoding that will be used for converting between text and bytes.
 
 
 ## Known problems ##
