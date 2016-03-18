@@ -28,6 +28,8 @@ Notice how the different memory types are implemented via plugins. Actually, the
 2. Take a look at the `plugins` directory. Each subdirectory here contains a `machine.config` file that holds a machine definition. The file for the _MSX2 with Nextor_ machine is fully annotated, take a look at it to understand how to create new machines or modify existing ones.
 3. Run `NestorMSX.exe`. The first time you will be asked to choose a machine. You can run a different machine via the appropriate menu option.
 
+**NOTE:** Since only text modes are emulated, you will not see the MSX logo at startup. Instead, you will go directly to the BASIC/DOS/Nextor prompt after a few seconds.
+
 
 ## Built-in plugins##
 
@@ -36,12 +38,30 @@ Notice how the different memory types are implemented via plugins. Actually, the
 * _Friendly name_: "Copy and Paste"
 * _Full class name_: "Konamiman.NestorMSX.Plugins.CopyPastePlugin"
 * _Configuration keys_:
-   * "copyKey": The key used for copy (optional)
-   * "pasteKey": The key used for paste (optional)
-   * "encoding": The encoding used to convert from bytes to text and viceversa (optional, default: "ASCII")
+    * "copyKey": The key used for copy (optional)
+    * "pasteKey": The key used for paste (optional)
+    * "encoding": The encoding used to convert from bytes to text and viceversa (optional, default: "ASCII")
+
+This plugins copies the MSX screen context to the clipboard (copy) and the other way around (paste). It only works in text modes.
+
+The possible values for "copyKey" and "pasteKey" are the members of the [.NET's Keys enumeration](https://msdn.microsoft.com/en-us/library/system.windows.forms.keys). If no keys are provided, copy & paste is only available via menu entry.
+
+
+### Clock IC ###
+
+* _Friendly name_: "Clock IC"
+* _Full class name_: "Konamiman.NestorMSX.Plugins.ClockIcPlugin"
+* _Configuration keys_:
+    * "useDataFile": Tells the plugin whether to persist clock IC data or not (optional, default: true)
+    * "dataFileName": The name of the file to use to persist data (optional, default: "clock-ic.dat")
+    * "useSingleDataFileForAllMachines": If true, one single data file will be used to persist data for all machines (optional, default: false)
+   
+This plugins emulates the MSX Clock IC that maintains the current date and time and stores certain screen configuration parameters. Note that the date and time are always in sync with the host and cannot be changed; the persistence settings affect the screen configuration only. 
+
+Note that a MSX2 machine will not boot if this plugin is not active.
+
 
 WIP...
-
 
 ## Host filesystem integration ##
 
