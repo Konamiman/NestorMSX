@@ -58,13 +58,30 @@ namespace Konamiman.NestorMSX
             return instance;
         }
 
+        public IEnumerable<string> GetPluginNames(IDictionary<string, object> pluginsSectionInConfig, bool activeStatus)
+        {
+            var validPluginConfigs =
+               pluginsSectionInConfig
+                   .Where(p => p.Value is IDictionary<string, object>)
+                   .ToDictionary(p => p.Key, p => (IDictionary<string, object>)p.Value);
+
+            Func<string, bool> isActive =
+                x => !validPluginConfigs[x].ContainsKey("active") || (validPluginConfigs[x]["active"] as bool?) == true;
+
+            var suitablePluginNames =
+                validPluginConfigs.Keys
+                    .Where(k => activeStatus ? isActive(k) : !isActive(k));
+
+            return suitablePluginNames;
+        }
+
         /// <summary>
         /// Gets all the globally defined plugins (defined in the "plugins" section of a config file)
         /// </summary>
         /// <param name="pluginsSectionInConfig">The "plugins" section of a config file</param>
         /// <param name="pluginConfigs">Plugin configurations to apply, more prioritary first</param>
         /// <returns>All the loaded plugin instances</returns>
-        public IEnumerable<object> LoadPlugins(IDictionary<string, object> pluginsSectionInConfig, params IDictionary<string, object>[] pluginConfigs)
+        public IEnumerable<object> LoadPlugins(IDictionary<string, object> pluginsSectionInConfig, IEnumerable<string> pluginNamesToExclude, params IDictionary<string, object>[] pluginConfigs)
         {
             var loadedPluginsList = new List<object>();
             
@@ -73,12 +90,9 @@ namespace Konamiman.NestorMSX
                     .Where(p => p.Value is IDictionary<string, object>)
                     .ToDictionary(p => p.Key, p => (IDictionary<string, object>)p.Value);
 
-            var activePluginConfigs =
-                validPluginConfigs.Keys
-                    .Where(k => !validPluginConfigs[k].ContainsKey("active") || (validPluginConfigs[k]["active"] as bool?) == true)
-                    .ToDictionary(k => k, k => validPluginConfigs[k]);
-
-            var namesOfPluginsConfiguredAsActive = activePluginConfigs.Keys;
+            var namesOfPluginsConfiguredAsActive = GetPluginNames(pluginsSectionInConfig, true);
+            if (pluginNamesToExclude != null)
+                namesOfPluginsConfiguredAsActive = namesOfPluginsConfiguredAsActive.Except(pluginNamesToExclude);
 
             foreach(var pluginName in namesOfPluginsConfiguredAsActive)
             {
