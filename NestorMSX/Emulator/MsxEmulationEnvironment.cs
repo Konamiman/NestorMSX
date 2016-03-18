@@ -10,8 +10,6 @@ using Konamiman.NestorMSX.Hardware;
 using Konamiman.NestorMSX.Host;
 using Konamiman.NestorMSX.Misc;
 using Konamiman.Z80dotNet;
-using System.Diagnostics;
-using System.Threading;
 
 namespace Konamiman.NestorMSX.Emulator
 {
@@ -62,9 +60,11 @@ namespace Konamiman.NestorMSX.Emulator
             GenerateInjectedConfig();
 
             var machineEmulationParameters = machineConfig.GetDictionaryOrDefault("emulationParameters");
-            defaultEmulationParameters.MergeInto(machineEmulationParameters);
+            var configToApply = injectedConfig.Keys.ToDictionary(k => k, k => injectedConfig[k]);
+            machineEmulationParameters.MergeInto(configToApply);
+            defaultEmulationParameters.MergeInto(configToApply);
 
-            this.globalConfig = ConvertConfigDictionaryToObject(machineEmulationParameters);
+            this.globalConfig = ConvertConfigDictionaryToObject(configToApply);
             globalConfig.GlobalPluginsConfig = configDictionary.GetDictionaryOrDefault("plugins");
             globalConfig.SharedPluginsConfig = configDictionary.GetDictionaryOrDefault("sharedPluginsConfig");
 
@@ -109,12 +109,12 @@ namespace Konamiman.NestorMSX.Emulator
         {
             var config = new Configuration();
 
-            config.ColorsFile = configDictionary.GetValue<string>("colorsFile").AsApplicationFilePath();
+            config.ColorsFile = configDictionary.GetMachineOrDataFilePath(configDictionary.GetValue<string>("colorsFile"));
             config.CpuSpeedInMHz = configDictionary.GetValueOrDefault<decimal>("cpuSpeedInMHz", 0);
             config.DisplayZoomLevel = configDictionary.GetValueOrDefault("displayZoomLevel", 2);
             config.HorizontalMarginInPixels = configDictionary.GetValueOrDefault("horizontalMarginInPixels", 8);
             config.VerticalMarginInPixels = configDictionary.GetValueOrDefault("verticalMarginInPixels", 16);
-            config.KeymapFile = configDictionary.GetValue<string>("keymapFile").AsApplicationFilePath();
+            config.KeymapFile = configDictionary.GetMachineOrDataFilePath(configDictionary.GetValue<string>("keymapFile"));
             config.VdpFrequencyMultiplier = configDictionary.GetValueOrDefault<decimal>("vdpFrequencyMultiplier", 1);
             config.VramSizeInKb = configDictionary.GetValueOrDefault<int>("vramSizeInKb", 128);
 

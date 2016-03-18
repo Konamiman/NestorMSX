@@ -125,9 +125,13 @@ namespace Konamiman.NestorMSX.Misc
                 return path;
 
             path = fileName.AsAbsolutePath(basePath);
-            if(File.Exists(path) || !throwIfFileNotFound)
+            if(File.Exists(path))
                 return path;
-            
+
+            path = fileName.AsApplicationFilePath();
+            if (File.Exists(path) || !throwIfFileNotFound)
+                return path;
+
             throw new ConfigurationException($"File file not found: {fileName}");
         }
 
