@@ -16,7 +16,7 @@ However, NestorMSX comes with a plugin system that allows to extend it to emulat
 - Copy & paste from/to the host machine clipboard (text only)
 - Plain RAM (size from 1 byte to 64K)
 - Plain ROM (size from 1 byte to 64K)
-- Standadr mapped RAM
+- Standard mapped RAM
 - MegaROM mappers: ASCII8, ASCII16 and MSX-DOS2
 
 Notice how the different memory types are implemented via plugins. Actually, the core NestorMSX emulated components are just the VDP, the keyboard and the slots system; everything else is handled via plugins.
@@ -32,6 +32,8 @@ Notice how the different memory types are implemented via plugins. Actually, the
 
 
 ## Built-in plugins##
+
+You can get a grasp how how the built-in plugins work by looking at the `machine.config` files, but here is the reference of all the available configuration options for them.
 
 ### Copy & Paste ###
 
@@ -90,6 +92,24 @@ This plugin is intended to be inserted in a slot and emulates a plain, non-mappe
 This plugin is intended to be inserted in a slot and emulates a plain, non-mapped ROM with any size from 1 byte to 64K bytes.
 
 
+### Mapped RAM ###
+
+* _Friendly name_: "Mapped RAM"
+* _Full class name_: "Konamiman.NestorMSX.Plugins.MappedRamPlugin"
+* _Configuration keys_:
+    * "sizeInKb": The size of the memory in K, must be one of: 64, 128, 256, 512, 1024, 2048, 4096 (optional, default: 3096)
+
+This plugin is intended to be inserted in a slot and emulates a standard mapped RAM memory with any size between 64K and 4096K.
+
+
+### Ascii8 and Ascii16 ROMs ###
+
+* _Friendly name_: "Ascii8", "Ascii16"
+* _Full class name_: "Konamiman.NestorMSX.Plugins.Ascii8RomPlugin", "Konamiman.NestorMSX.Plugins.Ascii16RomPlugin" 
+* _Configuration keys_:
+    * "file": The name of the file with the ROM contents
+
+These plugins are intended to be inserted in a slot and emulate a MegaROM cartridge with either the Ascii8 or the Ascii16 mapper, depending on the plugin chosen.
 
 
 WIP...

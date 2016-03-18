@@ -7,7 +7,7 @@ using Konamiman.Z80dotNet;
 
 namespace Konamiman.NestorMSX.Plugins
 {
-    [NestorMSXPlugin("Ascii18")]
+    [NestorMSXPlugin("Ascii8")]
     public class Ascii8RomPlugin
     {
         private readonly string fileName;
