@@ -137,7 +137,9 @@ namespace Konamiman.NestorMSX.Emulator
                 else if (globalSharedPluginsConfig.ContainsKey("dataDirectory"))
                     StringExtensions.DefaultBasePath = globalSharedPluginsConfig.GetValue<string>("dataDirectory");
 
-                var plugins = PluginsLoader.LoadPlugins(globalPlugins, machineSharedPluginsConfig, globalSharedPluginsConfig, injectedConfig);
+                var machinePlugins = machineConfig.GetDictionaryOrDefault("plugins");
+                var disabledMachinePlugins = PluginsLoader.GetPluginNames(machinePlugins, false);
+                var plugins = PluginsLoader.LoadPlugins(globalPlugins, disabledMachinePlugins, globalSharedPluginsConfig, injectedConfig);
                 foreach(var plugin in plugins)
                     RegisterPlugin(plugin);
             }
@@ -153,7 +155,7 @@ namespace Konamiman.NestorMSX.Emulator
 
             try
             {
-                var plugins = PluginsLoader.LoadPlugins(machinePlugins, machineSharedPluginsConfig, globalSharedPluginsConfig, injectedConfig);
+                var plugins = PluginsLoader.LoadPlugins(machinePlugins, null, machineSharedPluginsConfig, globalSharedPluginsConfig, injectedConfig);
                 foreach (var plugin in plugins)
                     RegisterPlugin(plugin);
             }
