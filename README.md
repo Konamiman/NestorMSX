@@ -117,7 +117,7 @@ These plugins are intended to be inserted in a slot and emulate a MegaROM cartri
 * _Friendly name_: "MSX-DOS"
 * _Full class name_: "Konamiman.NestorMSX.Plugins.MsxDosPlugin"
 * _Configuration keys_:
-    * "kernelFileName": The name of the file with the MSX-DOS 1 kernel (optional, default: "MsxDosKernel.rom")
+    * "kernelFile": The name of the file with the MSX-DOS 1 kernel (optional, default: "MsxDosKernel.rom")
 	* "numberOfDrives": The number of emulated DOS drives (optional, default: 2)
 	* "diskImageFiles": An array with the names of the disk image files that will be visible in the drives (optional, default: no files)
 	* "diskImagesDirectory": The directory where disk image files with relative name will be searched (optional, default: ""). The usual relative directory resolution rules apply.
@@ -136,14 +136,29 @@ Note that disk formatting is not supported. The disk image files should hold a p
 * _Friendly name_: "Deviceless MSX-DOS 2"
 * _Full class name_: "Konamiman.NestorMSX.Plugins.DevicelessMsxDos2RomPlugin"
 * _Configuration keys_:
-    * "kernelFileName": The name of the file with the MSX-DOS 2 kernel (optional, default: "MsxDos2Kernel.rom")
+    * "kernelFile": The name of the file with the MSX-DOS 2 kernel (optional, default: "MsxDos2Kernel.rom")
 
 This plugin emulates a standalone MSX-DOS 2 kernel. You can't attach emulated floppy disks or other storage devices to this plugin; use the MSX-DOS 1 plugin in another slot for that.
 
 The kernel file should have the standard MSX-DOS 2 mapper.
 
 
-These plugins are intended to be inserted in a slot and emulate a MegaROM cartridge with either the Ascii8 or the Ascii16 mapper, depending on the plugin chosen.
+### Nextor ###
+
+* _Friendly name_: "Nextor"
+* _Full class name_: "Konamiman.NestorMSX.Plugins.NextorPlugin"
+* _Configuration keys_:
+    * "kernelFile": The name of the file with the Nextor kernel, must be an Ascii8 ROM (optional, default: "NextorKernel.rom")
+	* "diskImageFiles": An array with up to 7 names for the disk image files that will be visible as connected storage devices (optional, default: no files)
+	* "diskImagesDirectory": The directory where disk image files with relative name will be searched (optional, default: ""). The usual relative directory resolution rules apply.
+
+This plugin emulates a Nextor kernel with up to 7 storage devices connected. It uses disk image files to emulate these devices.
+
+The disk image files don't need to be partitioned or formatted upfront, you will be able to partition them by using the FDISK tool that Nextor has built-in (`CALL FDISK` from the BASIC prompt)
+
+No particular storage controller is emulated; instead, the driver entry points are patched so that the emulator accesses the disk image files directly. Therefore, you can use any kernel file, as long as it is intended to work with an Ascii8 mapper. The standalone Ascii8 kernel will work fine.
+
+More information about Nextor is available at [Konamiman's MSX page](http://www.konamiman.com/msx/msx-e.html#nextor).
 
 
 WIP...
