@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using Konamiman.NestorMSX.Memories;
 using Konamiman.Z80dotNet;
 using Konamiman.NestorMSX.Misc;

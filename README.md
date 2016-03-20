@@ -112,7 +112,43 @@ This plugin is intended to be inserted in a slot and emulates a standard mapped 
 These plugins are intended to be inserted in a slot and emulate a MegaROM cartridge with either the Ascii8 or the Ascii16 mapper, depending on the plugin chosen.
 
 
+### MSX-DOS 1 ###
+
+* _Friendly name_: "MSX-DOS"
+* _Full class name_: "Konamiman.NestorMSX.Plugins.MsxDosPlugin"
+* _Configuration keys_:
+    * "kernelFileName": The name of the file with the MSX-DOS 1 kernel (optional, default: "MsxDosKernel.rom")
+	* "numberOfDrives": The number of emulated DOS drives (optional, default: 2)
+	* "diskImageFiles": An array with the names of the disk image files that will be visible in the drives (optional, default: no files)
+	* "diskImagesDirectory": The directory where disk image files with relative name will be searched (optional, default: ""). The usual relative directory resolution rules apply.
+	* "addressOfCallInihrd": The offset within the kernel file where the CALL INIHRD instruction is (optional, default: 0x176F)
+	* "addressOfCallDrives": The offset within the kernel file where the CALL DRIVES instruction is (optional, default: 0x1850)
+
+This plugin emulates a floppy disk drive or any other MSX-DOS based storage controller. It uses disk image files to emulate storage devices.
+
+Note that this is for MSX-DOS 1 only. If you want MSX-DOS 2, plug also the "Deviceless MSX-DOS 2" plugin in other slot. 
+
+Note that disk formatting is not supported. The disk image files should hold a proper FAT filesystem already.
+
+
+### MSX-DOS 2 ###
+
+* _Friendly name_: "Deviceless MSX-DOS 2"
+* _Full class name_: "Konamiman.NestorMSX.Plugins.DevicelessMsxDos2RomPlugin"
+* _Configuration keys_:
+    * "kernelFileName": The name of the file with the MSX-DOS 2 kernel (optional, default: "MsxDos2Kernel.rom")
+
+This plugin emulates a standalone MSX-DOS 2 kernel. You can't attach emulated floppy disks or other storage devices to this plugin; use the MSX-DOS 1 plugin in another slot for that.
+
+The kernel file should have the standard MSX-DOS 2 mapper.
+
+
+These plugins are intended to be inserted in a slot and emulate a MegaROM cartridge with either the Ascii8 or the Ascii16 mapper, depending on the plugin chosen.
+
+
 WIP...
+
+
 
 ## Host filesystem integration ##
 
