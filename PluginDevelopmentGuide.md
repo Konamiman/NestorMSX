@@ -1,6 +1,6 @@
 # NestorMSX plugin development guide #
 
-Anyone capable of programming in the .NET platform can develop plugins for NestorMSX. This guide explains how.
+Anyone capable of programming in the .NET platform can develop plugins for NestorMSX. This guide explains how. (It is also strongly recommended to take a look at the source code of the built-in plugins)
 
 
 ## The hello world plugin ##
@@ -88,3 +88,46 @@ namespace HelloWorldPluginForNestorMSX
 17) Tell Visual Studio to continue execution. Notice how the "Port 0 read was requested!" message appears in the console.
 
 ![Debugging the Hello World plugin](HelloWorldDebugging.png)
+
+
+## The basics ##
+
+A NestorMSX plugin is a .NET public class decorated with `NestorMsxPluginAttribute`, defined in the _NestorMSX.Infrastructure_ project. This attribute accepts a constructor parameter that will be the friendly name of the plugin.
+
+NestorMSX will search for plugins in all the class library files that exist in its `plugins` directory and also in subdirectories of that directory (so you can cleanly group together the library and its related files, if any).
+
+Besides being decorated with the attribute, the plugin class must either have a constructor with a certain signature, or have a static `GetInstance` method with the same arguments. Thus the minimal plugin can have one of these forms:
+
+```
+[NestorMSXPlugin("Plugin name")]
+public class ThePlugin
+{
+    public ThePlugin(PluginContext context, IDictionary<string, object> pluginConfig)
+    {
+    }
+}
+```
+
+```
+[NestorMSXPlugin("Plugin name")]
+public class ThePlugin
+{
+    public static ThePlugin GetInstance(PluginContext context, IDictionary<string, object> pluginConfig)
+    {
+        return AnInstanceOfThePlugin;
+    }
+}
+```
+
+Additionally, plugins intended to be inserted in a slot must have a `GetMemory` method with the following signature:
+
+```
+public IMemory GetMemory()
+{
+    return AnInstanceOfAClassImplementingIMemory;
+}
+```
+
+The returned instance of `IMemory` must be a 64K memory (it can be bigger internally by using a mapper or any other mechanism, but the visible addressing space must be 64K) and will be plugged in the slots system of the emulated machine.
+
+The `PluginContext` class is defined in _NestorMSX.Infrastructure_. The `IMemory` interface comes from the Z80.NET project.

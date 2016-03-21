@@ -19,7 +19,7 @@ However, NestorMSX comes with a plugin system that allows to extend it to emulat
 - Standard mapped RAM
 - MegaROM mappers: ASCII8 and ASCII16
 - MSX-DOS and Nextor (with disk images)
-- A special Disk BASIC than integrates with the host filesystem
+- A special Disk BASIC that integrates with the host filesystem
 
 Notice how the different memory types are implemented via plugins. Actually, the core NestorMSX emulated components are just the VDP, the keyboard and the slots system; everything else is handled via plugins.
 
