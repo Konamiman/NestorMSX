@@ -5,7 +5,7 @@ Anyone capable of programming in the .NET platform can develop plugins for Nesto
 
 ## The hello world plugin ##
 
-Let's start with a small tutorial in which we'll build a very simple plugin from scratch. The tutorial assumes that you have Visual Studio and will use C#, but any development environment with support for NuGet and any .NET language are actually fine to develop plugins.
+Let's start with a small tutorial in which we'll build a very simple plugin from scratch. This tutorial assumes that you have Visual Studio and will use C#, but any development environment with support for NuGet and any .NET language are actually fine to develop plugins.
 
 1) Open Visual Studio and create a new solution of type "Class Library". Name it `HelloWorldPluginForNestorMSX`.
 
@@ -50,7 +50,7 @@ namespace HelloWorldPluginForNestorMSX
 
 5) Compile the project in debug mode. Copy the resulting .dll and .pdb files to the _plugins_ directory of NestorMSX.
 
-6) Open the `machine.config` file of the _machines/Spanish MSX1 with DiskBASIC_ file (actually any machine will do) and add the following inside the `plugins` section:
+6) Open the `machine.config` file of the _machines/Spanish MSX1 with DiskBASIC_ directory (actually any machine would do) and add the following inside the `plugins` section:
 
 ```
 "Hello World": {  }

@@ -17,7 +17,9 @@ However, NestorMSX comes with a plugin system that allows to extend it to emulat
 - Plain RAM (size from 1 byte to 64K)
 - Plain ROM (size from 1 byte to 64K)
 - Standard mapped RAM
-- MegaROM mappers: ASCII8, ASCII16 and MSX-DOS2
+- MegaROM mappers: ASCII8 and ASCII16
+- MSX-DOS and Nextor (with disk images)
+- A special Disk BASIC than integrates with the host filesystem
 
 Notice how the different memory types are implemented via plugins. Actually, the core NestorMSX emulated components are just the VDP, the keyboard and the slots system; everything else is handled via plugins.
 
@@ -29,6 +31,8 @@ Notice how the different memory types are implemented via plugins. Actually, the
 3. Run `NestorMSX.exe`. The first time you will be asked to choose a machine. You can run a different machine via the appropriate menu option or via command line switch (see "Help" within NestorMSX itself).
 
 **NOTE:** Since only text modes are emulated, you will not see the MSX logo at startup. Instead, you will go directly to the BASIC/DOS/Nextor prompt after a few seconds.
+
+To emulate a MSX1 machine, just use MSX1 ROMS and set the VRAM size to 16K (and disable the clock IC plugin too if you want). It will be a MSX1 with V9938, though.
 
 
 ## Plugins ##

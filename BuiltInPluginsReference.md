@@ -1,6 +1,6 @@
 # NestorMSX built-in plugins reference #
 
-You can get a grasp how how the plugins work by looking at the `machine.config` files, but here is the reference of all the available built-in plugins and the configuration options for them. The built-in plugins reside in the `NestorMSX.BuiltInPlugins.dll` file in the `plugins` directory.
+You can get a grasp how how the NestorMSX plugin configuration work by looking at the bundled `machine.config` files, but here is the reference of all the available built-in plugins and the configuration options for them. All the built-in plugins reside in the `NestorMSX.BuiltInPlugins.dll` file in the `plugins` directory.
 
 Remember that you can disable any plugin by adding `"active": false` to its configuration, and that plugins are configured at either the `"plugins"` section in the _NestorMSX.config_ and _machine.config_ files, or at the `"slots"` section in the _machine.config_ files.
 
@@ -50,7 +50,7 @@ This plugin is intended to be inserted in a slot and emulates a plain, non-mappe
 
 1. Specify only base address: the size will then be 64K - base address.
 2. Specify only size: the base address will then be 64K - size.
-3. Don't specify either: it will be a 64K memory.
+3. Don't specify neither: it will be a 64K memory.
 
 
 ### Plain ROM ###
@@ -69,7 +69,7 @@ This plugin is intended to be inserted in a slot and emulates a plain, non-mappe
 * _Friendly name_: "Mapped RAM"
 * _Full class name_: "Konamiman.NestorMSX.Plugins.MappedRamPlugin"
 * _Configuration keys_:
-    * "sizeInKb": The size of the memory in K, must be one of: 64, 128, 256, 512, 1024, 2048, 4096 (optional, default: 3096)
+    * "sizeInKb": The size of the memory in K, must be one of: 64, 128, 256, 512, 1024, 2048, 4096 (optional, default: 4096)
 
 This plugin is intended to be inserted in a slot and emulates a standard mapped RAM memory with any size between 64K and 4096K.
 
@@ -98,7 +98,7 @@ These plugins are intended to be inserted in a slot and emulate a MegaROM cartri
 
 This plugin emulates a floppy disk drive or any other MSX-DOS based storage controller. It uses disk image files to emulate storage devices.
 
-Note that this is for MSX-DOS 1 only. If you want MSX-DOS 2, plug also the "Deviceless MSX-DOS 2" plugin in other slot. 
+Note that this is for MSX-DOS 1 only. If you want MSX-DOS 2, plug also the "Deviceless MSX-DOS 2" plugin in another slot. 
 
 Note that disk formatting is not supported. The disk image files should hold a proper FAT filesystem already.
 
@@ -126,7 +126,7 @@ The kernel file should have the standard MSX-DOS 2 mapper.
 
 This plugin emulates a Nextor kernel with up to 7 storage devices connected. It uses disk image files to emulate these devices.
 
-The disk image files don't need to be partitioned or formatted upfront, you will be able to partition them by using the FDISK tool that Nextor has built-in (`CALL FDISK` from the BASIC prompt)
+The disk image files don't need to be partitioned or formatted upfront, you will be able to partition them by using the FDISK tool that Nextor has built-in (`CALL FDISK` from the BASIC prompt).
 
 No particular storage controller is emulated; instead, the driver entry points are patched so that the emulator accesses the disk image files directly. Therefore, you can use any kernel file, as long as it is intended to work with an Ascii8 mapper. The standalone Ascii8 kernel will work fine.
 
