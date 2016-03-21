@@ -9,7 +9,7 @@ Let's start with a small tutorial in which we'll build a very simple plugin from
 
 1) Open Visual Studio and create a new solution of type "Class Library". Name it `HelloWorldPluginForNestorMSX`.
 
-2) Add a reference to the `System.Windows.Forms` assembly.
+2) Add a reference to the `System.Windows.Forms` assembly. (Note: this is not required for all plugins, only for those having its own UI)
 
 3) Install the `NestorMSX.Infrastructure` NuGet package.
 
@@ -56,7 +56,7 @@ namespace HelloWorldPluginForNestorMSX
 "Hello World": {  }
 ```
 
-7) Run NestorMSX in the machine where you have configured the plugin (use the command line switch or the menu entry to select the machine).
+7) Run NestorMSX as the machine where you have configured the plugin (use the command line switch or the menu entry to select the machine).
 
 8) Open the _Plugins_ menu. You will see a _Say Hello_ entry, click it and you will be greeted with a "Hello world!" dialog.
 
@@ -86,3 +86,5 @@ namespace HelloWorldPluginForNestorMSX
 16) Execute `print inp(0)` from the BASIC prompt. Notice how the second breakpoint is hit.
 
 17) Tell Visual Studio to continue execution. Notice how the "Port 0 read was requested!" message appears in the console.
+
+![Debugging the Hello World plugin](HelloWorldDebugging.png)
