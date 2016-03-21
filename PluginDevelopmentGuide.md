@@ -131,3 +131,19 @@ public IMemory GetMemory()
 The returned instance of `IMemory` must be a 64K memory (it can be bigger internally by using a mapper or any other mechanism, but the visible addressing space must be 64K) and will be plugged in the slots system of the emulated machine.
 
 The `PluginContext` class is defined in _NestorMSX.Infrastructure_. The `IMemory` interface comes from the Z80.NET project.
+
+
+## The plugin context ##
+
+The supplied `PluginContext` instance is what allows the plugin to really do something useful. By using this, the plugin can:
+
+* Subscribe to the various CPU events, such as memory and ports reads and writes. This is the way to emulate a ports-based hardware.
+* Access the VDP and the slots system to check (or change) their contents and state.
+* Access the window that hosts the emulator. A tipical case for this is to open a new window specifying the emulator window as its parent.
+* Receive key press events from the emulator. This is required if your plugin is intended to react to certain keys (the Copy & Paste plugin works this way, for example).
+* Access the full list of loaded plugins.
+* Set an entry in the emulator "Plugins" menu.
+
+Note that the `PluginContext` class has a `EnvironmentInitializationComplete` event. If your plugin needs to access the loaded plugins list or the slots system, it shouldn't do so until this event is fired. Note also that plugins aren't loaded/initialized in any particular order.
+
+Please take a look at the `PluginContext` class itself for more details.
