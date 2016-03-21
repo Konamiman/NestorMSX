@@ -16,6 +16,7 @@ Let's start with a small tutorial in which we'll build a very simple plugin from
 4) Add the `HelloWorldPlugin` class with this code:
 
 ```
+#!c#
 using Konamiman.NestorMSX;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -53,6 +54,7 @@ namespace HelloWorldPluginForNestorMSX
 6) Open the `machine.config` file of the _machines/Spanish MSX1 with DiskBASIC_ directory (actually any machine would do) and add the following inside the `plugins` section:
 
 ```
+#!json
 "Hello World": {  }
 ```
 
@@ -67,6 +69,7 @@ namespace HelloWorldPluginForNestorMSX
 10) Modify the plugin entry in `machine.config` so that it is as follows:
 
 ```
+#!json
 "Hello World": { "message": "Yadda!" }
 ```
 
@@ -99,6 +102,7 @@ NestorMSX will search for plugins in all the class library files that exist in i
 Besides being decorated with the attribute, the plugin class must either have a constructor with a certain signature, or have a static `GetInstance` method with the same arguments. Thus the minimal plugin can have one of these forms:
 
 ```
+#!c#
 [NestorMSXPlugin("Plugin name")]
 public class ThePlugin
 {
@@ -109,6 +113,7 @@ public class ThePlugin
 ```
 
 ```
+#!c#
 [NestorMSXPlugin("Plugin name")]
 public class ThePlugin
 {
@@ -122,6 +127,7 @@ public class ThePlugin
 Additionally, plugins intended to be inserted in a slot must have a `GetMemory` method with the following signature:
 
 ```
+#!c#
 public IMemory GetMemory()
 {
     return AnInstanceOfAClassImplementingIMemory;
