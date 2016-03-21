@@ -1,0 +1,3 @@
+# NestorMSX plugin development guide #
+
+TO DO...

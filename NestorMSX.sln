@@ -5,7 +5,9 @@ VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{7EC18F5A-DEDF-49FD-BFEF-EF20FA41189F}"
 	ProjectSection(SolutionItems) = preProject
+		BuiltInPluginsReference.md = BuiltInPluginsReference.md
 		LICENSE.txt = LICENSE.txt
+		PluginDevelopmentGuide.md = PluginDevelopmentGuide.md
 		README.md = README.md
 		ReleaseNotes.txt = ReleaseNotes.txt
 	EndProjectSection

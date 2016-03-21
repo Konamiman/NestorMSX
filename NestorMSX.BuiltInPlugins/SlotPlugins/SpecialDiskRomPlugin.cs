@@ -7,23 +7,20 @@ using Konamiman.Z80dotNet;
 
 namespace Konamiman.NestorMSX.Plugins
 {
-    [NestorMSXPlugin("Special DiskROM")]
-    public class SpecialDiskRomPlugin
+    [NestorMSXPlugin("Special DiskBASIC")]
+    public class SpecialDiskBasicPlugin
     {
         private const int BDOS = 0xFB03;    //as defined in dskbasic.mac
 
         private readonly string fileName;
         private readonly DosFunctionCallExecutor dosFunctionsExecutor;
 
-        public SpecialDiskRomPlugin(PluginContext context, IDictionary<string, object> pluginConfig)
+        public SpecialDiskBasicPlugin(PluginContext context, IDictionary<string, object> pluginConfig)
         {
-            if (!pluginConfig.ContainsKey("file"))
-                throw new InvalidOperationException("No 'file' key in config file");
-
-            fileName = pluginConfig.GetMachineFilePath(pluginConfig.GetValue<string>("file"));
+            fileName = pluginConfig.GetMachineFilePath(pluginConfig.GetValueOrDefault<string>("file", "SpecialDiskBasic.rom"));
 
             context.Cpu.BeforeInstructionFetch += Z80OnBeforeInstructionFetch;
-            var filesystemBasePath = pluginConfig.GetValue<string>("filesystemBasePath").AsAbsolutePath();
+            var filesystemBasePath = pluginConfig.GetValueOrDefault<string>("filesystemBasePath", "$MyDocuments$/NestorMSX/FileSystem").AsAbsolutePath();
             dosFunctionsExecutor = new DosFunctionCallExecutor(context.Cpu.Registers, context.SlotsSystem, filesystemBasePath);
         }
 
