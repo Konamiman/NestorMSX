@@ -153,3 +153,35 @@ The supplied `PluginContext` instance is what allows the plugin to really do som
 Note that the `PluginContext` class has a `EnvironmentInitializationComplete` event. If your plugin needs to access the loaded plugins list or the slots system, it shouldn't do so until this event is fired. Note also that plugins aren't loaded/initialized in any particular order.
 
 Please take a look at the `PluginContext` class itself for more details.
+
+
+## The plugin configuration ##
+
+The `pluginConfig` argument passed to the plugin class constructor or to the `GetInstance` method contains all the configuration that the user has supplied for the plugin in either the global _NestorMSX.config_ file or the specific _machine.config_ file. It is a dictionary that represents a direct translation of the JSON object that represents the plugin configuration. Values that are in turn JSON objects are supplied as nested dictionaries in turn.
+
+Rather than accessing the supplied dictionary directly, it is recommended to use the extension methods that are available in [the DictionaryExtensions class](NestorMSX.Infrastructure/Misc/DictionaryExtensions.cs), being the most important ones:
+
+* **GetValue<T>(key):** Gets the value of the specified key, appropriately converted to the specified type T. [The standard Convert class](https://msdn.microsoft.com/en-us/library/system.convert) is used to perform the conversion from string to T, and a special handling is in place for arrays. An exception is thrown if the key does not exist.
+
+* **GetValueOrDefault<T>(key):** Same as above, but the supplied default value is returned if the key does not exist.
+
+* **GetDictionaryOrDefault(key):** Returns the value of the specified key as a dictionary. If the key does not exist it returns an empty dictionary. If the key exists but the value is not a dictionary, an exception is thrown.
+
+* **MergeInto(destination):** Copies all the key/value pairs into the destination dictionary, but only for the keys that don't already exist. Useful to inject default values in the supplied configuration dictionary.
+
+* **GetMachineFilePath, GetMachineOrDataFilePath:** These methods are useful to find plugin-specific files when relative paths are supplied.
+
+See also [the StringExtensions class](NestorMSX.Infrastructure/Misc/StringExtensions.cs).
+
+
+### Injected configuration ###
+
+Besides containing the configuration object supplied by the user as a JSON object in the global or machine configuration file, `pluginConfig` contains also some extra values that are injected by NestorMSX and can be useful for the plugin. These are:
+
+* **"NestorMSX.machineName"**: Contains the name of the machine currently running.
+* **"NestorMSX.machineDirectory"**: Contains the full path of the directory where the `machine.config` file for the currently running machine is.
+* **"NestorMSX.sharedDirectory"**: Contains the full path of the _Shared_ subdirectory in the machines directory. Note that this directory is examined automatically as needed if you use the `GetMachineFilePath` and `GetMachineOrDataFilePath` methods.
+* **"NestorMSX.applicationDirectory"**: Contains the full path of the _NestorMSX.exe_ file.
+* **"NestorMSX.slotNumber"**: This value is injected only for plugins that are plugged in a slot. It contains the slot number where the plugin is, as one byte in the standard format (slot + 4*subslot + 128 if slot is expanded).
+
+Future versions of NestorMSX could inject more values, but the names of these will always start with "NestorMSX."

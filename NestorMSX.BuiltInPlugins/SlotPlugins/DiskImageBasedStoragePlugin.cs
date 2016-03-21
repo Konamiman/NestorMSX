@@ -75,7 +75,7 @@ namespace Konamiman.NestorMSX.Plugins
                 .Select(f => StringExtensions.AsAbsolutePath(f, basePathForDiskImages))
                 .ToArray();
 
-            this.slotNumber = new SlotNumber(pluginConfig.GetValue<byte>("slotNumber"));
+            this.slotNumber = new SlotNumber(pluginConfig.GetValue<byte>("NestorMSX.slotNumber"));
 
             var machineName = pluginConfig.GetValue<string>("NestorMSX.machineName");
             stateFileFullPath = $"{machineName}/{PluginDisplayName} in slot {slotNumber}.dat".AsAbsolutePath();
