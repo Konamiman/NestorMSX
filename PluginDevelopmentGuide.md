@@ -50,13 +50,13 @@ namespace HelloWorldPluginForNestorMSX
 
 5) Compile the project in debug mode. Copy the resulting .dll and .pdb files to the _plugins_ directory of NestorMSX.
 
-6) Open one of the `machine.config` files of the configured machines in the _machines_ directory of NestorMSX (choose a machine without disk system emulation to keep things simple) and add the following inside the `plugins` section:
+6) Open the `machine.config` file of the _machines/Spanish MSX1 with DiskBASIC_ file (actually any machine will do) and add the following inside the `plugins` section:
 
 ```
 "Hello World": {  }
 ```
 
-7) Run NestorMSX as the machine where you have configured the plugin (use the command line switch or the menu entry to select the machine).
+7) Run NestorMSX as the machine where you have configured the plugin (use the menu entry to select the machine or just run this from the command line: `NestorMSX machine="Spanish MSX1 with DiskBASIC"`).
 
 8) Open the _Plugins_ menu. You will see a _Say Hello_ entry, click it and you will be greeted with a "Hello world!" dialog.
 
