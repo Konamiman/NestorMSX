@@ -3,77 +3,45 @@
 
 ## What is this? ##
 
-NestorMSX is an extremely simple, incomplete, underperforming MSX emulator. Its main purpose is to serve as an example of an emulation environment built around [the Z80.NET package](https://bitbucket.org/konamiman/z80dotnet). It is written in C# and targets the .NET Framework 4 Client Profile.
+NestorMSX is a very simple, incomplete (but extensible via plugins), underperforming MSX emulator. It was originally developed with the purpose of serving as an example of an emulation environment built around [the Z80.NET package](https://bitbucket.org/konamiman/z80dotnet). It is written in C# and targets the .NET Framework 4 Client Profile.
+
+**[Here is the plugin development guide](PluginDevelopmentGuide.md)** in case you were searching for it, by the way.
 
 
 ## What does it emulate? ##
 
-The emulated machine is:
+The base emulated machine is a MSX2 computer with a keyboard and a text-only display (only SCREEN 0 and SCREEN1, without sprites, are emulated). And that's it: there is no emulation for sound, cassette, joystick, printer or any other hardware.
 
-- A first generation MSX computer
-- With a text-only display (only SCREEN 0 and SCREEN1, without sprites, are emulated)
-- With four primary slots
-- With a keyboard
-- ...and that's it: no sound, cassette, joystick, printer or any other hardware or peripheral is emulated.
+However, NestorMSX comes with a plugin system that allows to extend it to emulate additional hardware or to provide some nice extras (see the copy & paste plugin for example). NestorMSX comes with the following built-in plugins:
 
-The slots configuration is:
+- Clock IC chip (date and time are took from the host machine's clock)
+- Copy & paste from/to the host machine clipboard (text only)
+- Plain RAM (size from 1 byte to 64K)
+- Plain ROM (size from 1 byte to 64K)
+- Standard mapped RAM
+- MegaROM mappers: ASCII8 and ASCII16
+- MSX-DOS and Nextor (with disk images)
+- A special Disk BASIC that integrates with the host filesystem
 
-- Slot 0 contains the MSX BIOS and BASIC interpreter
-- Slot 1 contains a special DiskBASIC ROM (more on that below)
-- Slot 2 is empty by default, but you can attach a ROM file (more on that below)
-- Slot 3 contains 64K RAM
+Notice how the different memory types are implemented via plugins. Actually, the core NestorMSX emulated components are just the VDP, the keyboard and the slots system; everything else is handled via plugins.
 
 
 ## How to use ##
 
 1. Review the `NestorMSX.config` file and tweak it if appropriate. Each configuration key is appropriately (I hope!) explained.
-2. You may want to modify the key mappings file, `KeyMappings.txt`. If so, running NestorMSX in key test mode will be useful for you (more on that below).
-3. Run `NestorMSX.exe`, optionally passing the appropriate arguments (more on that below).
+2. Take a look at the `machines` directory. Each subdirectory here contains a `machine.config` file that holds a machine definition. The file for the _MSX2 with Nextor_ machine is fully annotated, take a look at it to understand how to create new machines or modify existing ones.
+3. Run `NestorMSX.exe`. The first time you will be asked to choose a machine. You can run a different machine via the appropriate menu option or via command line switch (see "Help" within NestorMSX itself).
+
+**NOTE:** Since only text modes are emulated, you will not see the MSX logo at startup. Instead, you will go directly to the BASIC/DOS/Nextor prompt after a few seconds.
+
+To emulate a MSX1 machine, just use MSX1 ROMS and set the VRAM size to 16K (and disable the clock IC plugin too if you want). It will be a MSX1 with V9938, though.
 
 
-## NestorMSX execution arguments ##
+## Plugins ##
 
-You can run `NestorMSX.exe` as follows:
+NestorMSX comes with a nice set of built-in plugins. Take a look at the _NestorMSX.config_ and _machine.config_ files to get an idea of how they work, then see the [Built-in plugins reference](BuiltInPluginsReference.md) for details.
 
-#### NestorMSX ####
-
-Start the emulator using `NestorMSX.config` for configuration.
-
-#### NestorMSX keytest ####
-
-Run the key test mode. A window will open in which you can see the names of the keys that you press. This is very useful if you want to create your own key mappings file.
-
-#### NestorMSX config=<filename> ####
-
-Start the emulator using the specified configuration file.
-
-#### NestorMSX slot2=<filename> ####
-
-Start the emulator using `NestorMSX.config` for configuration and inserting the specified filename as a ROM in slot 2. It overrides the file specified in the configuration file, if any. The maximum file size is 48KBytes.
-
-#### NestorMSX config=<filename> slot2=<filename> ####
-
-A combination of the two above.
-
-
-## Host filesystem integration ##
-
-NestorMSX comes with a special DiskBASIC ROM that is connected to slot 1. It allows to access the host filesystem directly from BASIC, bypassing the 8.3 filename format limitation along the way. So you can for example execute `SAVE "C:\users\konamiman\My Documents\My amazing program.bas"` from inside the emulated BASIC interpreter; go to that folder in the host system and the file will be there!
-
-You can load and save files (LOAD/SAVE, BLOAD/BSAVE) and use BASIC commands for accessing file contents (OPEN/CLOSE, GET/PUT, etc). However the filesystem management commands (DSKF, FILES, NAME, KILL, COPY) and the low level disk access commands (DSKI$, DSKO$) are not available.
-
-Oh, and you can also do `SAVE"$MyDocuments$\My amazing program.bas"`. See the explanation in `NestorMSX.config` for more details.
-
-
-## Copy & Paste ##
-
-NestorMSX has support for Copy & Paste operations. It works the following way:
-
-- Copy just converts the contents of the pattern name table in VRAM to text and inserts it in the clipboard, adding one line break at the end of each physical line (each 40 characters in SCREEN 0, or 32 in SCREEN 1).
-
-- Paste converts the clipboard text contents into bytes and inserts these in the keyboard buffer, so the emulated system acts as if the user had effectively typed the text.
-
-The default keys are `F11` for Copy and `F12` for Paste, but you can change this in the configuration file. You can also configure the text encoding that will be used for converting between text and bytes.
+If you are a developer and want to build your own plugins, take a look at the [Plugin development guide](PluginDevelopmentGuide.md).
 
 
 ## Known problems ##
@@ -81,12 +49,13 @@ The default keys are `F11` for Copy and `F12` for Paste, but you can change this
 - Poor performance
 - Inexact timing
 - Uber ugly application icon
+- The "Reset" menu entry often does not work
 
 
 ## Future plans ##
 
-- Emulate MSX2 (but again, text modes only)
-- Develop a plugins system
+- Partial emulation of graphic modes (to run MultiMente and similar tools)
+- Develop a state-of-the-art debugger
 
 
 ## Last but not least...

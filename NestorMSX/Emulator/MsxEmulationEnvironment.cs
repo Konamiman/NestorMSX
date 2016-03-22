@@ -222,7 +222,7 @@ namespace Konamiman.NestorMSX.Emulator
                     continue;
 
                 var pluginConfig = (IDictionary<string, object>)slotConfig.Value;
-                pluginConfig["slotNumber"] = slotNumber.EncodedByte;
+                pluginConfig["NestorMSX.slotNumber"] = slotNumber.EncodedByte;
 
                 var typeName = (string)pluginConfig["type"];
 

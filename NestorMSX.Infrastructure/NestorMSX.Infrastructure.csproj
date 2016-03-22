@@ -69,7 +69,7 @@
     <Compile Include="Memories\PlainRam.cs" />
     <Compile Include="Memories\PlainRom.cs" />
     <Compile Include="Menus\MenuEntry.cs" />
-    <Compile Include="Misc\DictionaryUtils.cs" />
+    <Compile Include="Misc\DictionaryExtensions.cs" />
     <Compile Include="Misc\SlotNumber.cs" />
     <Compile Include="Misc\StringExtensions.cs" />
     <Compile Include="Misc\TwinBit.cs" />

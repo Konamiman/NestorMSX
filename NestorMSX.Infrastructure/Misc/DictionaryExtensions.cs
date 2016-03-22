@@ -6,7 +6,7 @@ using Konamiman.NestorMSX.Exceptions;
 
 namespace Konamiman.NestorMSX.Misc
 {
-    public static class DictionaryUtils
+    public static class DictionaryExtensions
     {
         /// <summary>
         /// Gets the value of the configuration for the specified key, converted
@@ -140,21 +140,21 @@ namespace Konamiman.NestorMSX.Misc
             return (T)AdaptValue(typeof(T), key, value);
         }
 
-        private static object AdaptValue(Type type, string key, object value)
+        private static object AdaptValue(Type destinationType, string key, object value)
         {
             if(value == null)
                 return null;
 
-            if(type.IsInstanceOfType(value))
+            if(destinationType.IsInstanceOfType(value))
                 return value;
 
-            if(type.IsArray)
+            if(destinationType.IsArray)
             {
                 if(!value.GetType().IsArray)
                     throw new ConfigurationException($"Configuration key '{key}' has value '{value.ToString()}', that can't be converted to an array");
 
                 var originalArray = (Array)value;
-                var arrayItemsType = type.GetElementType();
+                var arrayItemsType = destinationType.GetElementType();
 
                 var arrayLength = originalArray.GetLength(0);
                 var adaptedArray = Array.CreateInstance(arrayItemsType, arrayLength);
@@ -168,10 +168,10 @@ namespace Konamiman.NestorMSX.Misc
             object[] convertMethodArguments;
             if(value is string)
             {
-                convertMethod = GetConvertMethod(type, new[] {typeof(string), typeof(int)});
+                convertMethod = GetConvertMethod(destinationType, new[] {typeof(string), typeof(int)});
                 if(convertMethod == null)
                 {
-                    convertMethod = GetConvertMethod(type, new[] {typeof(object)});
+                    convertMethod = GetConvertMethod(destinationType, new[] {typeof(object)});
                     convertMethodArguments = new object[] { value };
                 }
                 else
@@ -187,12 +187,12 @@ namespace Konamiman.NestorMSX.Misc
             }
             else
             {
-                convertMethod = GetConvertMethod(type, new[] { typeof(object) });
+                convertMethod = GetConvertMethod(destinationType, new[] { typeof(object) });
                 convertMethodArguments = new object[] { value };
             }
             
             if(convertMethod == null)
-                throw new ConfigurationException($"Configuration key '{key}' has value '{value.ToString()}', that can't be converted to '{type.Name}'");
+                throw new ConfigurationException($"Configuration key '{key}' has value '{value.ToString()}', that can't be converted to '{destinationType.Name}'");
 
             try
             {
@@ -201,7 +201,7 @@ namespace Konamiman.NestorMSX.Misc
             catch(TargetInvocationException ex)
             {
                 throw new ConfigurationException(
-                    $"Error when converting value {value.ToString()} for key '{key}' to {type.Name}: {ex.InnerException.Message}",
+                    $"Error when converting value {value.ToString()} for key '{key}' to {destinationType.Name}: {ex.InnerException.Message}",
                     ex.InnerException);
             }
         }
