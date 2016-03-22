@@ -173,7 +173,7 @@ Rather than accessing the supplied dictionary directly, it is recommended to use
 
 See also [the StringExtensions class](NestorMSX.Infrastructure/Misc/StringExtensions.cs).
 
-A nice bonus of the `GetValue` and `GetValueOrDefault` methods is that they parse strings representing hexadecimal numbers if they start with `#` or `0x`. See for example how in [the machine.config file for the 4K RAM MSX](NestorMSX/machines/MSX1%20with%204K%20RAM) the RAM size is specified as `"size": "0x1000"`; [the plain RAM plugin](NestorMSX.BuiltInPlugins/SlotPlugins/PlainRamPlugin.cs), meanwhile, is doing just `GetValueOrDefault<int>` to retrieve the value.
+A nice bonus of the `GetValue` and `GetValueOrDefault` methods is that they parse strings representing hexadecimal numbers if they start with `#` or `0x`. See for example how in [the machine.config file for the 4K RAM MSX](NestorMSX/machines) the RAM size is specified as `"size": "0x1000"`; [the plain RAM plugin](NestorMSX.BuiltInPlugins/SlotPlugins/PlainRamPlugin.cs), meanwhile, is doing just `GetValueOrDefault<int>` to retrieve the value.
 
 
 ### Injected configuration ###
@@ -187,3 +187,22 @@ Besides containing the configuration object supplied by the user as a JSON objec
 * **"NestorMSX.slotNumber"**: This value is injected only for plugins that are plugged in a slot. It contains the slot number where the plugin is, as one byte in the standard format (slot + 4*subslot + 128 if slot is expanded).
 
 Future versions of NestorMSX could inject more values, but the names of these will always start with "NestorMSX."
+
+
+## Adding menu entries ##
+
+The instance of `PluginContext` that is supplied to plugins has a `SetMenuEntry` method that allows plugins to expose one single entry in the emulator's _Plugins_ menu. This menu entry can either trigger an action when clicked, or expand to show more menu entries, depending on which constructor is used to create it:
+
+```
+#!c#
+new MenuEntry("Say Hello", () => MessageBox.Show(message))
+new MenuEntry("Options...", new[] {new MenuEntry(...), new MenuEntry(...)})
+
+```
+
+Those child menu entries can, in turn, either trigger an action or expand to more menu entries; there is in principle no limit for the menus nesting level.
+
+[The MenuEntry class](NestorMSX.Infrastructure/MenuEntry.cs) exposes some properties that control the appearance and behavior of the entry: `Title`, `IsEnabled`, `IsChecked` and `IsVisible`. Changes on these properties are applied immediately in the emulator's user interface. Note however that you can **not** add/remove entries from/to the `ChildEntries` collection; or rather, you can but these changes will not be reflected in the emulator. Instead, if you need to add/remove entries you can always recreate the menu from scratch by using the `PluginContext.SetMenuEntry` method again.
+
+The first parameter of the `SetMenuEntry` method must always be the plugin instance invoking the method (so usually just `this`). Finally, notice that there is a static `MenuEntry.CreateSeparator` method that can be useful to you.
+
