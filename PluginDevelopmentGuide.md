@@ -219,4 +219,4 @@ If you run NestorMSX with the "show console" argument (`NestorMSX.exe sc`) a con
 
 A more advanced debugging option is to attach a debugger to the running instance of NestorMSX (in Visual Studio use the _Debug - Attach to process_ menu entry) so that you can set breakpoints in your plugin source code and do a step-by-step tracing. Don't forget to copy your library's .pdb file to the plugins folder in addition to the .dll file.
 
-If you want is to set a breakpoint in your plugin's constructor, run NestorMSX in "wait for debugger" mode (`NestorMSX.exe sc`). This is the same as the "show console" mode except that the emulator execution will not start until the debugger is attached, and only then will al plugins be instantiated and initialized.
+If you want to set a breakpoint in your plugin's constructor, run NestorMSX in "wait for debugger" mode (`NestorMSX.exe wd`). This is the same as the "show console" mode except that the emulator execution will not start until the debugger is attached, and only then will all plugins be instantiated and initialized.

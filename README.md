@@ -5,6 +5,8 @@
 
 NestorMSX is a very simple, incomplete (but extensible via plugins), underperforming MSX emulator. It was originally developed with the purpose of serving as an example of an emulation environment built around [the Z80.NET package](https://bitbucket.org/konamiman/z80dotnet). It is written in C# and targets the .NET Framework 4 Client Profile.
 
+**[Here is the plugin development guide](PluginDevelopmentGuide.md)** in case you were searching for it, by the way.
+
 
 ## What does it emulate? ##
 
