@@ -202,7 +202,7 @@ new MenuEntry("Options...", new[] {new MenuEntry(...), new MenuEntry(...)})
 
 Those child menu entries can, in turn, either trigger an action or expand to more menu entries; there is in principle no limit for the menus nesting level.
 
-[The MenuEntry class](NestorMSX.Infrastructure/MenuEntry.cs) exposes some properties that control the appearance and behavior of the entry: `Title`, `IsEnabled`, `IsChecked` and `IsVisible`. Changes on these properties are applied immediately in the emulator's user interface. Note however that you can **not** add/remove entries from/to the `ChildEntries` collection; or rather, you can but these changes will not be reflected in the emulator. Instead, if you need to add/remove entries you can always recreate the menu from scratch by using the `PluginContext.SetMenuEntry` method again.
+[The MenuEntry class](NestorMSX.Infrastructure/Menus/MenuEntry.cs) exposes some properties that control the appearance and behavior of the entry: `Title`, `IsEnabled`, `IsChecked` and `IsVisible`. Changes on these properties are applied immediately in the emulator's user interface. Note however that you can **not** add/remove entries from/to the `ChildEntries` collection; or rather, you can but these changes will not be reflected in the emulator's menu. Instead, if you need to add/remove menu entries you can always recreate the menu from scratch by using the `PluginContext.SetMenuEntry` method again.
 
 The first parameter of the `SetMenuEntry` method must always be the plugin instance invoking the method (so usually just `this`). Finally, notice that there is a static `MenuEntry.CreateSeparator` method that can be useful to you.
 
