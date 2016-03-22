@@ -83,6 +83,8 @@ namespace Konamiman.NestorMSX
             if(consoleAllocated) {
                 Trace.Listeners.Add(new ConsoleTraceListener());
                 Trace.WriteLine($"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] Starting NestorMSX, machine name: {machineName}\r\n");
+                if(!waitForDebugger)
+                    Console.WriteLine($"My PID is: {Process.GetCurrentProcess().Id}\r\n");
             }
 
             emulationEnvironment = CreateEmulationEnvironment(args);
