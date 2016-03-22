@@ -173,7 +173,7 @@ Rather than accessing the supplied dictionary directly, it is recommended to use
 
 See also [the StringExtensions class](NestorMSX.Infrastructure/Misc/StringExtensions.cs).
 
-A nice bonus of the `GetValue` and `GetValueOrDefault` methods is that they parse strings representing hexadecimal numbers if they start with `#` or `0x`. See for example how in [the machine.config file for the 4K RAM MSX](NestorMSX/machines/MSX1 with 4K RAM) the RAM size is specified as `"size": "0x1000"`; [the plain RAM plugin](NestorMSX.BuiltInPlugins/SlotPlugins/PlainRamPlugin.cs), meanwhile, is doing just `GetValueOrDefault<int>` to retrieve the value.
+A nice bonus of the `GetValue` and `GetValueOrDefault` methods is that they parse strings representing hexadecimal numbers if they start with `#` or `0x`. See for example how in [the machine.config file for the 4K RAM MSX](NestorMSX/machines/MSX1%20with%204K%20RAM) the RAM size is specified as `"size": "0x1000"`; [the plain RAM plugin](NestorMSX.BuiltInPlugins/SlotPlugins/PlainRamPlugin.cs), meanwhile, is doing just `GetValueOrDefault<int>` to retrieve the value.
 
 
 ### Injected configuration ###
