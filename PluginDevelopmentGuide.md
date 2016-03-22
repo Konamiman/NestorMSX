@@ -188,4 +188,4 @@ Besides containing the configuration object supplied by the user as a JSON objec
 
 Future versions of NestorMSX could inject more values, but the names of these will always start with "NestorMSX."
 
-    [1]: NestorMSX/machines/MSX1%20with%204K%20RAM%20;-)
+[1]: ./NestorMSX/machines/MSX1%20with%204K%20RAM%20;-)
