@@ -136,6 +136,9 @@
     <None Include="DiskBasic\dskbasic.mac" />
     <None Include="DiskBasic\L80.CPM" />
     <None Include="DiskBasic\M80.CPM" />
+    <Content Include="machines\README.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="machines\Shared\SpecialDiskBasic.rom">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

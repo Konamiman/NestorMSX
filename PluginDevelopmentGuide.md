@@ -11,7 +11,7 @@ Let's start with a small tutorial in which we'll build a very simple plugin from
 
 2) Add a reference to the `System.Windows.Forms` assembly. (Note: this is not required for all plugins, only for those having its own UI)
 
-3) Install the `NestorMSX.Infrastructure` NuGet package.
+3) Install [the `NestorMSX.Infrastructure` NuGet package](https://www.nuget.org/packages/NestorMSX.Infrastructure/2.0.0).
 
 4) Add the `HelloWorldPlugin` class with this code:
 
