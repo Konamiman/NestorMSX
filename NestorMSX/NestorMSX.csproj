@@ -234,6 +234,10 @@
       <Project>{a04bb668-5cb3-467a-b575-4c72ca62e7f9}</Project>
       <Name>NestorMSX.BuiltInPlugins</Name>
     </ProjectReference>
+    <ProjectReference Include="..\NestorMSX.Debugger\NestorMSX.Debugger.csproj">
+      <Project>{a844dc19-add4-49f6-9512-8e1f94d1ae34}</Project>
+      <Name>NestorMSX.Debugger</Name>
+    </ProjectReference>
     <ProjectReference Include="..\NestorMSX.Infrastructure\NestorMSX.Infrastructure.csproj">
       <Project>{41786ee5-ecd9-4b70-b0d9-ed4878ae9fc5}</Project>
       <Name>NestorMSX.Infrastructure</Name>
@@ -242,7 +246,8 @@
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>move NestorMSX.BuiltInPlugins.* $(TargetDir)plugins</PostBuildEvent>
+    <PostBuildEvent>move NestorMSX.BuiltInPlugins.* $(TargetDir)plugins
+move NestorMSX.Debugger.* $(TargetDir)plugins</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
