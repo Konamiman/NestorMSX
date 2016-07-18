@@ -7,7 +7,7 @@
     <ProjectGuid>{A844DC19-ADD4-49F6-9512-8E1F94D1AE34}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Konamiman.NestorMSX.Debugger</RootNamespace>
+    <RootNamespace>Konamiman.NestorMSX.Z80Debugger</RootNamespace>
     <AssemblyName>NestorMSX.Debugger</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -45,9 +45,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DecodedInstruction.cs" />
-    <Compile Include="ImmediateOperandType.cs" />
-    <Compile Include="IInstructionDecoder.cs" />
+    <Compile Include="Z80Instruction.cs" />
+    <Compile Include="Operand.cs" />
+    <Compile Include="OperandType.cs" />
+    <Compile Include="IInstructionExtractor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
