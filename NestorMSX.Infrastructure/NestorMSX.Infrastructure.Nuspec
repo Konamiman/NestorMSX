@@ -6,9 +6,9 @@
     <title>$title$</title>
     <authors>$author$</authors>
     <owners>$author$</owners>
-    <licenseUrl>https://bitbucket.org/konamiman/nestormsx/src/default/LICENSE.txt</licenseUrl>
-    <projectUrl>https://bitbucket.org/konamiman/nestormsx</projectUrl>
-    <iconUrl>https://bytebucket.org/konamiman/nestormsx/raw/61238da861f610fe9025ae6ed7ed79bc3acafd36/NestorMSX.Infrastructure/NuGetIcon.png</iconUrl>
+    <licenseUrl>https://github.com/Konamiman/NestorMSX/blob/master/LICENSE.txt</licenseUrl>
+    <projectUrl>https://github.com/Konamiman/NestorMSX</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/Konamiman/NestorMSX/master/NestorMSX.Infrastructure/NuGetIcon.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <summary>$description$</summary>
     <description>Infrastructure package needed to develop plugins for NestorMSX.</description>

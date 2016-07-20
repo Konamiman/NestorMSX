@@ -21,8 +21,8 @@ a { text-decoration: none }
 <h4>NestorMSX 2.0</h4>
 <p>(c) 2015, 2016 Konamiman - <a target=""_blank"" href=""http://www.konamiman.com"">http://www.konamiman.com</a></p>
 <br/>
-<p>Source code and configuration guide: <a target=""_blank"" href=""https://bitbucket.org/konamiman/nestormsx"">https://bitbucket.org/konamiman/nestormsx</a></p>
-<p>Uses Z80.NET: <a target=""_blank"" href=""https://bitbucket.org/konamiman/z80dotnet"">https://bitbucket.org/konamiman/z80dotnet</a></p>
+<p>Source code and configuration guide: <a target=""_blank"" href=""https://github.com/Konamiman/NestorMSX"">https://github.com/Konamiman/NestorMSX</a></p>
+<p>Uses Z80.NET: <a target=""_blank"" href=""https://github.com/Konamiman/Z80dotNet"">https://github.com/Konamiman/Z80dotNet</a></p>
 <br/>
 <p><strong><a target=""_blank"" href=""http://konamiman.com/msx/msx-e.html#donate"">Donations are welcome!</a></strong></p>
 </body></html>
