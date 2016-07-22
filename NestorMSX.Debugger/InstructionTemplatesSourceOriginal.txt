@@ -1,5 +1,23 @@
 ﻿;https://metacpan.org/pod/Asm::Z80::Table
 
+;The following extensions were implemented in this assembly/disassembly table:
+
+;ixh and ixl can be used as the high- and low-byte of ix; the same with iyh and iyl.
+;ldi increments the memory pointer in indirect register addressing after the load, e.g. 'ldi a,(hl)' is 'ld a,(hl):inc hl'.
+;ldd decrements the memory pointer in indirect register addressing after the load; e.g. 'lda a,(hl)' is 'ld a,(hl):dec hl'.
+;16-bit load between two registers is composed by two 8-bit load instructions or a sequence of push/pop, e.g. 'ld bc,de' is 'ld b,d:ld c,e', and 'ld hl,ix' is 'push ix:pop hl'.
+;16-bit load in indirect register addressing is composed by a sequence of 8-bit load instructions and register increment/decrement, e.g. 'ld bc,(hl)' is 'ld c,(hl):inc hl:ld b,(hl):dec hl'.
+;16-bit subtract is composed by clearing the carry flag and subtract with carry, e.g. 'sub hl,bc' is 'or a:sbc hl,bc'.
+;sll (and the synonym sli) is Shift Logical Left, works as sla but sets bit 0.
+;'in f,(c)' reads the port pointed by c and sets the flags, but does not store the result.
+;'out (c),0' outputs zero to the port pointed by c.
+;Two argument rotate instrution in index register indirect mode stores the result in the second argument, e.g. 'rlc (ix+d),c' rotates the value pointed by (ix+d) and stores the result in c.
+;Three argument bit set/clear instrution in index register indirect mode stores the result in the third argument, e.g. 'set 3,(ix+d),c' sets bit-3 of the the value pointed by (ix+d) and stores the result in c.
+;Rotate instructions (rl, rr, sla, sll, sli, sra, srl) with the 16-bit registers are implemented by rotating one register into carry and the other from carry.
+;Conditional relative jump with flags not available in jr are coded as absolute jumps, e.g. <'jr po,NN'> is <'jp po,NN'>.
+;The RST instruction takes as its parameter either the address to jump to or the reset vector number - this is just the address / 8.
+;'stop' is a special instruction for CPU::Emulator::Z80 coded as 0xDD, 0xDD, 0x00.
+
 adc  a,(hl)        ; 8E
 adc  a,(ix)        ; DD 8E 00
 adc  a,(ix+DIS)    ; DD 8E DIS

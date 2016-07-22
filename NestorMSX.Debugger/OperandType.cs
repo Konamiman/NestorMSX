@@ -5,6 +5,7 @@
         ImmediateByte,
         ImmediateWord,
         RelativeJumpAddress,
-        IndexRegisterOffset
+        IndexRegisterOffset,
+        AbsoluteMemoryAddress
     }
 }

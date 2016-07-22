@@ -45,6 +45,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="InstructionType.cs" />
     <Compile Include="Z80Instruction.cs" />
     <Compile Include="Operand.cs" />
     <Compile Include="OperandType.cs" />
