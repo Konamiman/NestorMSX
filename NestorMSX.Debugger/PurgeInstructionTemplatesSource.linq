@@ -25,6 +25,7 @@ lines = lines
 	.Where(l => !toIgnore.Any(ti => l.Split(';')[0].Trim().Contains(ti)))
 	.Where(l => !regexToIgnore.IsMatch(l))
 	.Where(l => !l.StartsWith("rst") || validRsts.Any(r => l.Contains(r)))
+	.Where(l => (l.Contains("(ix)") || l.Contains("(iy)")) && !l.Contains("00"))
 	.ToArray();
 	
 lines.Dump();
