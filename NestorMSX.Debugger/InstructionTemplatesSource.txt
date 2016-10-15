@@ -191,7 +191,7 @@ dec iyl   ; FD 2D
 dec l   ; 2D
 dec sp  ; 3B
 di    ; F3
-djnz NN  ; 10 NNo
+djnz NNo  ; 10 NNo
 ei    ; FB
 ex (sp),hl  ; E3
 ex (sp),ix  ; DD E3
@@ -248,11 +248,11 @@ jp p,NN  ; F2 NNl NNh
 jp pe,NN  ; EA NNl NNh
 jp po,NN  ; E2 NNl NNh
 jp z,NN  ; CA NNl NNh
-jr NN  ; 18 NNo
-jr c,NN  ; 38 NNo
-jr nc,NN  ; 30 NNo
-jr nz,NN  ; 20 NNo
-jr z,NN  ; 28 NNo
+jr NNo  ; 18 NNo
+jr c,NNo  ; 38 NNo
+jr nc,NNo  ; 30 NNo
+jr nz,NNo  ; 20 NNo
+jr z,NNo  ; 28 NNo
 ld (NN),a  ; 32 NNl NNh
 ld (NN),bc  ; ED 43 NNl NNh
 ld (NN),de  ; ED 53 NNl NNh

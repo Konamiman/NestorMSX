@@ -25,7 +25,8 @@ lines = lines
 	.Where(l => !toIgnore.Any(ti => l.Split(';')[0].Trim().Contains(ti)))
 	.Where(l => !regexToIgnore.IsMatch(l))
 	.Where(l => !l.StartsWith("rst") || validRsts.Any(r => l.Contains(r)))
-	.Where(l => (l.Contains("(ix)") || l.Contains("(iy)")) && !l.Contains("00"))
+	.Where(l => !l.Contains("(i") || (l.Contains("(i") && !l.Contains("00")))
+	.Select(l => l.Contains("NNo") ? l.Replace("NN ", "NNo ") : l)
 	.ToArray();
 	
 lines.Dump();
