@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{7EC18F5A-DEDF-49FD-BFEF-EF20FA41189F}"
 	ProjectSection(SolutionItems) = preProject
@@ -26,6 +26,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NestorMSX.Infrastructure", "NestorMSX.Infrastructure\NestorMSX.Infrastructure.csproj", "{41786EE5-ECD9-4B70-B0D9-ED4878AE9FC5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NestorMSX.Debugger", "NestorMSX.Debugger\NestorMSX.Debugger.csproj", "{A844DC19-ADD4-49F6-9512-8E1F94D1AE34}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NestorMSX.Debugger.Tests", "NestorMSX.Debugger.Tests\NestorMSX.Debugger.Tests.csproj", "{04B282CF-DE03-4C4F-98E3-F93B0A7CF8F9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -53,6 +55,10 @@ Global
 		{A844DC19-ADD4-49F6-9512-8E1F94D1AE34}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A844DC19-ADD4-49F6-9512-8E1F94D1AE34}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A844DC19-ADD4-49F6-9512-8E1F94D1AE34}.Release|Any CPU.Build.0 = Release|Any CPU
+		{04B282CF-DE03-4C4F-98E3-F93B0A7CF8F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{04B282CF-DE03-4C4F-98E3-F93B0A7CF8F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{04B282CF-DE03-4C4F-98E3-F93B0A7CF8F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{04B282CF-DE03-4C4F-98E3-F93B0A7CF8F9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

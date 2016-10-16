@@ -45,6 +45,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="InstructionExtractor.cs" />
+    <Compile Include="InstructionExtractor.SingleByte_temp.cs">
+      <DependentUpon>InstructionExtractor.cs</DependentUpon>
+    </Compile>
     <Compile Include="InstructionType.cs" />
     <Compile Include="Z80Instruction.cs" />
     <Compile Include="Operand.cs" />
@@ -60,7 +64,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="PurgeInstructionTemplatesSource.linq" />
+    <None Include="LinqPad\PurgeInstructionTemplatesSource.linq" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="InstructionTemplatesSource.txt" />

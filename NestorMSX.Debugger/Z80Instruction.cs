@@ -1,4 +1,7 @@
-﻿namespace Konamiman.NestorMSX.Z80Debugger
+﻿using System;
+using System.Linq;
+
+namespace Konamiman.NestorMSX.Z80Debugger
 {
     public class Z80Instruction
     {
@@ -11,5 +14,20 @@
         public bool WritesToPort { get; set; }
         public bool ChangesPc { get; set; }
         public bool ChangesSp { get; set; }
+
+        public Z80Instruction Clone()
+        {
+            return new Z80Instruction
+            {
+                FormatString = FormatString,
+                RawBytes = RawBytes,
+                Operands = Operands.Select(o => o.Clone()).ToArray(),
+                InstructionType = InstructionType,
+                WritesToMemory = WritesToMemory,
+                WritesToPort = WritesToPort,
+                ChangesPc = ChangesPc,
+                ChangesSp = ChangesSp
+            };
+        }
     }
 }

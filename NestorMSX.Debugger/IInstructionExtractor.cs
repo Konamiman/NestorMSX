@@ -4,7 +4,7 @@ namespace Konamiman.NestorMSX.Z80Debugger
 {
     public interface IInstructionExtractor
     {
-        IMemory Memory { get; set; }
+        IMemory Memory { get; }
         ushort NextInstructionAddress { get; set; }
         Z80Instruction ExtractInstruction();
     }

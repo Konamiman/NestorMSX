@@ -3,7 +3,7 @@
 //The resulting file includes all standard documented and undocumented instructions,
 //but does NOT include mirrors and undefined instructions
 
-var lines = File.ReadAllLines(Path.Combine(Path.GetDirectoryName(Util.CurrentQueryPath), "InstructionTemplatesSourceOriginal.txt"));
+var lines = File.ReadAllLines(Path.Combine(Path.GetDirectoryName(Util.CurrentQueryPath), "../InstructionTemplatesSourceOriginal.txt"));
 
 var toIgnore = new[] {
 		"jr po", "jr pe", "jr p", "jr m",
@@ -31,4 +31,4 @@ lines = lines
 	
 lines.Dump();
 
-File.WriteAllLines(Path.Combine(Path.GetDirectoryName(Util.CurrentQueryPath), "InstructionTemplatesSource.txt"), lines);
+File.WriteAllLines(Path.Combine(Path.GetDirectoryName(Util.CurrentQueryPath), "../InstructionTemplatesSource.txt"), lines);
