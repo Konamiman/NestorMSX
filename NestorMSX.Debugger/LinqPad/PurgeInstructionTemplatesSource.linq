@@ -7,10 +7,11 @@ var lines = File.ReadAllLines(Path.Combine(Path.GetDirectoryName(Util.CurrentQue
 
 var toIgnore = new[] {
 		"jr po", "jr pe", "jr p", "jr m",
-		"ldi ", "ldd ", "stop", "sub hl,sp"
+		"ldi ", "ldd ", "stop", "sub hl,sp",
+		"add hl,hl"
 	};
 
-var regexToIgnore = new Regex(@"(ld|sub) (bc|de|hl|ix|iy),\(?(bc|de|hl|ix|iy)\)?");
+var regexToIgnore = new Regex(@"(ld|sub) \(?(bc|de|hl|ix|iy)\)?,\(?(bc|de|hl|ix|iy)\)?");
 
 var validRsts = new[] { 0, 8, 16, 24, 32, 40, 48, 56}.Select(l => l.ToString());
 

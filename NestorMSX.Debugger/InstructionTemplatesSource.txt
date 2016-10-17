@@ -34,7 +34,6 @@ add a,iyl  ; FD 85
 add a,l   ; 85
 add hl,bc  ; 09
 add hl,de  ; 19
-add hl,hl  ; 29
 add hl,sp  ; 39
 add ix,bc  ; DD 09
 add ix,de  ; DD 19
@@ -265,10 +264,8 @@ ld (de),a  ; 12
 ld (hl),N  ; 36 N
 ld (hl),a  ; 77
 ld (hl),b  ; 70
-ld (hl),bc  ; 71 23 70 2B
 ld (hl),c  ; 71
 ld (hl),d  ; 72
-ld (hl),de  ; 73 23 72 2B
 ld (hl),e  ; 73
 ld (hl),h  ; 74
 ld (hl),l  ; 75
