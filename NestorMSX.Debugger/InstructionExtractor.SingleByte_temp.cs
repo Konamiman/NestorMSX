@@ -1,4 +1,5 @@
-﻿namespace Konamiman.NestorMSX.Z80Debugger
+﻿#if false
+namespace Konamiman.NestorMSX.Z80Debugger
 {
     public partial class InstructionExtractor
     {
@@ -36,3 +37,4 @@
         };
     }
 }
+#endif

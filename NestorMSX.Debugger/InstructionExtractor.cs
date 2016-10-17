@@ -54,7 +54,7 @@ namespace Konamiman.NestorMSX.Z80Debugger
 
         private Z80Instruction ExtractSingleByteInstruction(byte instructionByte)
         {
-            return sinlgeByteInstructionPrototypes[instructionByte].Clone();
+            return singleByteInstructionPrototypes[instructionByte].Clone();
         }
 
         private Z80Instruction ExtractFDInstruction()
