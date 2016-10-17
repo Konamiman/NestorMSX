@@ -1,0 +1,57 @@
+﻿<#@ template debug="false" hostspecific="true" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".cs" #>
+<#
+var lines = File.ReadAllLines(Host.ResolvePath("InstructionTemplatesSource.txt"));
+
+var items =
+	lines
+	.Select(l => l.Trim().Replace("   ", " ").Replace("  ", " "))
+	.Where(l => l != "" && !l.StartsWith(";"))
+	.Select(l => { var tokens = l.Split(';').Select(t => t.Trim()).ToArray(); return tokens; })
+	.Where(t => !t[1].StartsWith("CB") && !t[1].StartsWith("ED") && !t[1].StartsWith("DD") && !t[1].StartsWith("FD"))
+	.Select(t => new Tuple<string, string[], byte[]>(t[0], t[1].Split(' '), t[1].Split(' ').Select(x => x=="DIS" || x.StartsWith("N") ? (byte)0 : Byte.Parse(x, System.Globalization.NumberStyles.AllowHexSpecifier )).ToArray()))
+	.OrderBy(t => t.Item2[0])
+	.ToArray()
+	;
+
+var nullTuple = new[] { new Tuple<string, string[], byte[]>(null, null, null)};
+
+items = items
+	.Take(0xCB)
+	.Concat(nullTuple)
+	.Concat(items.Skip(0xCB).Take(0xDD-0xCB-1))
+	.Concat(nullTuple)
+	.Concat(items.Skip(0xDD-1).Take(0xED-0xDD-1))
+	.Concat(nullTuple)
+	.Concat(items.Skip(0xED-2).Take(0xFD-0xED-1))
+	.Concat(nullTuple)
+	.Concat(items.Skip(0xFD-3).Take(0xFF-0xFD))
+	.ToArray()
+	;
+
+int index = 0;
+	#>
+namespace Konamiman.NestorMSX.Z80Debugger
+{
+    public partial class InstructionExtractor
+    {
+        private readonly Z80Instruction[] _singleByteInstructionPrototypes =
+        {
+<# foreach(var item in items) { #>
+<# if(item.Item1 == null) { #>
+			null, //<#= string.Format("0x{0:X2}",index) #>
+<# } else { #>
+<# var formatString = item.Item1.Replace("NNo","{0}").Replace("NN","{0}").Replace("N","{0}"); #>
+            new Z80Instruction
+            {
+                FormatString = "<#=formatString#>"
+            },
+<# } index++;} #>
+		};
+    }
+}

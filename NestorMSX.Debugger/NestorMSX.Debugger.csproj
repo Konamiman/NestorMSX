@@ -46,6 +46,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="InstructionExtractor.cs" />
+    <Compile Include="InstructionExtractor.SingleByteInstructions.cs">
+      <DependentUpon>InstructionExtractor.SingleByteInstructions.tt</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
     <Compile Include="InstructionExtractor.SingleByte_temp.cs">
       <DependentUpon>InstructionExtractor.cs</DependentUpon>
     </Compile>
@@ -63,12 +68,21 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="LinqPad\GetSingleByteInstructions.linq" />
     <None Include="packages.config" />
     <None Include="LinqPad\PurgeInstructionTemplatesSource.linq" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="InstructionExtractor.SingleByteInstructions.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>InstructionExtractor.SingleByteInstructions.cs</LastGenOutput>
+      <DependentUpon>InstructionExtractor.cs</DependentUpon>
+    </Content>
     <Content Include="InstructionTemplatesSource.txt" />
     <Content Include="InstructionTemplatesSourceOriginal.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
