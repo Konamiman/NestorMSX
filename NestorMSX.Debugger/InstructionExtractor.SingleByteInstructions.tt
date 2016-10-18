@@ -57,6 +57,9 @@ namespace Konamiman.NestorMSX.Z80Debugger
 	   var operandIndex = -1;
 	   var bytes = item.Item2.ToList();
 
+	   if(formatString.StartsWith("rst"))
+	       formatString = string.Format("rst {0:X}", int.Parse(formatString.Substring(4)));
+
 	   string operandType = "ImmediateByte";
 	   operandIndex = bytes.IndexOf("N");
 	   if(operandIndex == -1) {

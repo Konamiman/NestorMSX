@@ -704,13 +704,10 @@ rl (iy+DIS),h ; FD CB DIS 14
 rl (iy+DIS),l ; FD CB DIS 15
 rl a   ; CB 17
 rl b   ; CB 10
-rl bc  ; CB 11 CB 10
 rl c   ; CB 11
 rl d   ; CB 12
-rl de  ; CB 13 CB 12
 rl e   ; CB 13
 rl h   ; CB 14
-rl hl  ; CB 15 CB 14
 rl l   ; CB 15
 rla   ; 17
 rlc (hl)  ; CB 06
@@ -756,13 +753,10 @@ rr (iy+DIS),h ; FD CB DIS 1C
 rr (iy+DIS),l ; FD CB DIS 1D
 rr a   ; CB 1F
 rr b   ; CB 18
-rr bc  ; CB 18 CB 19
 rr c   ; CB 19
 rr d   ; CB 1A
-rr de  ; CB 1A CB 1B
 rr e   ; CB 1B
 rr h   ; CB 1C
-rr hl  ; CB 1C CB 1D
 rr l   ; CB 1D
 rra   ; 1F
 rrc (hl)  ; CB 0E
@@ -1030,41 +1024,12 @@ sla (iy+DIS),h ; FD CB DIS 24
 sla (iy+DIS),l ; FD CB DIS 25
 sla a   ; CB 27
 sla b   ; CB 20
-sla bc  ; CB 21 CB 10
 sla c   ; CB 21
 sla d   ; CB 22
-sla de  ; CB 23 CB 12
 sla e   ; CB 23
 sla h   ; CB 24
 sla hl  ; 29
 sla l   ; CB 25
-sli (hl)  ; CB 36
-sli (ix+DIS) ; DD CB DIS 36
-sli (ix+DIS),a ; DD CB DIS 37
-sli (ix+DIS),b ; DD CB DIS 30
-sli (ix+DIS),c ; DD CB DIS 31
-sli (ix+DIS),d ; DD CB DIS 32
-sli (ix+DIS),e ; DD CB DIS 33
-sli (ix+DIS),h ; DD CB DIS 34
-sli (ix+DIS),l ; DD CB DIS 35
-sli (iy+DIS) ; FD CB DIS 36
-sli (iy+DIS),a ; FD CB DIS 37
-sli (iy+DIS),b ; FD CB DIS 30
-sli (iy+DIS),c ; FD CB DIS 31
-sli (iy+DIS),d ; FD CB DIS 32
-sli (iy+DIS),e ; FD CB DIS 33
-sli (iy+DIS),h ; FD CB DIS 34
-sli (iy+DIS),l ; FD CB DIS 35
-sli a   ; CB 37
-sli b   ; CB 30
-sli bc  ; CB 31 CB 10
-sli c   ; CB 31
-sli d   ; CB 32
-sli de  ; CB 33 CB 12
-sli e   ; CB 33
-sli h   ; CB 34
-sli hl  ; CB 35 CB 14
-sli l   ; CB 35
 sll (hl)  ; CB 36
 sll (ix+DIS) ; DD CB DIS 36
 sll (ix+DIS),a ; DD CB DIS 37
@@ -1084,13 +1049,10 @@ sll (iy+DIS),h ; FD CB DIS 34
 sll (iy+DIS),l ; FD CB DIS 35
 sll a   ; CB 37
 sll b   ; CB 30
-sll bc  ; CB 31 CB 10
 sll c   ; CB 31
 sll d   ; CB 32
-sll de  ; CB 33 CB 12
 sll e   ; CB 33
 sll h   ; CB 34
-sll hl  ; CB 35 CB 14
 sll l   ; CB 35
 sra (hl)  ; CB 2E
 sra (ix+DIS) ; DD CB DIS 2E
@@ -1111,13 +1073,10 @@ sra (iy+DIS),h ; FD CB DIS 2C
 sra (iy+DIS),l ; FD CB DIS 2D
 sra a   ; CB 2F
 sra b   ; CB 28
-sra bc  ; CB 28 CB 19
 sra c   ; CB 29
 sra d   ; CB 2A
-sra de  ; CB 2A CB 1B
 sra e   ; CB 2B
 sra h   ; CB 2C
-sra hl  ; CB 2C CB 1D
 sra l   ; CB 2D
 srl (hl)  ; CB 3E
 srl (ix+DIS) ; DD CB DIS 3E
@@ -1138,13 +1097,10 @@ srl (iy+DIS),h ; FD CB DIS 3C
 srl (iy+DIS),l ; FD CB DIS 3D
 srl a   ; CB 3F
 srl b   ; CB 38
-srl bc  ; CB 38 CB 19
 srl c   ; CB 39
 srl d   ; CB 3A
-srl de  ; CB 3A CB 1B
 srl e   ; CB 3B
 srl h   ; CB 3C
-srl hl  ; CB 3C CB 1D
 srl l   ; CB 3D
 sub (hl)  ; 96
 sub (ix+DIS) ; DD 96 DIS

@@ -8,7 +8,7 @@ var lines = File.ReadAllLines(Path.Combine(Path.GetDirectoryName(Util.CurrentQue
 var toIgnore = new[] {
 		"jr po", "jr pe", "jr p", "jr m",
 		"ldi ", "ldd ", "stop", "sub hl,sp",
-		"add hl,hl"
+		"add hl,hl", "sli"
 	};
 
 var regexToIgnore = new Regex(@"(ld|sub) \(?(bc|de|hl|ix|iy)\)?,\(?(bc|de|hl|ix|iy)\)?");
@@ -22,6 +22,10 @@ lines = lines
 	.Where(l => {
 		var parts = l.Split(';')[1].Trim().Split(' ');
 		return parts.Length <= 4;
+	})
+	.Where(l =>	{
+		var parts = l.Split(';')[1].Trim().Split(' ');
+		return parts[0] != "CB" || parts.Length == 2;
 	})
 	.Where(l => !toIgnore.Any(ti => l.Split(';')[0].Trim().Contains(ti)))
 	.Where(l => !regexToIgnore.IsMatch(l))

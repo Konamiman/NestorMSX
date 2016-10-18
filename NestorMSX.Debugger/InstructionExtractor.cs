@@ -23,7 +23,7 @@ namespace Konamiman.NestorMSX.Z80Debugger
             Z80Instruction instruction;
 
             if (nextByte == 0xCB)
-                instruction = ExtractCBInstruction();
+                instruction = ExtractCBInstruction(Memory[NextInstructionAddress+1]);
             else if (nextByte == 0xED)
                 instruction = ExtractEDInstruction();
             else if (nextByte == 0xDD)
@@ -57,6 +57,11 @@ namespace Konamiman.NestorMSX.Z80Debugger
             return singleByteInstructionPrototypes[instructionByte].Clone();
         }
 
+        private Z80Instruction ExtractCBInstruction(byte nextByte)
+        {
+            return cbInstructionPrototypes[nextByte].Clone();
+        }
+
         private Z80Instruction ExtractFDInstruction()
         {
             throw new NotImplementedException();
@@ -72,9 +77,6 @@ namespace Konamiman.NestorMSX.Z80Debugger
             throw new NotImplementedException();
         }
 
-        private Z80Instruction ExtractCBInstruction()
-        {
-            throw new NotImplementedException();
-        }
+
     }
 }
