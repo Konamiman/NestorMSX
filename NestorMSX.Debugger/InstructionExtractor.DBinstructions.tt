@@ -32,7 +32,7 @@ namespace Konamiman.NestorMSX.Z80Debugger
         {
 <# foreach(var item in items) { #>
 <#
-       var instructionType = item.Item1.StartsWith("sll") ? "UndocumentedNew" : "Standard";
+       var instructionType = item.Item1.StartsWith("sll") ? "Undocumented" : "Standard";
        var bytes = item.Item2.ToList();
 #>
             new Z80Instruction //0xCB <#= string.Format("0x{0:X2}",index) #>

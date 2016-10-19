@@ -8,9 +8,9 @@ namespace Konamiman.NestorMSX.Z80Debugger
     public enum InstructionType
     {
         Standard,
-        UndocumentedNew,
-        DocumentedMirror,
-        UndocumentedMirror,
+        Undocumented,
+        SafeMirror,
+        UnsafeMirror,
         Undefined
     }
 }

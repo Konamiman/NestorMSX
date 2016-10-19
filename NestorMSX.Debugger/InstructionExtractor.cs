@@ -25,7 +25,7 @@ namespace Konamiman.NestorMSX.Z80Debugger
             if (nextByte == 0xCB)
                 instruction = ExtractCBInstruction(Memory[NextInstructionAddress+1]);
             else if (nextByte == 0xED)
-                instruction = ExtractEDInstruction();
+                instruction = ExtractEDInstruction(Memory[NextInstructionAddress+1]);
             else if (nextByte == 0xDD)
                 instruction = ExtractDDInstruction();
             else if (nextByte == 0xFD)
@@ -62,6 +62,44 @@ namespace Konamiman.NestorMSX.Z80Debugger
             return cbInstructionPrototypes[nextByte].Clone();
         }
 
+        private Z80Instruction ExtractEDInstruction(byte nextByte)
+        {
+            Z80Instruction instruction = null;
+
+            if (nextByte >= 0x40 && nextByte < 0x80)
+                instruction = EDInstructionPrototypes[nextByte - 0x40];
+            
+            if (nextByte >= 0xA0 && nextByte < 0xBC)
+                instruction = EDBlockInstructionPrototypes[nextByte - 0xA0];
+
+            if(instruction != null)
+                return instruction;
+
+            return new Z80Instruction
+            {
+                FormatString = "db {0},{1}",
+                RawBytes = new byte[] {0xED, 0xBB},
+                Operands = new[]
+                {
+                    new Operand
+                    {
+                        Type = OperandType.ImmediateByte,
+                        OffsetWithinInstruction = 0
+                    },
+                    new Operand
+                    {
+                        Type = OperandType.ImmediateByte,
+                        OffsetWithinInstruction = 1
+                    }
+                },
+                InstructionType = InstructionType.Undefined,
+                ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            };
+        }
+
         private Z80Instruction ExtractFDInstruction()
         {
             throw new NotImplementedException();
@@ -71,12 +109,5 @@ namespace Konamiman.NestorMSX.Z80Debugger
         {
             throw new NotImplementedException();
         }
-
-        private Z80Instruction ExtractEDInstruction()
-        {
-            throw new NotImplementedException();
-        }
-
-
     }
 }
