@@ -51,6 +51,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>InstructionExtractor.DBinstructions.tt</DependentUpon>
     </Compile>
+    <Compile Include="InstructionExtractor.DDinstructions.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>InstructionExtractor.DDinstructions.tt</DependentUpon>
+    </Compile>
     <Compile Include="InstructionExtractor.EDinstructions.cs">
       <DependentUpon>InstructionExtractor.EDinstructions.tt</DependentUpon>
       <DesignTime>True</DesignTime>
@@ -79,6 +84,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="LinqPad\GetCBInstructions.linq" />
+    <None Include="LinqPad\GetDDInstructions.linq" />
     <None Include="LinqPad\GetEDInstructions.linq" />
     <None Include="LinqPad\GetSingleByteInstructions.linq" />
     <None Include="packages.config" />
@@ -89,6 +95,11 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <DependentUpon>InstructionExtractor.cs</DependentUpon>
       <LastGenOutput>InstructionExtractor.DBinstructions.cs</LastGenOutput>
+    </Content>
+    <Content Include="InstructionExtractor.DDinstructions.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>InstructionExtractor.cs</DependentUpon>
+      <LastGenOutput>InstructionExtractor.DDinstructions.cs</LastGenOutput>
     </Content>
     <Content Include="InstructionExtractor.EDinstructions.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
