@@ -33,5 +33,48 @@ namespace NestorMSX.Debugger.Tests
             Assert.AreEqual("rlc c", instruction.FormatString);
             CollectionAssert.AreEqual(new byte[] {0xCB, 0x01}, instruction.RawBytes);
         }
+
+        [Test]
+        [TestCase(0x40, "in b,(c)")]
+        [TestCase(0x7E, "im 2")]
+        [TestCase(0xA0, "ldi")]
+        [TestCase(0xBB, "otdr")]
+        public void ExtractsEdInstruction(int secondByte, string text)
+        {
+            var memory = new PlainMemory(65536);
+            memory.SetContents(0, new byte[] {0xED, (byte)secondByte});
+            var sut = new InstructionExtractor(memory);
+            var instruction = sut.ExtractInstruction();
+
+            Assert.AreEqual(2, sut.NextInstructionAddress);
+            Assert.AreEqual(text, instruction.FormatString);
+            CollectionAssert.AreEqual(new byte[] {0xED, (byte)secondByte}, instruction.RawBytes);
+        }
+
+        [Test]
+        [TestCase(0x77)]
+        [TestCase(0x7F)]
+        [TestCase(0xA4)]
+        [TestCase(0xA7)]
+        [TestCase(0xAC)]
+        [TestCase(0xAF)]
+        [TestCase(0xB4)]
+        [TestCase(0xB7)]
+        [TestCase(0xBC)]
+        [TestCase(0xBF)]
+        public void ExtractsUndefinedEdsAsUndefinedInstructions(int secondByte)
+        {
+            var memory = new PlainMemory(65536);
+            memory.SetContents(0, new byte[] {0xED, (byte)secondByte});
+            var sut = new InstructionExtractor(memory);
+            var instruction = sut.ExtractInstruction();
+
+            Assert.AreEqual(2, sut.NextInstructionAddress);
+            Assert.AreEqual("db {0},{1}", instruction.FormatString);
+            CollectionAssert.AreEqual(new byte[] {0xED, (byte)secondByte}, instruction.RawBytes);
+            Assert.AreEqual(InstructionType.Undefined, instruction.InstructionType);
+            Assert.AreEqual(0xED, instruction.Operands[0].Value);
+            Assert.AreEqual((byte)secondByte, instruction.Operands[1].Value);
+        }
     }
 }

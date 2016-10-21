@@ -33,17 +33,19 @@ namespace Konamiman.NestorMSX.Z80Debugger
             else
                 instruction = ExtractSingleByteInstruction(nextByte);
 
-            foreach (var operand in instruction.Operands) {
-                if(operand.Type == OperandType.ImmediateWord || operand.Type == OperandType.AbsoluteMemoryAddress) {
-                    var valueLow = Memory[NextInstructionAddress + operand.OffsetWithinInstruction];
-                    var valueHigh = Memory[NextInstructionAddress + operand.OffsetWithinInstruction + 1];
-                    operand.Value = valueLow | (valueHigh << 8);
-                    instruction.RawBytes[operand.OffsetWithinInstruction] = valueLow;
-                    instruction.RawBytes[operand.OffsetWithinInstruction + 1] = valueHigh;
-                }
-                else {
-                    operand.Value = Memory[NextInstructionAddress];
-                    instruction.RawBytes[operand.OffsetWithinInstruction] = (byte)operand.Value;
+            if(instruction.InstructionType != InstructionType.Undefined) {
+                foreach (var operand in instruction.Operands) {
+                    if(operand.Type == OperandType.ImmediateWord || operand.Type == OperandType.AbsoluteMemoryAddress) {
+                        var valueLow = Memory[NextInstructionAddress + operand.OffsetWithinInstruction];
+                        var valueHigh = Memory[NextInstructionAddress + operand.OffsetWithinInstruction + 1];
+                        operand.Value = valueLow | (valueHigh << 8);
+                        instruction.RawBytes[operand.OffsetWithinInstruction] = valueLow;
+                        instruction.RawBytes[operand.OffsetWithinInstruction + 1] = valueHigh;
+                    }
+                    else {
+                        operand.Value = Memory[NextInstructionAddress + operand.OffsetWithinInstruction];
+                        instruction.RawBytes[operand.OffsetWithinInstruction] = (byte)operand.Value;
+                    }
                 }
             }
 
@@ -78,18 +80,20 @@ namespace Konamiman.NestorMSX.Z80Debugger
             return new Z80Instruction
             {
                 FormatString = "db {0},{1}",
-                RawBytes = new byte[] {0xED, 0xBB},
+                RawBytes = new byte[] {0xED, nextByte},
                 Operands = new[]
                 {
                     new Operand
                     {
                         Type = OperandType.ImmediateByte,
-                        OffsetWithinInstruction = 0
+                        OffsetWithinInstruction = 0,
+                        Value = 0xED
                     },
                     new Operand
                     {
                         Type = OperandType.ImmediateByte,
-                        OffsetWithinInstruction = 1
+                        OffsetWithinInstruction = 1,
+                        Value = nextByte
                     }
                 },
                 InstructionType = InstructionType.Undefined,
