@@ -1158,5 +1158,1162 @@ namespace Konamiman.NestorMSX.Z80Debugger
                 WritesToPort = false
             },
 		};
+
+
+        private readonly Z80Instruction[] FDInstructionPrototypes =
+        {
+            new Z80Instruction //0xFD 0x09
+            {
+                FormatString = "add iy,bc",
+				RawBytes = new byte[] { 0xFD, 0x09 },
+				Operands = new Operand[0],
+				InstructionType = InstructionType.Standard,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0x19
+            {
+                FormatString = "add iy,de",
+				RawBytes = new byte[] { 0xFD, 0x19 },
+				Operands = new Operand[0],
+				InstructionType = InstructionType.Standard,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0x21
+            {
+                FormatString = "ld iy,{0}",
+				RawBytes = new byte[] { 0xFD, 0x21, 0x00, 0x00 },
+				Operands = new[]
+                {
+                    new Operand
+                    {
+                        Type = OperandType.ImmediateWord,
+                        OffsetWithinInstruction = 2
+                    }
+                },
+				InstructionType = InstructionType.Standard,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0x22
+            {
+                FormatString = "ld ({0}),iy",
+				RawBytes = new byte[] { 0xFD, 0x22, 0x00, 0x00 },
+				Operands = new[]
+                {
+                    new Operand
+                    {
+                        Type = OperandType.AbsoluteMemoryAddress,
+                        OffsetWithinInstruction = 2
+                    }
+                },
+				InstructionType = InstructionType.Standard,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = true,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0x23
+            {
+                FormatString = "inc iy",
+				RawBytes = new byte[] { 0xFD, 0x23 },
+				Operands = new Operand[0],
+				InstructionType = InstructionType.Standard,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0x24
+            {
+                FormatString = "inc iyh",
+				RawBytes = new byte[] { 0xFD, 0x24 },
+				Operands = new Operand[0],
+				InstructionType = InstructionType.Undocumented,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0x25
+            {
+                FormatString = "dec iyh",
+				RawBytes = new byte[] { 0xFD, 0x25 },
+				Operands = new Operand[0],
+				InstructionType = InstructionType.Undocumented,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0x26
+            {
+                FormatString = "ld iyh,{0}",
+				RawBytes = new byte[] { 0xFD, 0x26, 0x00 },
+				Operands = new[]
+                {
+                    new Operand
+                    {
+                        Type = OperandType.ImmediateByte,
+                        OffsetWithinInstruction = 2
+                    }
+                },
+				InstructionType = InstructionType.Undocumented,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0x29
+            {
+                FormatString = "add iy,iy",
+				RawBytes = new byte[] { 0xFD, 0x29 },
+				Operands = new Operand[0],
+				InstructionType = InstructionType.Standard,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0x2A
+            {
+                FormatString = "ld iy,({0})",
+				RawBytes = new byte[] { 0xFD, 0x2A, 0x00, 0x00 },
+				Operands = new[]
+                {
+                    new Operand
+                    {
+                        Type = OperandType.AbsoluteMemoryAddress,
+                        OffsetWithinInstruction = 2
+                    }
+                },
+				InstructionType = InstructionType.Standard,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0x2B
+            {
+                FormatString = "dec iy",
+				RawBytes = new byte[] { 0xFD, 0x2B },
+				Operands = new Operand[0],
+				InstructionType = InstructionType.Standard,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0x2C
+            {
+                FormatString = "inc iyl",
+				RawBytes = new byte[] { 0xFD, 0x2C },
+				Operands = new Operand[0],
+				InstructionType = InstructionType.Undocumented,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0x2D
+            {
+                FormatString = "dec iyl",
+				RawBytes = new byte[] { 0xFD, 0x2D },
+				Operands = new Operand[0],
+				InstructionType = InstructionType.Undocumented,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0x2E
+            {
+                FormatString = "ld iyl,{0}",
+				RawBytes = new byte[] { 0xFD, 0x2E, 0x00 },
+				Operands = new[]
+                {
+                    new Operand
+                    {
+                        Type = OperandType.ImmediateByte,
+                        OffsetWithinInstruction = 2
+                    }
+                },
+				InstructionType = InstructionType.Undocumented,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0x34
+            {
+                FormatString = "inc (iy+{0})",
+				RawBytes = new byte[] { 0xFD, 0x34, 0x00 },
+				Operands = new[]
+                {
+                    new Operand
+                    {
+                        Type = OperandType.IndexRegisterOffset,
+                        OffsetWithinInstruction = 2
+                    }
+                },
+				InstructionType = InstructionType.Standard,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = true,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0x35
+            {
+                FormatString = "dec (iy+{0})",
+				RawBytes = new byte[] { 0xFD, 0x35, 0x00 },
+				Operands = new[]
+                {
+                    new Operand
+                    {
+                        Type = OperandType.IndexRegisterOffset,
+                        OffsetWithinInstruction = 2
+                    }
+                },
+				InstructionType = InstructionType.Standard,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = true,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0x36
+            {
+                FormatString = "ld (iy+{0}),{1}",
+				RawBytes = new byte[] { 0xFD, 0x36, 0x00, 0x00 },
+				Operands = new[]
+                {
+				    new Operand
+                    {
+                        Type = OperandType.IndexRegisterOffset,
+                        OffsetWithinInstruction = 2
+                    },
+                    new Operand
+                    {
+                        Type = OperandType.ImmediateByte,
+                        OffsetWithinInstruction = 3
+                    }
+                },
+				InstructionType = InstructionType.Standard,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = true,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0x39
+            {
+                FormatString = "add iy,sp",
+				RawBytes = new byte[] { 0xFD, 0x39 },
+				Operands = new Operand[0],
+				InstructionType = InstructionType.Standard,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0x44
+            {
+                FormatString = "ld b,iyh",
+				RawBytes = new byte[] { 0xFD, 0x44 },
+				Operands = new Operand[0],
+				InstructionType = InstructionType.Undocumented,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0x45
+            {
+                FormatString = "ld b,iyl",
+				RawBytes = new byte[] { 0xFD, 0x45 },
+				Operands = new Operand[0],
+				InstructionType = InstructionType.Undocumented,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0x46
+            {
+                FormatString = "ld b,(iy+{0})",
+				RawBytes = new byte[] { 0xFD, 0x46, 0x00 },
+				Operands = new[]
+                {
+                    new Operand
+                    {
+                        Type = OperandType.IndexRegisterOffset,
+                        OffsetWithinInstruction = 2
+                    }
+                },
+				InstructionType = InstructionType.Standard,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0x4C
+            {
+                FormatString = "ld c,iyh",
+				RawBytes = new byte[] { 0xFD, 0x4C },
+				Operands = new Operand[0],
+				InstructionType = InstructionType.Undocumented,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0x4D
+            {
+                FormatString = "ld c,iyl",
+				RawBytes = new byte[] { 0xFD, 0x4D },
+				Operands = new Operand[0],
+				InstructionType = InstructionType.Undocumented,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0x4E
+            {
+                FormatString = "ld c,(iy+{0})",
+				RawBytes = new byte[] { 0xFD, 0x4E, 0x00 },
+				Operands = new[]
+                {
+                    new Operand
+                    {
+                        Type = OperandType.IndexRegisterOffset,
+                        OffsetWithinInstruction = 2
+                    }
+                },
+				InstructionType = InstructionType.Standard,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0x54
+            {
+                FormatString = "ld d,iyh",
+				RawBytes = new byte[] { 0xFD, 0x54 },
+				Operands = new Operand[0],
+				InstructionType = InstructionType.Undocumented,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0x55
+            {
+                FormatString = "ld d,iyl",
+				RawBytes = new byte[] { 0xFD, 0x55 },
+				Operands = new Operand[0],
+				InstructionType = InstructionType.Undocumented,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0x56
+            {
+                FormatString = "ld d,(iy+{0})",
+				RawBytes = new byte[] { 0xFD, 0x56, 0x00 },
+				Operands = new[]
+                {
+                    new Operand
+                    {
+                        Type = OperandType.IndexRegisterOffset,
+                        OffsetWithinInstruction = 2
+                    }
+                },
+				InstructionType = InstructionType.Standard,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0x5C
+            {
+                FormatString = "ld e,iyh",
+				RawBytes = new byte[] { 0xFD, 0x5C },
+				Operands = new Operand[0],
+				InstructionType = InstructionType.Undocumented,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0x5D
+            {
+                FormatString = "ld e,iyl",
+				RawBytes = new byte[] { 0xFD, 0x5D },
+				Operands = new Operand[0],
+				InstructionType = InstructionType.Undocumented,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0x5E
+            {
+                FormatString = "ld e,(iy+{0})",
+				RawBytes = new byte[] { 0xFD, 0x5E, 0x00 },
+				Operands = new[]
+                {
+                    new Operand
+                    {
+                        Type = OperandType.IndexRegisterOffset,
+                        OffsetWithinInstruction = 2
+                    }
+                },
+				InstructionType = InstructionType.Standard,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0x60
+            {
+                FormatString = "ld iyh,b",
+				RawBytes = new byte[] { 0xFD, 0x60 },
+				Operands = new Operand[0],
+				InstructionType = InstructionType.Undocumented,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0x61
+            {
+                FormatString = "ld iyh,c",
+				RawBytes = new byte[] { 0xFD, 0x61 },
+				Operands = new Operand[0],
+				InstructionType = InstructionType.Undocumented,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0x62
+            {
+                FormatString = "ld iyh,d",
+				RawBytes = new byte[] { 0xFD, 0x62 },
+				Operands = new Operand[0],
+				InstructionType = InstructionType.Undocumented,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0x63
+            {
+                FormatString = "ld iyh,e",
+				RawBytes = new byte[] { 0xFD, 0x63 },
+				Operands = new Operand[0],
+				InstructionType = InstructionType.Undocumented,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0x64
+            {
+                FormatString = "ld iyh,iyh",
+				RawBytes = new byte[] { 0xFD, 0x64 },
+				Operands = new Operand[0],
+				InstructionType = InstructionType.Undocumented,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0x65
+            {
+                FormatString = "ld iyh,iyl",
+				RawBytes = new byte[] { 0xFD, 0x65 },
+				Operands = new Operand[0],
+				InstructionType = InstructionType.Undocumented,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0x66
+            {
+                FormatString = "ld h,(iy+{0})",
+				RawBytes = new byte[] { 0xFD, 0x66, 0x00 },
+				Operands = new[]
+                {
+                    new Operand
+                    {
+                        Type = OperandType.IndexRegisterOffset,
+                        OffsetWithinInstruction = 2
+                    }
+                },
+				InstructionType = InstructionType.Standard,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0x67
+            {
+                FormatString = "ld iyh,a",
+				RawBytes = new byte[] { 0xFD, 0x67 },
+				Operands = new Operand[0],
+				InstructionType = InstructionType.Undocumented,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0x68
+            {
+                FormatString = "ld iyl,b",
+				RawBytes = new byte[] { 0xFD, 0x68 },
+				Operands = new Operand[0],
+				InstructionType = InstructionType.Undocumented,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0x69
+            {
+                FormatString = "ld iyl,c",
+				RawBytes = new byte[] { 0xFD, 0x69 },
+				Operands = new Operand[0],
+				InstructionType = InstructionType.Undocumented,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0x6A
+            {
+                FormatString = "ld iyl,d",
+				RawBytes = new byte[] { 0xFD, 0x6A },
+				Operands = new Operand[0],
+				InstructionType = InstructionType.Undocumented,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0x6B
+            {
+                FormatString = "ld iyl,e",
+				RawBytes = new byte[] { 0xFD, 0x6B },
+				Operands = new Operand[0],
+				InstructionType = InstructionType.Undocumented,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0x6C
+            {
+                FormatString = "ld iyl,iyh",
+				RawBytes = new byte[] { 0xFD, 0x6C },
+				Operands = new Operand[0],
+				InstructionType = InstructionType.Undocumented,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0x6D
+            {
+                FormatString = "ld iyl,iyl",
+				RawBytes = new byte[] { 0xFD, 0x6D },
+				Operands = new Operand[0],
+				InstructionType = InstructionType.Undocumented,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0x6E
+            {
+                FormatString = "ld l,(iy+{0})",
+				RawBytes = new byte[] { 0xFD, 0x6E, 0x00 },
+				Operands = new[]
+                {
+                    new Operand
+                    {
+                        Type = OperandType.IndexRegisterOffset,
+                        OffsetWithinInstruction = 2
+                    }
+                },
+				InstructionType = InstructionType.Standard,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0x6F
+            {
+                FormatString = "ld iyl,a",
+				RawBytes = new byte[] { 0xFD, 0x6F },
+				Operands = new Operand[0],
+				InstructionType = InstructionType.Undocumented,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0x70
+            {
+                FormatString = "ld (iy+{0}),b",
+				RawBytes = new byte[] { 0xFD, 0x70, 0x00 },
+				Operands = new[]
+                {
+                    new Operand
+                    {
+                        Type = OperandType.IndexRegisterOffset,
+                        OffsetWithinInstruction = 2
+                    }
+                },
+				InstructionType = InstructionType.Standard,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = true,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0x71
+            {
+                FormatString = "ld (iy+{0}),c",
+				RawBytes = new byte[] { 0xFD, 0x71, 0x00 },
+				Operands = new[]
+                {
+                    new Operand
+                    {
+                        Type = OperandType.IndexRegisterOffset,
+                        OffsetWithinInstruction = 2
+                    }
+                },
+				InstructionType = InstructionType.Standard,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = true,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0x72
+            {
+                FormatString = "ld (iy+{0}),d",
+				RawBytes = new byte[] { 0xFD, 0x72, 0x00 },
+				Operands = new[]
+                {
+                    new Operand
+                    {
+                        Type = OperandType.IndexRegisterOffset,
+                        OffsetWithinInstruction = 2
+                    }
+                },
+				InstructionType = InstructionType.Standard,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = true,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0x73
+            {
+                FormatString = "ld (iy+{0}),e",
+				RawBytes = new byte[] { 0xFD, 0x73, 0x00 },
+				Operands = new[]
+                {
+                    new Operand
+                    {
+                        Type = OperandType.IndexRegisterOffset,
+                        OffsetWithinInstruction = 2
+                    }
+                },
+				InstructionType = InstructionType.Standard,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = true,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0x74
+            {
+                FormatString = "ld (iy+{0}),h",
+				RawBytes = new byte[] { 0xFD, 0x74, 0x00 },
+				Operands = new[]
+                {
+                    new Operand
+                    {
+                        Type = OperandType.IndexRegisterOffset,
+                        OffsetWithinInstruction = 2
+                    }
+                },
+				InstructionType = InstructionType.Standard,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = true,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0x75
+            {
+                FormatString = "ld (iy+{0}),l",
+				RawBytes = new byte[] { 0xFD, 0x75, 0x00 },
+				Operands = new[]
+                {
+                    new Operand
+                    {
+                        Type = OperandType.IndexRegisterOffset,
+                        OffsetWithinInstruction = 2
+                    }
+                },
+				InstructionType = InstructionType.Standard,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = true,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0x77
+            {
+                FormatString = "ld (iy+{0}),a",
+				RawBytes = new byte[] { 0xFD, 0x77, 0x00 },
+				Operands = new[]
+                {
+                    new Operand
+                    {
+                        Type = OperandType.IndexRegisterOffset,
+                        OffsetWithinInstruction = 2
+                    }
+                },
+				InstructionType = InstructionType.Standard,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = true,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0x7C
+            {
+                FormatString = "ld a,iyh",
+				RawBytes = new byte[] { 0xFD, 0x7C },
+				Operands = new Operand[0],
+				InstructionType = InstructionType.Undocumented,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0x7D
+            {
+                FormatString = "ld a,iyl",
+				RawBytes = new byte[] { 0xFD, 0x7D },
+				Operands = new Operand[0],
+				InstructionType = InstructionType.Undocumented,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0x7E
+            {
+                FormatString = "ld a,(iy+{0})",
+				RawBytes = new byte[] { 0xFD, 0x7E, 0x00 },
+				Operands = new[]
+                {
+                    new Operand
+                    {
+                        Type = OperandType.IndexRegisterOffset,
+                        OffsetWithinInstruction = 2
+                    }
+                },
+				InstructionType = InstructionType.Standard,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0x84
+            {
+                FormatString = "add a,iyh",
+				RawBytes = new byte[] { 0xFD, 0x84 },
+				Operands = new Operand[0],
+				InstructionType = InstructionType.Undocumented,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0x85
+            {
+                FormatString = "add a,iyl",
+				RawBytes = new byte[] { 0xFD, 0x85 },
+				Operands = new Operand[0],
+				InstructionType = InstructionType.Undocumented,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0x86
+            {
+                FormatString = "add a,(iy+{0})",
+				RawBytes = new byte[] { 0xFD, 0x86, 0x00 },
+				Operands = new[]
+                {
+                    new Operand
+                    {
+                        Type = OperandType.IndexRegisterOffset,
+                        OffsetWithinInstruction = 2
+                    }
+                },
+				InstructionType = InstructionType.Standard,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0x8C
+            {
+                FormatString = "adc a,iyh",
+				RawBytes = new byte[] { 0xFD, 0x8C },
+				Operands = new Operand[0],
+				InstructionType = InstructionType.Undocumented,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0x8D
+            {
+                FormatString = "adc a,iyl",
+				RawBytes = new byte[] { 0xFD, 0x8D },
+				Operands = new Operand[0],
+				InstructionType = InstructionType.Undocumented,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0x8E
+            {
+                FormatString = "adc a,(iy+{0})",
+				RawBytes = new byte[] { 0xFD, 0x8E, 0x00 },
+				Operands = new[]
+                {
+                    new Operand
+                    {
+                        Type = OperandType.IndexRegisterOffset,
+                        OffsetWithinInstruction = 2
+                    }
+                },
+				InstructionType = InstructionType.Standard,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0x94
+            {
+                FormatString = "sub iyh",
+				RawBytes = new byte[] { 0xFD, 0x94 },
+				Operands = new Operand[0],
+				InstructionType = InstructionType.Undocumented,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0x95
+            {
+                FormatString = "sub iyl",
+				RawBytes = new byte[] { 0xFD, 0x95 },
+				Operands = new Operand[0],
+				InstructionType = InstructionType.Undocumented,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0x96
+            {
+                FormatString = "sub (iy+{0})",
+				RawBytes = new byte[] { 0xFD, 0x96, 0x00 },
+				Operands = new[]
+                {
+                    new Operand
+                    {
+                        Type = OperandType.IndexRegisterOffset,
+                        OffsetWithinInstruction = 2
+                    }
+                },
+				InstructionType = InstructionType.Standard,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0x9C
+            {
+                FormatString = "sbc a,iyh",
+				RawBytes = new byte[] { 0xFD, 0x9C },
+				Operands = new Operand[0],
+				InstructionType = InstructionType.Undocumented,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0x9D
+            {
+                FormatString = "sbc a,iyl",
+				RawBytes = new byte[] { 0xFD, 0x9D },
+				Operands = new Operand[0],
+				InstructionType = InstructionType.Undocumented,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0x9E
+            {
+                FormatString = "sbc a,(iy+{0})",
+				RawBytes = new byte[] { 0xFD, 0x9E, 0x00 },
+				Operands = new[]
+                {
+                    new Operand
+                    {
+                        Type = OperandType.IndexRegisterOffset,
+                        OffsetWithinInstruction = 2
+                    }
+                },
+				InstructionType = InstructionType.Standard,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0xA4
+            {
+                FormatString = "and iyh",
+				RawBytes = new byte[] { 0xFD, 0xA4 },
+				Operands = new Operand[0],
+				InstructionType = InstructionType.Undocumented,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0xA5
+            {
+                FormatString = "and iyl",
+				RawBytes = new byte[] { 0xFD, 0xA5 },
+				Operands = new Operand[0],
+				InstructionType = InstructionType.Undocumented,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0xA6
+            {
+                FormatString = "and (iy+{0})",
+				RawBytes = new byte[] { 0xFD, 0xA6, 0x00 },
+				Operands = new[]
+                {
+                    new Operand
+                    {
+                        Type = OperandType.IndexRegisterOffset,
+                        OffsetWithinInstruction = 2
+                    }
+                },
+				InstructionType = InstructionType.Standard,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0xAC
+            {
+                FormatString = "xor iyh",
+				RawBytes = new byte[] { 0xFD, 0xAC },
+				Operands = new Operand[0],
+				InstructionType = InstructionType.Undocumented,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0xAD
+            {
+                FormatString = "xor iyl",
+				RawBytes = new byte[] { 0xFD, 0xAD },
+				Operands = new Operand[0],
+				InstructionType = InstructionType.Undocumented,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0xAE
+            {
+                FormatString = "xor (iy+{0})",
+				RawBytes = new byte[] { 0xFD, 0xAE, 0x00 },
+				Operands = new[]
+                {
+                    new Operand
+                    {
+                        Type = OperandType.IndexRegisterOffset,
+                        OffsetWithinInstruction = 2
+                    }
+                },
+				InstructionType = InstructionType.Standard,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0xB4
+            {
+                FormatString = "or iyh",
+				RawBytes = new byte[] { 0xFD, 0xB4 },
+				Operands = new Operand[0],
+				InstructionType = InstructionType.Undocumented,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0xB5
+            {
+                FormatString = "or iyl",
+				RawBytes = new byte[] { 0xFD, 0xB5 },
+				Operands = new Operand[0],
+				InstructionType = InstructionType.Undocumented,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0xB6
+            {
+                FormatString = "or (iy+{0})",
+				RawBytes = new byte[] { 0xFD, 0xB6, 0x00 },
+				Operands = new[]
+                {
+                    new Operand
+                    {
+                        Type = OperandType.IndexRegisterOffset,
+                        OffsetWithinInstruction = 2
+                    }
+                },
+				InstructionType = InstructionType.Standard,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0xBC
+            {
+                FormatString = "cp iyh",
+				RawBytes = new byte[] { 0xFD, 0xBC },
+				Operands = new Operand[0],
+				InstructionType = InstructionType.Undocumented,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0xBD
+            {
+                FormatString = "cp iyl",
+				RawBytes = new byte[] { 0xFD, 0xBD },
+				Operands = new Operand[0],
+				InstructionType = InstructionType.Undocumented,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0xBE
+            {
+                FormatString = "cp (iy+{0})",
+				RawBytes = new byte[] { 0xFD, 0xBE, 0x00 },
+				Operands = new[]
+                {
+                    new Operand
+                    {
+                        Type = OperandType.IndexRegisterOffset,
+                        OffsetWithinInstruction = 2
+                    }
+                },
+				InstructionType = InstructionType.Standard,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0xE1
+            {
+                FormatString = "pop iy",
+				RawBytes = new byte[] { 0xFD, 0xE1 },
+				Operands = new Operand[0],
+				InstructionType = InstructionType.Standard,
+				ChangesSp = true,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0xE3
+            {
+                FormatString = "ex (sp),iy",
+				RawBytes = new byte[] { 0xFD, 0xE3 },
+				Operands = new Operand[0],
+				InstructionType = InstructionType.Standard,
+				ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0xE5
+            {
+                FormatString = "push iy",
+				RawBytes = new byte[] { 0xFD, 0xE5 },
+				Operands = new Operand[0],
+				InstructionType = InstructionType.Standard,
+				ChangesSp = true,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0xE9
+            {
+                FormatString = "jp (iy)",
+				RawBytes = new byte[] { 0xFD, 0xE9 },
+				Operands = new Operand[0],
+				InstructionType = InstructionType.Standard,
+				ChangesSp = false,
+                ChangesPc = true,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+            new Z80Instruction //0xFD 0xF9
+            {
+                FormatString = "ld sp,iy",
+				RawBytes = new byte[] { 0xFD, 0xF9 },
+				Operands = new Operand[0],
+				InstructionType = InstructionType.Standard,
+				ChangesSp = true,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            },
+		};
+
+
     }
 }

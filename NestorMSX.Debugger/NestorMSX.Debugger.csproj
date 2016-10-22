@@ -51,10 +51,10 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>InstructionExtractor.DBinstructions.tt</DependentUpon>
     </Compile>
-    <Compile Include="InstructionExtractor.DDinstructions.cs">
+    <Compile Include="InstructionExtractor.DDandFDinstructions.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>InstructionExtractor.DDinstructions.tt</DependentUpon>
+      <DependentUpon>InstructionExtractor.DDandFDinstructions.tt</DependentUpon>
     </Compile>
     <Compile Include="InstructionExtractor.EDinstructions.cs">
       <DependentUpon>InstructionExtractor.EDinstructions.tt</DependentUpon>
@@ -96,10 +96,10 @@
       <DependentUpon>InstructionExtractor.cs</DependentUpon>
       <LastGenOutput>InstructionExtractor.DBinstructions.cs</LastGenOutput>
     </Content>
-    <Content Include="InstructionExtractor.DDinstructions.tt">
+    <Content Include="InstructionExtractor.DDandFDinstructions.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <DependentUpon>InstructionExtractor.cs</DependentUpon>
-      <LastGenOutput>InstructionExtractor.DDinstructions.cs</LastGenOutput>
+      <LastGenOutput>InstructionExtractor.DDandFDinstructions.cs</LastGenOutput>
     </Content>
     <Content Include="InstructionExtractor.EDinstructions.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
