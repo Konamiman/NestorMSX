@@ -19,19 +19,21 @@ namespace Konamiman.NestorMSX.Z80Debugger
 
         public Z80Instruction ExtractInstruction()
         {
-            var nextByte = Memory[NextInstructionAddress];
+            var opcode = Memory[NextInstructionAddress];
             Z80Instruction instruction;
 
-            if (nextByte == 0xCB)
-                instruction = ExtractCBInstruction(Memory[NextInstructionAddress+1]);
-            else if (nextByte == 0xED)
-                instruction = ExtractEDInstruction(Memory[NextInstructionAddress+1]);
-            else if (nextByte == 0xDD)
-                instruction = ExtractDDInstruction();
-            else if (nextByte == 0xFD)
-                instruction = ExtractFDInstruction();
+            if(opcode == 0xCB)
+                instruction = ExtractCBInstruction(Memory[NextInstructionAddress + 1]);
+            else if(opcode == 0xED)
+                instruction = ExtractEDInstruction(Memory[NextInstructionAddress + 1]);
+            else if (opcode == 0xDD || opcode == 0xFD) {
+                var nextByte = Memory[NextInstructionAddress + 1];
+                instruction = nextByte == 0xCB ? 
+                    ExtractDDCBorFDCBInstruction(opcode, nextByte) :
+                    ExtractDDorFDInstruction(opcode, nextByte);
+            }
             else
-                instruction = ExtractSingleByteInstruction(nextByte);
+                instruction = ExtractSingleByteInstruction(opcode);
 
             if(instruction.InstructionType != InstructionType.Undefined) {
                 foreach (var operand in instruction.Operands) {
@@ -75,7 +77,7 @@ namespace Konamiman.NestorMSX.Z80Debugger
                 instruction = EDBlockInstructionPrototypes[nextByte - 0xA0];
 
             if(instruction != null)
-                return instruction;
+                return instruction.Clone();
 
             return new Z80Instruction
             {
@@ -104,12 +106,28 @@ namespace Konamiman.NestorMSX.Z80Debugger
             };
         }
 
-        private Z80Instruction ExtractFDInstruction()
+        private static readonly Dictionary<byte, byte[]> DDFDs = new Dictionary<byte, byte[]>
         {
-            throw new NotImplementedException();
+            {0xDD, new[] {(byte)0xDD}},
+            {0xFD, new[] {(byte)0xFD}}
+        };
+
+        private Z80Instruction ExtractDDorFDInstruction(byte prefix, byte nextByte)
+        {
+            var instructions = prefix == 0xDD ? DDInstructionPrototypes : FDInstructionPrototypes;
+            if(instructions.ContainsKey(nextByte)) {
+                return instructions[nextByte].Clone();
+            } else {
+                var instruction = ExtractSingleByteInstruction(nextByte);
+                instruction.RawBytes = DDFDs[prefix].Concat(instruction.RawBytes).ToArray();
+                instruction.InstructionType = InstructionType.SafeMirror;
+                foreach (var operand in instruction.Operands)
+                    operand.OffsetWithinInstruction = operand.OffsetWithinInstruction + 1;
+                return instruction;
+            }
         }
 
-        private Z80Instruction ExtractDDInstruction()
+        private Z80Instruction ExtractDDCBorFDCBInstruction(byte prefix, byte nextByte)
         {
             throw new NotImplementedException();
         }
