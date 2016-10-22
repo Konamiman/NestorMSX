@@ -106,12 +106,6 @@ namespace Konamiman.NestorMSX.Z80Debugger
             };
         }
 
-        private static readonly Dictionary<byte, byte[]> DDFDs = new Dictionary<byte, byte[]>
-        {
-            {0xDD, new[] {(byte)0xDD}},
-            {0xFD, new[] {(byte)0xFD}}
-        };
-
         private Z80Instruction ExtractDDorFDInstruction(byte prefix, byte nextByte)
         {
             var instructions = prefix == 0xDD ? DDInstructionPrototypes : FDInstructionPrototypes;
