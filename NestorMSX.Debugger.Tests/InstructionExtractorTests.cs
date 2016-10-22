@@ -93,20 +93,26 @@ namespace NestorMSX.Debugger.Tests
         }
 
         [Test]
-        [TestCase(0xDD, "ix")]
-        [TestCase(0xFD, "iy")]
-        public void ExtractsMirroredLdDeNn(int prefix, string registerName)
+        [TestCase(0xDD, 0xDD)]
+        [TestCase(0xDD, 0xFD)]
+        [TestCase(0xDD, 0xED)]
+        [TestCase(0xDD, 0x00)]
+        [TestCase(0xFD, 0xDD)]
+        [TestCase(0xFD, 0xFD)]
+        [TestCase(0xFD, 0xED)]
+        [TestCase(0xFD, 0x00)]
+        public void ExtractsDdsFdsFollowedByUnrecognizedsAsUndefinedInstructions(int prefix, int secondByte)
         {
             var memory = new PlainMemory(65536);
-            memory.SetContents(0, new byte[] {(byte)prefix, 0x11, 0x34, 0x12});
+            memory.SetContents(0, new byte[] {(byte)prefix, (byte)secondByte});
             var sut = new InstructionExtractor(memory);
             var instruction = sut.ExtractInstruction();
 
-            Assert.AreEqual(4, sut.NextInstructionAddress);
-            Assert.AreEqual("ld de,{0}", instruction.FormatString);
-            Assert.AreEqual(InstructionType.SafeMirror, instruction.InstructionType);
-            CollectionAssert.AreEqual(new byte[] {(byte)prefix, 0x11, 0x34, 0x12}, instruction.RawBytes);
-            Assert.AreEqual(0x1234, instruction.Operands.Single().Value);
+            Assert.AreEqual(1, sut.NextInstructionAddress);
+            Assert.AreEqual("db {0}", instruction.FormatString);
+            CollectionAssert.AreEqual(new byte[] {(byte)prefix}, instruction.RawBytes);
+            Assert.AreEqual(InstructionType.Undefined, instruction.InstructionType);
+            Assert.AreEqual((byte)prefix, instruction.Operands[0].Value);
         }
     }
 }

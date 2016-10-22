@@ -115,16 +115,28 @@ namespace Konamiman.NestorMSX.Z80Debugger
         private Z80Instruction ExtractDDorFDInstruction(byte prefix, byte nextByte)
         {
             var instructions = prefix == 0xDD ? DDInstructionPrototypes : FDInstructionPrototypes;
-            if(instructions.ContainsKey(nextByte)) {
+            if(instructions.ContainsKey(nextByte))
                 return instructions[nextByte].Clone();
-            } else {
-                var instruction = ExtractSingleByteInstruction(nextByte);
-                instruction.RawBytes = DDFDs[prefix].Concat(instruction.RawBytes).ToArray();
-                instruction.InstructionType = InstructionType.SafeMirror;
-                foreach (var operand in instruction.Operands)
-                    operand.OffsetWithinInstruction = operand.OffsetWithinInstruction + 1;
-                return instruction;
-            }
+
+            return new Z80Instruction
+            {
+                FormatString = "db {0}",
+                RawBytes = new byte[] {prefix},
+                Operands = new[]
+                {
+                    new Operand
+                    {
+                        Type = OperandType.ImmediateByte,
+                        OffsetWithinInstruction = 0,
+                        Value = prefix
+                    }
+                },
+                InstructionType = InstructionType.Undefined,
+                ChangesSp = false,
+                ChangesPc = false,
+                WritesToMemory = false,
+                WritesToPort = false
+            };
         }
 
         private Z80Instruction ExtractDDCBorFDCBInstruction(byte prefix, byte nextByte)
