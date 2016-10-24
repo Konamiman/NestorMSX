@@ -56,6 +56,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>InstructionExtractor.DDandFDinstructions.tt</DependentUpon>
     </Compile>
+    <Compile Include="InstructionExtractor.DDCBandFDCBinstructions.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>InstructionExtractor.DDCBandFDCBinstructions.tt</DependentUpon>
+    </Compile>
     <Compile Include="InstructionExtractor.EDinstructions.cs">
       <DependentUpon>InstructionExtractor.EDinstructions.tt</DependentUpon>
       <DesignTime>True</DesignTime>
@@ -100,6 +105,11 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <DependentUpon>InstructionExtractor.cs</DependentUpon>
       <LastGenOutput>InstructionExtractor.DDandFDinstructions.cs</LastGenOutput>
+    </Content>
+    <Content Include="InstructionExtractor.DDCBandFDCBinstructions.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>InstructionExtractor.cs</DependentUpon>
+      <LastGenOutput>InstructionExtractor.DDCBandFDCBinstructions.cs</LastGenOutput>
     </Content>
     <Content Include="InstructionExtractor.EDinstructions.tt">
       <Generator>TextTemplatingFileGenerator</Generator>

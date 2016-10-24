@@ -29,7 +29,7 @@ namespace Konamiman.NestorMSX.Z80Debugger
             else if (opcode == 0xDD || opcode == 0xFD) {
                 var nextByte = Memory[NextInstructionAddress + 1];
                 instruction = nextByte == 0xCB ? 
-                    ExtractDDCBorFDCBInstruction(opcode, nextByte) :
+                    ExtractDDCBorFDCBInstruction(opcode) :
                     ExtractDDorFDInstruction(opcode, nextByte);
             }
             else
@@ -133,9 +133,11 @@ namespace Konamiman.NestorMSX.Z80Debugger
             };
         }
 
-        private Z80Instruction ExtractDDCBorFDCBInstruction(byte prefix, byte nextByte)
+        private Z80Instruction ExtractDDCBorFDCBInstruction(byte prefix)
         {
-            throw new NotImplementedException();
+            var instructions = prefix == 0xDD ? DDCBInstructionPrototypes : FDCBInstructionPrototypes;
+            var opcode = Memory[NextInstructionAddress + 3];
+            return instructions[opcode].Clone();
         }
     }
 }
