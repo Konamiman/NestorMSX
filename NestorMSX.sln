@@ -29,6 +29,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NestorMSX.Debugger", "Nesto
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NestorMSX.Debugger.Tests", "NestorMSX.Debugger.Tests\NestorMSX.Debugger.Tests.csproj", "{04B282CF-DE03-4C4F-98E3-F93B0A7CF8F9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NestorDisassembler", "NestorDisassembler\NestorDisassembler.csproj", "{6702F307-FD44-4842-B8C8-3E62C18FFD52}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -59,6 +61,10 @@ Global
 		{04B282CF-DE03-4C4F-98E3-F93B0A7CF8F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{04B282CF-DE03-4C4F-98E3-F93B0A7CF8F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{04B282CF-DE03-4C4F-98E3-F93B0A7CF8F9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6702F307-FD44-4842-B8C8-3E62C18FFD52}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6702F307-FD44-4842-B8C8-3E62C18FFD52}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6702F307-FD44-4842-B8C8-3E62C18FFD52}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6702F307-FD44-4842-B8C8-3E62C18FFD52}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

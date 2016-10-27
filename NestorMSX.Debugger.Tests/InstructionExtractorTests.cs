@@ -114,5 +114,21 @@ namespace NestorMSX.Debugger.Tests
             Assert.AreEqual(InstructionType.Undefined, instruction.InstructionType);
             Assert.AreEqual((byte)prefix, instruction.Operands[0].Value);
         }
+
+        [Test]
+        [TestCase(0xDD, "ix")]
+        [TestCase(0xFD, "iy")]
+        public void ExtractsRlIxyN(int prefix, string registerName)
+        {
+            var memory = new PlainMemory(65536);
+            memory.SetContents(0, new byte[] {(byte)prefix, 0xCB, 0x34, 0x16});
+            var sut = new InstructionExtractor(memory);
+            var instruction = sut.ExtractInstruction();
+
+            Assert.AreEqual(4, sut.NextInstructionAddress);
+            Assert.AreEqual($"rl ({registerName}+{{0}})", instruction.FormatString);
+            CollectionAssert.AreEqual(new byte[] {(byte)prefix, 0xCB, 0x34, 0x16}, instruction.RawBytes);
+            Assert.AreEqual(0x34, instruction.Operands[0].Value);
+        }
     }
 }
