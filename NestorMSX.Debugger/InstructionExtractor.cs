@@ -8,26 +8,36 @@ namespace Konamiman.NestorMSX.Z80Debugger
 {
     public partial class InstructionExtractor : IInstructionExtractor
     {
-        public InstructionExtractor(IMemory memory)
+        public InstructionExtractor(Func<int, byte> getByteAtAddress)
         {
-            this.Memory = memory;
+            this.GetByteAtAddress = getByteAtAddress;
         }
 
-        public IMemory Memory { get; }
+        public InstructionExtractor(byte[] memoryBytes)
+            : this(address => memoryBytes[address])
+        {
+        }
+
+        public InstructionExtractor(IMemory memory)
+            : this(address => memory[address])
+        {
+        }
+
+        public Func<int, byte> GetByteAtAddress { get; }
 
         public ushort NextInstructionAddress { get; set; }
 
         public Z80Instruction ExtractInstruction()
         {
-            var opcode = Memory[NextInstructionAddress];
+            var opcode = GetByteAtAddress(NextInstructionAddress);
             Z80Instruction instruction;
 
             if(opcode == 0xCB)
-                instruction = ExtractCBInstruction(Memory[NextInstructionAddress + 1]);
+                instruction = ExtractCBInstruction(GetByteAtAddress(NextInstructionAddress + 1));
             else if(opcode == 0xED)
-                instruction = ExtractEDInstruction(Memory[NextInstructionAddress + 1]);
+                instruction = ExtractEDInstruction(GetByteAtAddress(NextInstructionAddress + 1));
             else if (opcode == 0xDD || opcode == 0xFD) {
-                var nextByte = Memory[NextInstructionAddress + 1];
+                var nextByte = GetByteAtAddress(NextInstructionAddress + 1);
                 instruction = nextByte == 0xCB ? 
                     ExtractDDCBorFDCBInstruction(opcode) :
                     ExtractDDorFDInstruction(opcode, nextByte);
@@ -38,14 +48,14 @@ namespace Konamiman.NestorMSX.Z80Debugger
             if(instruction.InstructionType != InstructionType.Undefined) {
                 foreach (var operand in instruction.Operands) {
                     if(operand.Type == OperandType.ImmediateWord || operand.Type == OperandType.AbsoluteMemoryAddress) {
-                        var valueLow = Memory[NextInstructionAddress + operand.OffsetWithinInstruction];
-                        var valueHigh = Memory[NextInstructionAddress + operand.OffsetWithinInstruction + 1];
+                        var valueLow = GetByteAtAddress(NextInstructionAddress + operand.OffsetWithinInstruction);
+                        var valueHigh = GetByteAtAddress(NextInstructionAddress + operand.OffsetWithinInstruction + 1);
                         operand.Value = valueLow | (valueHigh << 8);
                         instruction.RawBytes[operand.OffsetWithinInstruction] = valueLow;
                         instruction.RawBytes[operand.OffsetWithinInstruction + 1] = valueHigh;
                     }
                     else {
-                        operand.Value = Memory[NextInstructionAddress + operand.OffsetWithinInstruction];
+                        operand.Value = GetByteAtAddress(NextInstructionAddress + operand.OffsetWithinInstruction);
                         instruction.RawBytes[operand.OffsetWithinInstruction] = (byte)operand.Value;
                     }
                 }
@@ -136,7 +146,7 @@ namespace Konamiman.NestorMSX.Z80Debugger
         private Z80Instruction ExtractDDCBorFDCBInstruction(byte prefix)
         {
             var instructions = prefix == 0xDD ? DDCBInstructionPrototypes : FDCBInstructionPrototypes;
-            var opcode = Memory[NextInstructionAddress + 3];
+            var opcode = GetByteAtAddress(NextInstructionAddress + 3);
             return instructions[opcode].Clone();
         }
     }

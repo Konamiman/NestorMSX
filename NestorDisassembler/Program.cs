@@ -11,9 +11,7 @@ namespace Konamiman.NestorDisassembler
         static void Main(string[] args)
         {
             var fileContents = File.ReadAllBytes(args[0]);
-            var memory = new PlainRam(0, 65536);
-            memory.SetContents(0, fileContents);
-            var extractor = new InstructionExtractor(memory);
+            var extractor = new InstructionExtractor(fileContents);
 
             while(extractor.NextInstructionAddress < fileContents.Length)
             {
