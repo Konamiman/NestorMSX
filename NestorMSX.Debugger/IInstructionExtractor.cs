@@ -1,5 +1,4 @@
 ﻿using System;
-using Konamiman.Z80dotNet;
 
 namespace Konamiman.NestorMSX.Z80Debugger
 {

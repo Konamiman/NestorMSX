@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Konamiman.Z80dotNet;
 
 namespace Konamiman.NestorMSX.Z80Debugger
 {
@@ -15,11 +11,6 @@ namespace Konamiman.NestorMSX.Z80Debugger
 
         public InstructionExtractor(byte[] memoryBytes)
             : this(address => memoryBytes[address])
-        {
-        }
-
-        public InstructionExtractor(IMemory memory)
-            : this(address => memory[address])
         {
         }
 

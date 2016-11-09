@@ -38,10 +38,6 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="Z80dotNet, Version=1.0.5.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Z80dotNet.1.0.5.0\lib\net40-Client\Z80dotNet.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="InstructionExtractor.cs" />
@@ -91,7 +87,6 @@
     <None Include="LinqPad\GetDDInstructions.linq" />
     <None Include="LinqPad\GetEDInstructions.linq" />
     <None Include="LinqPad\GetSingleByteInstructions.linq" />
-    <None Include="packages.config" />
     <None Include="LinqPad\PurgeInstructionTemplatesSource.linq" />
   </ItemGroup>
   <ItemGroup>

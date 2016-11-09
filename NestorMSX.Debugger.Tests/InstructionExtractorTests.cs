@@ -1,18 +1,20 @@
 ﻿using System.Linq;
 using Konamiman.NestorMSX.Z80Debugger;
-using Konamiman.Z80dotNet;
 using NUnit.Framework;
 
 namespace NestorMSX.Debugger.Tests
 {
     public class InstructionExtractorTests
     {
+        private InstructionExtractor GetExtractor(params byte[] data)
+        {
+            return new InstructionExtractor(data);
+        }
+
         [Test]
         public void ExtractsLdBcNn()
         {
-            var memory = new PlainMemory(65536);
-            memory.SetContents(0, new byte[] {0x01, 0x33, 0x22});
-            var sut = new InstructionExtractor(memory);
+            var sut = GetExtractor(0x01, 0x33, 0x22);
             var instruction = sut.ExtractInstruction();
 
             Assert.AreEqual(3, sut.NextInstructionAddress);
@@ -24,9 +26,7 @@ namespace NestorMSX.Debugger.Tests
         [Test]
         public void ExtractsRlcC()
         {
-            var memory = new PlainMemory(65536);
-            memory.SetContents(0, new byte[] {0xCB, 0x01});
-            var sut = new InstructionExtractor(memory);
+            var sut = GetExtractor(0xCB, 0x01);
             var instruction = sut.ExtractInstruction();
 
             Assert.AreEqual(2, sut.NextInstructionAddress);
@@ -41,9 +41,7 @@ namespace NestorMSX.Debugger.Tests
         [TestCase(0xBB, "otdr")]
         public void ExtractsEdInstruction(int secondByte, string text)
         {
-            var memory = new PlainMemory(65536);
-            memory.SetContents(0, new byte[] {0xED, (byte)secondByte});
-            var sut = new InstructionExtractor(memory);
+            var sut = GetExtractor(0xED, (byte)secondByte);
             var instruction = sut.ExtractInstruction();
 
             Assert.AreEqual(2, sut.NextInstructionAddress);
@@ -64,9 +62,7 @@ namespace NestorMSX.Debugger.Tests
         [TestCase(0xBF)]
         public void ExtractsUndefinedEdsAsUndefinedInstructions(int secondByte)
         {
-            var memory = new PlainMemory(65536);
-            memory.SetContents(0, new byte[] {0xED, (byte)secondByte});
-            var sut = new InstructionExtractor(memory);
+            var sut = GetExtractor(0xED, (byte)secondByte);
             var instruction = sut.ExtractInstruction();
 
             Assert.AreEqual(2, sut.NextInstructionAddress);
@@ -82,9 +78,7 @@ namespace NestorMSX.Debugger.Tests
         [TestCase(0xFD, "iy")]
         public void ExtractsAddIxyBc(int prefix, string registerName)
         {
-            var memory = new PlainMemory(65536);
-            memory.SetContents(0, new byte[] {(byte)prefix, 0x09});
-            var sut = new InstructionExtractor(memory);
+            var sut = GetExtractor((byte)prefix, 0x09);
             var instruction = sut.ExtractInstruction();
 
             Assert.AreEqual(2, sut.NextInstructionAddress);
@@ -103,9 +97,7 @@ namespace NestorMSX.Debugger.Tests
         [TestCase(0xFD, 0x00)]
         public void ExtractsDdsFdsFollowedByUnrecognizedsAsUndefinedInstructions(int prefix, int secondByte)
         {
-            var memory = new PlainMemory(65536);
-            memory.SetContents(0, new byte[] {(byte)prefix, (byte)secondByte});
-            var sut = new InstructionExtractor(memory);
+            var sut = GetExtractor((byte)prefix, (byte)secondByte);
             var instruction = sut.ExtractInstruction();
 
             Assert.AreEqual(1, sut.NextInstructionAddress);
@@ -120,9 +112,7 @@ namespace NestorMSX.Debugger.Tests
         [TestCase(0xFD, "iy")]
         public void ExtractsRlIxyN(int prefix, string registerName)
         {
-            var memory = new PlainMemory(65536);
-            memory.SetContents(0, new byte[] {(byte)prefix, 0xCB, 0x34, 0x16});
-            var sut = new InstructionExtractor(memory);
+            var sut = GetExtractor((byte)prefix, 0xCB, 0x34, 0x16);
             var instruction = sut.ExtractInstruction();
 
             Assert.AreEqual(4, sut.NextInstructionAddress);
