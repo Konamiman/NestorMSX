@@ -671,7 +671,7 @@ namespace Konamiman.NestorMSX.Z80Debugger
                     }
                 },
 				InstructionType = InstructionType.Standard,
-				ChangesSp = false,
+				ChangesSp = true,
                 ChangesPc = false,
                 WritesToMemory = false,
                 WritesToPort = false
@@ -700,7 +700,7 @@ namespace Konamiman.NestorMSX.Z80Debugger
 				RawBytes = new byte[] { 0x33 },
 				Operands = new Operand[0],
 				InstructionType = InstructionType.Standard,
-				ChangesSp = false,
+				ChangesSp = true,
                 ChangesPc = false,
                 WritesToMemory = false,
                 WritesToPort = false
@@ -713,7 +713,7 @@ namespace Konamiman.NestorMSX.Z80Debugger
 				InstructionType = InstructionType.Standard,
 				ChangesSp = false,
                 ChangesPc = false,
-                WritesToMemory = false,
+                WritesToMemory = true,
                 WritesToPort = false
             },
             new Z80Instruction //0x35
@@ -724,7 +724,7 @@ namespace Konamiman.NestorMSX.Z80Debugger
 				InstructionType = InstructionType.Standard,
 				ChangesSp = false,
                 ChangesPc = false,
-                WritesToMemory = false,
+                WritesToMemory = true,
                 WritesToPort = false
             },
             new Z80Instruction //0x36
@@ -809,7 +809,7 @@ namespace Konamiman.NestorMSX.Z80Debugger
 				RawBytes = new byte[] { 0x3B },
 				Operands = new Operand[0],
 				InstructionType = InstructionType.Standard,
-				ChangesSp = false,
+				ChangesSp = true,
                 ChangesPc = false,
                 WritesToMemory = false,
                 WritesToPort = false
@@ -2384,8 +2384,8 @@ namespace Konamiman.NestorMSX.Z80Debugger
 				RawBytes = new byte[] { 0xC7 },
 				Operands = new Operand[0],
 				InstructionType = InstructionType.Standard,
-				ChangesSp = false,
-                ChangesPc = false,
+				ChangesSp = true,
+                ChangesPc = true,
                 WritesToMemory = false,
                 WritesToPort = false
             },
@@ -2490,8 +2490,8 @@ namespace Konamiman.NestorMSX.Z80Debugger
 				RawBytes = new byte[] { 0xCF },
 				Operands = new Operand[0],
 				InstructionType = InstructionType.Standard,
-				ChangesSp = false,
-                ChangesPc = false,
+				ChangesSp = true,
+                ChangesPc = true,
                 WritesToMemory = false,
                 WritesToPort = false
             },
@@ -2606,8 +2606,8 @@ namespace Konamiman.NestorMSX.Z80Debugger
 				RawBytes = new byte[] { 0xD7 },
 				Operands = new Operand[0],
 				InstructionType = InstructionType.Standard,
-				ChangesSp = false,
-                ChangesPc = false,
+				ChangesSp = true,
+                ChangesPc = true,
                 WritesToMemory = false,
                 WritesToPort = false
             },
@@ -2712,8 +2712,8 @@ namespace Konamiman.NestorMSX.Z80Debugger
 				RawBytes = new byte[] { 0xDF },
 				Operands = new Operand[0],
 				InstructionType = InstructionType.Standard,
-				ChangesSp = false,
-                ChangesPc = false,
+				ChangesSp = true,
+                ChangesPc = true,
                 WritesToMemory = false,
                 WritesToPort = false
             },
@@ -2821,8 +2821,8 @@ namespace Konamiman.NestorMSX.Z80Debugger
 				RawBytes = new byte[] { 0xE7 },
 				Operands = new Operand[0],
 				InstructionType = InstructionType.Standard,
-				ChangesSp = false,
-                ChangesPc = false,
+				ChangesSp = true,
+                ChangesPc = true,
                 WritesToMemory = false,
                 WritesToPort = false
             },
@@ -2920,8 +2920,8 @@ namespace Konamiman.NestorMSX.Z80Debugger
 				RawBytes = new byte[] { 0xEF },
 				Operands = new Operand[0],
 				InstructionType = InstructionType.Standard,
-				ChangesSp = false,
-                ChangesPc = false,
+				ChangesSp = true,
+                ChangesPc = true,
                 WritesToMemory = false,
                 WritesToPort = false
             },
@@ -3029,8 +3029,8 @@ namespace Konamiman.NestorMSX.Z80Debugger
 				RawBytes = new byte[] { 0xF7 },
 				Operands = new Operand[0],
 				InstructionType = InstructionType.Standard,
-				ChangesSp = false,
-                ChangesPc = false,
+				ChangesSp = true,
+                ChangesPc = true,
                 WritesToMemory = false,
                 WritesToPort = false
             },
@@ -3051,7 +3051,7 @@ namespace Konamiman.NestorMSX.Z80Debugger
 				RawBytes = new byte[] { 0xF9 },
 				Operands = new Operand[0],
 				InstructionType = InstructionType.Standard,
-				ChangesSp = false,
+				ChangesSp = true,
                 ChangesPc = false,
                 WritesToMemory = false,
                 WritesToPort = false
@@ -3128,8 +3128,8 @@ namespace Konamiman.NestorMSX.Z80Debugger
 				RawBytes = new byte[] { 0xFF },
 				Operands = new Operand[0],
 				InstructionType = InstructionType.Standard,
-				ChangesSp = false,
-                ChangesPc = false,
+				ChangesSp = true,
+                ChangesPc = true,
                 WritesToMemory = false,
                 WritesToPort = false
             },

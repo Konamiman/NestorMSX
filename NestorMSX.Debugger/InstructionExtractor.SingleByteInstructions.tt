@@ -34,8 +34,8 @@ items = items
 	.ToArray()
 	;
 
-var changingSp = new[] {"push", "pop", "call", "ret"};
-var changingPc = new[] {"jp", "jr", "call", "ret", "djnz"};
+var changingSp = new[] {"push", "pop", "call", "ret", "ld sp", "inc sp", "dec sp", "rst"};
+var changingPc = new[] {"jp", "jr", "call", "ret", "djnz", "rst"};
 
 int index = 0;
 	#>
@@ -97,7 +97,7 @@ namespace Konamiman.NestorMSX.Z80Debugger
 				InstructionType = InstructionType.Standard,
 				ChangesSp = <#= changingSp.Any(x => item.Item1.StartsWith(x)) ? "true" : "false" #>,
                 ChangesPc = <#= changingPc.Any(x => item.Item1.StartsWith(x)) ? "true" : "false" #>,
-                WritesToMemory = <#= !item.Item1.StartsWith("ex") && !item.Item1.StartsWith("out") && item.Item1.Contains("),") ? "true" : "false" #>,
+                WritesToMemory = <#= (item.Item1.Contains("c (hl)") || (!item.Item1.StartsWith("ex") && !item.Item1.StartsWith("out") && item.Item1.Contains("),"))) ? "true" : "false" #>,
                 WritesToPort = <#= item.Item1.StartsWith("out") ? "true" : "false" #>
             },
 <# } index++;} #>
