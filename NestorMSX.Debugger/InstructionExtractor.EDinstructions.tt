@@ -127,8 +127,8 @@ namespace Konamiman.NestorMSX.Z80Debugger
                 },
 <# } #>
 				InstructionType = InstructionType.<#= instructionType#>,
-				ChangesSp = <#= item.Item1.StartsWith("ld sp") ? "true" : "false" #>,
-                ChangesPc = false,
+				ChangesSp = <#= item.Item1.StartsWith("ret") || item.Item1.StartsWith("ld sp") ? "true" : "false" #>,
+                ChangesPc = <#= item.Item1.StartsWith("ret") ? "true" : "false" #>,
                 WritesToMemory = <#= item.Item1.StartsWith("ld (") ? "true" : "false" #>,
                 WritesToPort = <#= item.Item1.StartsWith("out") ? "true" : "false" #>
             },
