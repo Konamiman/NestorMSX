@@ -40,40 +40,40 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="InstructionExtractor.cs" />
-    <Compile Include="InstructionExtractor.DBinstructions.cs">
+    <Compile Include="InstructionExtraction\InstructionExtractor.cs" />
+    <Compile Include="InstructionExtraction\InstructionExtractor.DBinstructions.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>InstructionExtractor.DBinstructions.tt</DependentUpon>
     </Compile>
-    <Compile Include="InstructionExtractor.DDandFDinstructions.cs">
+    <Compile Include="InstructionExtraction\InstructionExtractor.DDandFDinstructions.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>InstructionExtractor.DDandFDinstructions.tt</DependentUpon>
     </Compile>
-    <Compile Include="InstructionExtractor.DDCBandFDCBinstructions.cs">
+    <Compile Include="InstructionExtraction\InstructionExtractor.DDCBandFDCBinstructions.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>InstructionExtractor.DDCBandFDCBinstructions.tt</DependentUpon>
     </Compile>
-    <Compile Include="InstructionExtractor.EDinstructions.cs">
+    <Compile Include="InstructionExtraction\InstructionExtractor.EDinstructions.cs">
       <DependentUpon>InstructionExtractor.EDinstructions.tt</DependentUpon>
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
     </Compile>
-    <Compile Include="InstructionExtractor.SingleByteInstructions.cs">
+    <Compile Include="InstructionExtraction\InstructionExtractor.SingleByteInstructions.cs">
       <DependentUpon>InstructionExtractor.SingleByteInstructions.tt</DependentUpon>
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
     </Compile>
-    <Compile Include="InstructionExtractor.SingleByte_temp.cs">
+    <Compile Include="InstructionExtraction\InstructionExtractor.SingleByte_temp.cs">
       <DependentUpon>InstructionExtractor.cs</DependentUpon>
     </Compile>
-    <Compile Include="InstructionType.cs" />
-    <Compile Include="Z80Instruction.cs" />
-    <Compile Include="Operand.cs" />
-    <Compile Include="OperandType.cs" />
-    <Compile Include="IInstructionExtractor.cs" />
+    <Compile Include="InstructionExtraction\InstructionType.cs" />
+    <Compile Include="InstructionExtraction\Z80Instruction.cs" />
+    <Compile Include="InstructionExtraction\Operand.cs" />
+    <Compile Include="InstructionExtraction\OperandType.cs" />
+    <Compile Include="InstructionExtraction\IInstructionExtractor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -83,40 +83,40 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="LinqPad\GetCBInstructions.linq" />
-    <None Include="LinqPad\GetDDInstructions.linq" />
-    <None Include="LinqPad\GetEDInstructions.linq" />
-    <None Include="LinqPad\GetSingleByteInstructions.linq" />
-    <None Include="LinqPad\PurgeInstructionTemplatesSource.linq" />
+    <None Include="InstructionExtraction\LinqPad\GetCBInstructions.linq" />
+    <None Include="InstructionExtraction\LinqPad\GetDDInstructions.linq" />
+    <None Include="InstructionExtraction\LinqPad\GetEDInstructions.linq" />
+    <None Include="InstructionExtraction\LinqPad\GetSingleByteInstructions.linq" />
+    <None Include="InstructionExtraction\LinqPad\PurgeInstructionTemplatesSource.linq" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="InstructionExtractor.DBinstructions.tt">
+    <Content Include="InstructionExtraction\InstructionExtractor.DBinstructions.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <DependentUpon>InstructionExtractor.cs</DependentUpon>
       <LastGenOutput>InstructionExtractor.DBinstructions.cs</LastGenOutput>
     </Content>
-    <Content Include="InstructionExtractor.DDandFDinstructions.tt">
+    <Content Include="InstructionExtraction\InstructionExtractor.DDandFDinstructions.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <DependentUpon>InstructionExtractor.cs</DependentUpon>
       <LastGenOutput>InstructionExtractor.DDandFDinstructions.cs</LastGenOutput>
     </Content>
-    <Content Include="InstructionExtractor.DDCBandFDCBinstructions.tt">
+    <Content Include="InstructionExtraction\InstructionExtractor.DDCBandFDCBinstructions.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <DependentUpon>InstructionExtractor.cs</DependentUpon>
       <LastGenOutput>InstructionExtractor.DDCBandFDCBinstructions.cs</LastGenOutput>
     </Content>
-    <Content Include="InstructionExtractor.EDinstructions.tt">
+    <Content Include="InstructionExtraction\InstructionExtractor.EDinstructions.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>InstructionExtractor.EDinstructions.cs</LastGenOutput>
       <DependentUpon>InstructionExtractor.cs</DependentUpon>
     </Content>
-    <Content Include="InstructionExtractor.SingleByteInstructions.tt">
+    <Content Include="InstructionExtraction\InstructionExtractor.SingleByteInstructions.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>InstructionExtractor.SingleByteInstructions.cs</LastGenOutput>
       <DependentUpon>InstructionExtractor.cs</DependentUpon>
     </Content>
-    <Content Include="InstructionTemplatesSource.txt" />
-    <Content Include="InstructionTemplatesSourceOriginal.txt" />
+    <Content Include="InstructionExtraction\InstructionTemplatesSource.txt" />
+    <Content Include="InstructionExtraction\InstructionTemplatesSourceOriginal.txt" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />

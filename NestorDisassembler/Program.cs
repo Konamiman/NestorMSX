@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using Konamiman.NestorMSX.Memories;
 using Konamiman.NestorMSX.Z80Debugger;
+using Konamiman.NestorMSX.Z80Debugger.InstructionExtraction;
 
 namespace Konamiman.NestorDisassembler
 {

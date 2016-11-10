@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Konamiman.NestorMSX.Z80Debugger
+﻿namespace Konamiman.NestorMSX.Z80Debugger.InstructionExtraction
 {
     public enum InstructionType
     {

@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using Konamiman.NestorMSX.Z80Debugger;
+using Konamiman.NestorMSX.Z80Debugger.InstructionExtraction;
 using NUnit.Framework;
 
 namespace NestorMSX.Debugger.Tests

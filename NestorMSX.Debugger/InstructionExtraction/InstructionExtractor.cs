@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Konamiman.NestorMSX.Z80Debugger
+namespace Konamiman.NestorMSX.Z80Debugger.InstructionExtraction
 {
     public partial class InstructionExtractor : IInstructionExtractor
     {
