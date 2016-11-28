@@ -31,8 +31,13 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Evaluant.Calculator, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>ExpressionEvaluator\Evaluant.Calculator.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -40,6 +45,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Console\ExpressionEvaluator\EvaluantExpressionEvaluatorWrapper.cs" />
+    <Compile Include="Console\ExpressionEvaluator\EvaluateFunctionEventArgs.cs" />
+    <Compile Include="Console\ExpressionEvaluator\EvaluateNameEventArgs.cs" />
+    <Compile Include="Console\ExpressionEvaluator\IExpressionEvaluator.cs" />
     <Compile Include="InstructionExtraction\InstructionExtractor.cs" />
     <Compile Include="InstructionExtraction\InstructionExtractor.DBinstructions.cs">
       <AutoGen>True</AutoGen>
@@ -90,6 +99,8 @@
     <None Include="InstructionExtraction\LinqPad\PurgeInstructionTemplatesSource.linq" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Console\ExpressionEvaluator\Evaluant.Antlr.dll" />
+    <Content Include="Console\ExpressionEvaluator\Evaluant.Calculator.dll" />
     <Content Include="InstructionExtraction\InstructionExtractor.DBinstructions.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <DependentUpon>InstructionExtractor.cs</DependentUpon>
