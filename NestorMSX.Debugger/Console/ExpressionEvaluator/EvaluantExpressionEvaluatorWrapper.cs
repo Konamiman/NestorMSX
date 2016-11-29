@@ -36,8 +36,8 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console.ExpressionEvaluator
             //Swap apostrophes and quotes, adjusting escapes, e.g.:
             //"O'Brian said \"Hello!\"" --> 'O\'Brian said "Hello!"'
             expression = Regex.Replace(expression,
-	            @"(?<escapquot>\\"")|(?<quot>"")|(?<apos>')",
-	            e => e.Groups["escapquot"].Value != "" ? @"""" : e.Groups["quot"].Value != "" ? @"'" : @"\'");
+                @"(?<escapquot>\\"")|(?<quot>"")|(?<apos>')",
+                e => e.Groups["escapquot"].Value != "" ? @"""" : e.Groups["quot"].Value != "" ? @"'" : @"\'");
 
             //Replace hex and bin literals with decimal literals
             //Hex can start with 0x, &H or #, or end with h
@@ -55,9 +55,8 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console.ExpressionEvaluator
 
             //Enclose variable names in [ ] but skipping string literals
             expression = Regex.Replace(expression,
-	            @"('[^'\\]*(?:\\.[^'\\]*)*')|((?>[A-Za-z][A-Za-z0-9]*)(?!\())",
-	            e => e.Groups[1].Value != "" ? e.Value : "["+e.Value+"]");
-
+	           @"('[^'\\]*(?:\\.[^'\\]*)*')|((?>[A-Za-z_][A-Za-z0-9_\.]*)(?!\())",
+	           e => e.Groups[1].Value != "" ? e.Value : "["+e.Value+"]");
 
             return expression;
         }

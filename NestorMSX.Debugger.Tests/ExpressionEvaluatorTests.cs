@@ -66,5 +66,17 @@ namespace NestorMSX.Debugger.Tests
 
             Assert.AreEqual(@"I say: Hello, ""world"" 'again'", result);
         }
+
+        [Test]
+        public void AcceptsNamesWithDots()
+        {
+            var expression = @"foo.bar.fizz(fizz.buzz.foo, 3.1416, "".string.literal.\""quotes\""."" )";
+            Sut.EvaluateName += (sender, args) => args.Result = args.Name;
+            Sut.EvaluateFunction += (sender, args) => args.Result = args.Name + ": " + string.Join(",", args.Parameters);
+
+            var result = Sut.Evaluate(expression);
+
+            Assert.AreEqual(@"foo.bar.fizz: fizz.buzz.foo,3.1416,.string.literal.""quotes"".", result);
+        }
     }
 }

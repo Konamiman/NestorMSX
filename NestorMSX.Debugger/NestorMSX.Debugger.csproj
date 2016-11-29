@@ -31,9 +31,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Evaluant.Calculator, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Evaluant.Antlr, Version=0.3.0.37313, Culture=neutral, PublicKeyToken=973cde3f1cafed03, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>ExpressionEvaluator\Evaluant.Calculator.dll</HintPath>
+      <HintPath>Console\ExpressionEvaluator\Evaluant.Antlr.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -46,6 +46,22 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Console\ExpressionEvaluator\EvaluantExpressionEvaluatorWrapper.cs" />
+    <Compile Include="Console\ExpressionEvaluator\Evaluant\Domain\BinaryExpression.cs" />
+    <Compile Include="Console\ExpressionEvaluator\Evaluant\Domain\EvaluationVisitor.cs" />
+    <Compile Include="Console\ExpressionEvaluator\Evaluant\Domain\Function.cs" />
+    <Compile Include="Console\ExpressionEvaluator\Evaluant\Domain\LogicalExpression.cs" />
+    <Compile Include="Console\ExpressionEvaluator\Evaluant\Domain\LogicalExpressionVisitor.cs" />
+    <Compile Include="Console\ExpressionEvaluator\Evaluant\Domain\Parameter.cs" />
+    <Compile Include="Console\ExpressionEvaluator\Evaluant\Domain\UnaryExpression.cs" />
+    <Compile Include="Console\ExpressionEvaluator\Evaluant\Domain\Value.cs" />
+    <Compile Include="Console\ExpressionEvaluator\Evaluant\ECalcLexer.cs" />
+    <Compile Include="Console\ExpressionEvaluator\Evaluant\ECalcParser.cs" />
+    <Compile Include="Console\ExpressionEvaluator\Evaluant\EvaluateFunctionHandler.cs" />
+    <Compile Include="Console\ExpressionEvaluator\Evaluant\EvaluateParameterHandler.cs" />
+    <Compile Include="Console\ExpressionEvaluator\Evaluant\EvaluationException.cs" />
+    <Compile Include="Console\ExpressionEvaluator\Evaluant\Expression.cs" />
+    <Compile Include="Console\ExpressionEvaluator\Evaluant\FunctionArgs.cs" />
+    <Compile Include="Console\ExpressionEvaluator\Evaluant\ParameterArgs.cs" />
     <Compile Include="Console\ExpressionEvaluator\EvaluateFunctionEventArgs.cs" />
     <Compile Include="Console\ExpressionEvaluator\EvaluateNameEventArgs.cs" />
     <Compile Include="Console\ExpressionEvaluator\IExpressionEvaluator.cs" />
@@ -92,6 +108,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Console\ExpressionEvaluator\Evaluant\Function.cd" />
+    <None Include="Console\ExpressionEvaluator\Evaluant\LogicalExpression.cd" />
     <None Include="InstructionExtraction\LinqPad\GetCBInstructions.linq" />
     <None Include="InstructionExtraction\LinqPad\GetDDInstructions.linq" />
     <None Include="InstructionExtraction\LinqPad\GetEDInstructions.linq" />
@@ -100,7 +118,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Console\ExpressionEvaluator\Evaluant.Antlr.dll" />
-    <Content Include="Console\ExpressionEvaluator\Evaluant.Calculator.dll" />
     <Content Include="InstructionExtraction\InstructionExtractor.DBinstructions.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <DependentUpon>InstructionExtractor.cs</DependentUpon>
