@@ -45,6 +45,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Console\AliasAttribute.cs" />
+    <Compile Include="Console\CommandArgument.cs" />
+    <Compile Include="Console\CommandParameter.cs" />
+    <Compile Include="Console\CommandInterpreter.cs" />
     <Compile Include="Console\ExpressionEvaluator\EvaluantExpressionEvaluatorWrapper.cs" />
     <Compile Include="Console\ExpressionEvaluator\Evaluant\Domain\BinaryExpression.cs" />
     <Compile Include="Console\ExpressionEvaluator\Evaluant\Domain\EvaluationVisitor.cs" />
@@ -65,6 +69,10 @@
     <Compile Include="Console\ExpressionEvaluator\EvaluateFunctionEventArgs.cs" />
     <Compile Include="Console\ExpressionEvaluator\EvaluateNameEventArgs.cs" />
     <Compile Include="Console\ExpressionEvaluator\IExpressionEvaluator.cs" />
+    <Compile Include="Console\Command.cs" />
+    <Compile Include="Console\IgnoreAttribute.cs" />
+    <Compile Include="Console\MethodCommand.cs" />
+    <Compile Include="Console\NamespaceAttribute.cs" />
     <Compile Include="InstructionExtraction\InstructionExtractor.cs" />
     <Compile Include="InstructionExtraction\InstructionExtractor.DBinstructions.cs">
       <AutoGen>True</AutoGen>
