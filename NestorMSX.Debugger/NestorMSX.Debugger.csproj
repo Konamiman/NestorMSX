@@ -47,6 +47,7 @@
   <ItemGroup>
     <Compile Include="Console\AliasAttribute.cs" />
     <Compile Include="Console\CommandArgument.cs" />
+    <Compile Include="Console\CommandExecutionException.cs" />
     <Compile Include="Console\CommandParameter.cs" />
     <Compile Include="Console\CommandInterpreter.cs" />
     <Compile Include="Console\ExpressionEvaluator\EvaluantExpressionEvaluatorWrapper.cs" />
@@ -72,7 +73,6 @@
     <Compile Include="Console\Command.cs" />
     <Compile Include="Console\IgnoreAttribute.cs" />
     <Compile Include="Console\MethodCommand.cs" />
-    <Compile Include="Console\NamespaceAttribute.cs" />
     <Compile Include="InstructionExtraction\InstructionExtractor.cs" />
     <Compile Include="InstructionExtraction\InstructionExtractor.DBinstructions.cs">
       <AutoGen>True</AutoGen>

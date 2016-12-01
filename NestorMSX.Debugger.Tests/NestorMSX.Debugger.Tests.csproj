@@ -44,6 +44,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CommandInterpreterTests.cs" />
+    <Compile Include="CommandInterpreterTests.FunctionMode.cs">
+      <DependentUpon>CommandInterpreterTests.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CommandInterpreterTests.SingleWordMode.cs">
+      <DependentUpon>CommandInterpreterTests.cs</DependentUpon>
+    </Compile>
     <Compile Include="ExpressionEvaluatorTests.cs" />
     <Compile Include="InstructionExtractorTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
