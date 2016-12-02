@@ -14,7 +14,7 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console
             if(!Regex.IsMatch(
                 aliases,
                 @"^ *[A-Za-z_][A-Za-z_0-9]*(, *[A-Za-z_][A-Za-z_0-9]*)* *$")) {
-                throw new ArgumentException($"{nameof(aliases)} must be a comma-separated list of identifier, each consisting of letters, numbers and underscores; first character can't be a number");
+                throw new ArgumentException($"{nameof(aliases)} must be a comma-separated list of identifier, each consisting of letters, numbers and underscores; first character can't be a number. Got '{aliases}' instead.");
             }
 
             Aliases = aliases

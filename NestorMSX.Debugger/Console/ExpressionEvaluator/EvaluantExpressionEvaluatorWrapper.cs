@@ -52,10 +52,10 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console.ExpressionEvaluator
                 expression = Regex.Replace(expression,
                     @"('[^'\\]*(?:\\.[^'\\]*)*')" + //anything in single quotes (string literals) is to be untouched
                     @"|" +
-                    @"(((0[xX])|(&[Hh])|#)(?<hvalue>[0-9A-Fa-f]+))|((?<hvalue>[0-9][0-9A-Fa-f]*)(?![\(\]])(H|h))" +
+                    @"(((0[xX])|(&[Hh])|#)(?<hvalue>[0-9A-Za-z]+))|((?<hvalue>[0-9][0-9A-Za-z]*)(?![\(\]])(H|h))" +
                     //hex numbers
                     @"|" +
-                    @"(((&[bB])|%)(?<bvalue>[0-9A-Fa-f]+))|((?<bvalue>[0-9][0-9A-Fa-f]*)(?![\(\]])(B|b))",
+                    @"(((&[bB])|%)(?<bvalue>[0-9A-Za-z]+))|((?<bvalue>[0-9][0-9A-Za-z]*)(?![\(\]])(B|b))",
                     //bin numbers - [0-F] on purpose to catch FormatExceptions
                     e =>
                         e.Groups["hvalue"].Value != ""

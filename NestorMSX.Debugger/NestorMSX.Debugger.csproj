@@ -71,6 +71,7 @@
     <Compile Include="Console\ExpressionEvaluator\EvaluateNameEventArgs.cs" />
     <Compile Include="Console\ExpressionEvaluator\IExpressionEvaluator.cs" />
     <Compile Include="Console\Command.cs" />
+    <Compile Include="Console\ExtensionMethods.cs" />
     <Compile Include="Console\IgnoreAttribute.cs" />
     <Compile Include="Console\MethodCommand.cs" />
     <Compile Include="InstructionExtraction\InstructionExtractor.cs" />

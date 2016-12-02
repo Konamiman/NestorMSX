@@ -31,8 +31,7 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console
             commandExecutors = new[]
             {
                 new Tuple<string, Func<string, object>>("^[A-Za-z_][A-Za-z_0-9.]*$", ExecuteSingleWord),
-                new Tuple<string, Func<string, object>>("^[A-Za-z_][A-Za-z_0-9.]* +[^ ]+$", ExecuteCommandStyle),
-                new Tuple<string, Func<string, object>>("^[A-Za-z_][A-Za-z_0-9.]*\\(.*\\)$", ExecuteFunctionStyle)
+                new Tuple<string, Func<string, object>>("^[A-Za-z_][A-Za-z_0-9.]* +.+$", ExecuteCommandStyle)
             };
         }
 
@@ -99,7 +98,7 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console
                     throw new CommandExecutionException($"Unknown command: {name}");
                 var commands = commandsBySimpleName[name];
                 if(commands.Count > 1 && commands.Select(c => c.EquivalencyId).Distinct().Count() > 1)
-                    throw new CommandExecutionException($"Ambiguous command {name}, possible matches: {string.Join(",", commandFullNamesBySimpleName[name].ToArray())}");
+                    throw new CommandExecutionException($"Ambiguous command '{name}', possible matches: {string.Join(",", commandFullNamesBySimpleName[name].ToArray())}");
                 return commands[0];
             }
 
@@ -112,11 +111,10 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console
         public object ExecuteCommand(string commandLine)
         {
             commandLine = commandLine.Trim();
-            var executor = commandExecutors.FirstOrDefault(e => Regex.IsMatch(commandLine, e.Item1));
-            if(executor == null)
-                throw new CommandExecutionException("Syntax error");
+            var executor =
+                commandExecutors.FirstOrDefault(e => Regex.IsMatch(commandLine, e.Item1))?.Item2 ?? ExecuteFunctionStyle;
 
-            return executor.Item2(commandLine);
+            return executor(commandLine);
         }
 
         private object ExecuteSingleWord(string commandLine)
@@ -138,11 +136,11 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console
                 if(Regex.IsMatch(token, "^([A-Za-z_][A-Za-z_0-9]*)=")) {
                     var indexOfEquals = token.IndexOf("=");
                     var argName = token.Substring(0, indexOfEquals).ToLower();
-                    var argValue = token.Substring(indexOfEquals + 1);
+                    var argValue = expressionEvaluator.Evaluate(token.Substring(indexOfEquals + 1));
                     arguments.Add(new CommandArgument(argName, argValue));
                 }
                 else {
-                    arguments.Add(new CommandArgument(null, token));
+                    arguments.Add(new CommandArgument(null, expressionEvaluator.Evaluate(token)));
                 }
             }
 

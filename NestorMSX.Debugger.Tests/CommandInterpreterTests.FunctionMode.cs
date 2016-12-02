@@ -79,5 +79,13 @@ namespace NestorMSX.Debugger.Tests
             var result = (int)Sut.ExecuteCommand(command);
             Assert.AreEqual(10+20+1+2+3+30+40+50+60+2+3, result);
         }
+
+        [Test]
+        public void CanActAsCalculator()
+        {
+            var command = "(2+3*4)*3";
+            var result = Sut.ExecuteCommand(command);
+            Assert.AreEqual(42, result);
+        }
     }
 }
