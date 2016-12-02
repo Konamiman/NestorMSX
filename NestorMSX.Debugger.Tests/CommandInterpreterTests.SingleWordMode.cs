@@ -53,5 +53,12 @@ namespace NestorMSX.Debugger.Tests
             var result = Sut.ExecuteCommand(command);
             Assert.AreEqual(ClassWithCommands.SimpleCommandWithAliasesResult, result);
         }
+        
+        [Test]
+        public void CanExecuteVoidMethodsAndReturnsNull()
+        {
+            var result = Sut.ExecuteCommand("thevoid");
+            Assert.IsNull(result);
+        }
     }
 }

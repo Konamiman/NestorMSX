@@ -46,6 +46,10 @@ namespace NestorMSX.Debugger.Tests
             {
                 throw new Exception("Booo!");
             }
+
+            public void TheVoid()
+            {
+            }
         }
 
         private CommandInterpreter Sut;
