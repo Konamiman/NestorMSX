@@ -12,7 +12,7 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console
         private readonly object hostingObject;
         private readonly string[] mandatoryParameterNames;
         private readonly string[] parameterNames;
-        private readonly Dictionary<CommandParameter, Tuple<Type, TypeConverter>> converters;
+        private readonly Dictionary<CommandParameter, TypeConverterWrapper> converters;
 
         public MethodCommand(MethodInfo method, object hostingObject, Guid equivalencyId)
         {
@@ -26,9 +26,9 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console
                     .Select(p => new CommandParameter(p.Name, !p.IsOptional, p.DefaultValue))
                     .ToArray();
 
-            converters = new Dictionary<CommandParameter, Tuple<Type, TypeConverter>>();
+            converters = new Dictionary<CommandParameter, TypeConverterWrapper>();
             for(var i=0; i < methodParameters.Length; i++)
-                converters.Add(Parameters[i], new Tuple<Type, TypeConverter>(methodParameters[i].ParameterType, TypeDescriptor.GetConverter(methodParameters[i].ParameterType)));
+                converters.Add(Parameters[i], new TypeConverterWrapper(TypeDescriptor.GetConverter(methodParameters[i].ParameterType), methodParameters[i].ParameterType));
 
             mandatoryParameterNames = Parameters.Where(p => p.IsMandatory).Select(p => p.Name).ToArray();
             parameterNames = Parameters.Select(p => p.Name).ToArray();
@@ -67,10 +67,10 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console
             if(unknownArgumentNames.Any())
                 throw new CommandExecutionException($"{name}: Unknown parameter '{unknownArgumentNames.First()}'");
 
-            var argumentValues = fixedArguments.Zip(Parameters, (a, p) => converters[p].Item2.TryConvertFrom(a.Value, converters[p].Item1)).ToList();
+            var argumentValues = fixedArguments.Zip(Parameters, (a, p) => converters[p].ConvertFrom(a.Value)).ToList();
             foreach(var parameter in Parameters.Skip(fixedArguments.Length)) {
                 var matchingArgument = arguments.SingleOrDefault(a => a.Name != null && a.Name == parameter.Name);
-                argumentValues.Add(matchingArgument == null ? parameter.DefaultValue : converters[parameter].Item2.TryConvertFrom(matchingArgument.Value, converters[parameter].Item1));
+                argumentValues.Add(matchingArgument == null ? parameter.DefaultValue : converters[parameter].ConvertFrom(matchingArgument.Value));
             }
 
             try

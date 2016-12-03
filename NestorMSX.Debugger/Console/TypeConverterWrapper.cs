@@ -3,9 +3,18 @@ using System.ComponentModel;
 
 namespace Konamiman.NestorMSX.Z80Debugger.Console
 {
-    public static class ExtensionMethods
+    public class TypeConverterWrapper
     {
-        public static object TryConvertFrom(this TypeConverter converter, object value, Type targetType)
+        private readonly TypeConverter converter;
+        private readonly Type targetType;
+
+        public TypeConverterWrapper(TypeConverter converter, Type targetType)
+        {
+            this.converter = converter;
+            this.targetType = targetType;
+        }
+
+        public object ConvertFrom(object value)
         {
             if (value.GetType() == targetType)
                 return value;
