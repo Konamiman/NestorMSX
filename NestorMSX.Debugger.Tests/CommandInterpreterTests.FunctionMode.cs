@@ -5,9 +5,9 @@ namespace NestorMSX.Debugger.Tests
     public partial class CommandInterpreterTests
     {
         [Test]
-        [TestCase("simplecommand()")]
-        [TestCase("SimpleCommand()")]
-        [TestCase("   SimpleCommand(   )  ")]
+        [TestCase("simplekommand()")]
+        [TestCase("Simplekommand()")]
+        [TestCase("   SimpleKommand(   )  ")]
         public void CanRunSimpleCommandInFunctionMode(string command)
         {
             var result = Sut.ExecuteCommand(command);
@@ -15,10 +15,10 @@ namespace NestorMSX.Debugger.Tests
         }
 
         [Test]
-        [TestCase("niceclass.simplecommand()")]
-        [TestCase("NiceClass.SimpleCommand()")]
-        [TestCase("   classy.SimpleCommand(   )  ")]
-        public void CanRunSimpleCommandInFunctionMode_UsingClassAlias(string command)
+        [TestCase("SomeCommands.simplekommand()")]
+        [TestCase("somecommands.SimpleKommand()")]
+        [TestCase("   some.SimpleKommand(   )  ")]
+        public void CanRunSimpleCommandInFunctionMode_UsingClassName(string command)
         {
             var result = Sut.ExecuteCommand(command);
             Assert.AreEqual(ClassWithCommands.SimpleCommandResult, result);
@@ -36,10 +36,10 @@ namespace NestorMSX.Debugger.Tests
         }
 
         [Test]
-        [TestCase("NiceClass.simpleandnice()")]
-        [TestCase("classy.SimpleAndNice()")]
-        [TestCase("   Classy.san(   )  ")]
-        [TestCase("   niceclass.SAN(   )  ")]
+        [TestCase("SomeCommands.simpleandnice()")]
+        [TestCase("some.SimpleAndNice()")]
+        [TestCase("   some.san(   )  ")]
+        [TestCase("   s.SAN(   )  ")]
         public void CanRunSimpleCommandInFunctionMode_UsingClassAlias_UsingCommandAlias(string command)
         {
             var result = Sut.ExecuteCommand(command);
@@ -51,7 +51,7 @@ namespace NestorMSX.Debugger.Tests
         [TestCase("  Addition")]
         [TestCase("sum")]
         [TestCase(" Sum")]
-        [TestCase("niceclass.sum")]
+        [TestCase("somecommands.sum")]
         public void CanRunCommandWithParametersSpecifyingOnlyMandatoryParameters(string commandName)
         {
             var command = $"{commandName}( 10, 20,30 )";
@@ -64,7 +64,7 @@ namespace NestorMSX.Debugger.Tests
         [TestCase("  Addition")]
         [TestCase("sum")]
         [TestCase(" Sum")]
-        [TestCase("niceclass.sum")]
+        [TestCase("some.sum")]
         public void CanRunCommandWithParametersSpecifyingAllParameters(string commandName)
         {
             var command = $"{commandName}( 10, 20,30,0x40,%1111,7 )";

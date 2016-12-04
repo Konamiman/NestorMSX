@@ -14,11 +14,11 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console
         private readonly string[] parameterNames;
         private readonly Dictionary<CommandParameter, TypeConverterWrapper> converters;
 
-        public MethodCommand(MethodInfo method, object hostingObject, Guid equivalencyId)
+        public MethodCommand(string name, MethodInfo method, object hostingObject)
+            :base(name)
         {
             this.method = method;
             this.hostingObject = hostingObject;
-            this.EquivalencyId = equivalencyId;
 
             var methodParameters = method.GetParameters();
             this.Parameters =
@@ -82,7 +82,5 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console
                 throw new CommandExecutionException($"Exception thrown by method '{hostingObject.GetType().Name}.{method.Name}': {ex.InnerException.Message}", ex.InnerException);
             }
         }
-
-        public override Guid EquivalencyId { get; }
     }
 }

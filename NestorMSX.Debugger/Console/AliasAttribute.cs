@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 
 namespace Konamiman.NestorMSX.Z80Debugger.Console
 {
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method | AttributeTargets.Property, AllowMultiple = false)]
+    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Property, AllowMultiple = false)]
     public class AliasAttribute : Attribute
     {
         private static readonly char[] comma = {','};

@@ -5,9 +5,10 @@ namespace NestorMSX.Debugger.Tests
     public partial class CommandInterpreterTests
     {
         [Test]
-        [TestCase("simplecommand")]
-        [TestCase("SimpleCommand")]
-        [TestCase("   SimpleCommand  ")]
+        [TestCase("simplekommand")]
+        [TestCase("Simplekommand")]
+        [TestCase("   Simplekommand  ")]
+        [TestCase("simplek")]
         public void CanRunSimpleCommandInSingleWordMode(string command)
         {
             var result = Sut.ExecuteCommand(command);
@@ -15,10 +16,11 @@ namespace NestorMSX.Debugger.Tests
         }
 
         [Test]
-        [TestCase("niceclass.simplecommand")]
-        [TestCase("classy.SimpleCommand")]
-        [TestCase("   NiceClass.SimpleCommand  ")]
-        [TestCase("   Classy.simplecommand  ")]
+        [TestCase("somecommands.simplekommand")]
+        [TestCase("somec.SimpleK")]
+        [TestCase("   NestorMSX.Debugger.Tests.somecommands.Simplekommand  ")]
+        [TestCase("   Deb.Tes.some.Simplekommand  ")]
+        [TestCase("   Te.so.simplek  ")]
         public void CanRunSimpleCommandInSingleWordMode_UsingClassAliases(string command)
         {
             var result = Sut.ExecuteCommand(command);
@@ -41,19 +43,6 @@ namespace NestorMSX.Debugger.Tests
             Assert.AreEqual(ClassWithCommands.SimpleCommandWithAliasesResult, result);
         }
 
-        [Test]
-        [TestCase("niceclass.simpleandnice")]
-        [TestCase("NiceClass.SimpleAndNice")]
-        [TestCase("   Classy.simpleandnice  ")]
-        [TestCase("classy.san")]
-        [TestCase("classy.San")]
-        [TestCase("   niceclass.san  ")]
-        public void CanRunSimpleCommandInSingleWordMode_UsingClassAliases_UsingCommandAliases(string command)
-        {
-            var result = Sut.ExecuteCommand(command);
-            Assert.AreEqual(ClassWithCommands.SimpleCommandWithAliasesResult, result);
-        }
-        
         [Test]
         public void CanExecuteVoidMethodsAndReturnsNull()
         {

@@ -7,7 +7,7 @@ namespace NestorMSX.Debugger.Tests
 {
     public partial class CommandInterpreterTests
     {
-        [Alias("classy")]
+        [Name("somecommands")]
         class ClassWithCommands_Duplicate
         {
             public string san()
@@ -23,7 +23,7 @@ namespace NestorMSX.Debugger.Tests
             AssertThrows<Exception>(createInterpreter, "Duplicate", "san");
         }
 
-        [Alias("morecommands")]
+        [Name("morecommands")]
         class ClassWithCommands_Ambiguous
         {
             public string san()
@@ -36,8 +36,8 @@ namespace NestorMSX.Debugger.Tests
         public void ThrowsOnAmbiguousCommands()
         {
             var sut = new CommandInterpreter(new EvaluantExpressionEvaluatorWrapper(), new object[] {new ClassWithCommands(), new ClassWithCommands_Ambiguous() });
-            TestDelegate runCommand = () => sut.ExecuteCommand("san");
-            AssertThrows(runCommand, "Ambiguous", "morecommands.san", "classy.san");
+            TestDelegate runCommand = () => sut.ExecuteCommand("somecommands.simple");
+            AssertThrows(runCommand, "simplekommand", "simplecommandwithaliases");
         }
 
         [Test]

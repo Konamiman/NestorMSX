@@ -2,9 +2,9 @@
 
 namespace Konamiman.NestorMSX.Z80Debugger.Console
 {
-    public abstract class Command
+    public abstract class Command : TokenWithName
     {
-        public Command(CommandParameter[] parameters = null)
+        protected Command(string name, CommandParameter[] parameters = null) : base(name)
         {
             Parameters = parameters;
         }
@@ -12,6 +12,5 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console
         protected object HostingObject { get; }
         public CommandParameter[] Parameters { get; protected set; }
         public abstract object Execute(string name, CommandArgument[] arguments);
-        public abstract Guid EquivalencyId { get; }
     }
 }

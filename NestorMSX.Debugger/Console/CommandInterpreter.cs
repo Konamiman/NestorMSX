@@ -10,21 +10,17 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console
     public class CommandInterpreter
     {
         private readonly IExpressionEvaluator expressionEvaluator;
-        private readonly Dictionary<string, Command> commandsByFullName;
-        private readonly Dictionary<string, List<string>> commandFullNamesBySimpleName;
-        private readonly Dictionary<string, List<Command>> commandsBySimpleName;
-
+        private readonly Command[] commands;
         private readonly Tuple<string, Func<string, object>>[] commandExecutors;
 
         public CommandInterpreter(IExpressionEvaluator expressionEvaluator, object[] commandsProviders)
         {
             this.expressionEvaluator = expressionEvaluator;
             
-            commandsByFullName = new Dictionary<string, Command>();
-            commandsBySimpleName = new Dictionary<string, List<Command>>();
-            commandFullNamesBySimpleName = new Dictionary<string, List<string>>();
+            var commandsList = new List<Command>();
             foreach(var obj in commandsProviders)
-                AddCommandsFrom(obj);
+                AddCommandsFrom(obj, commandsList);
+            commands = commandsList.ToArray();
             
             expressionEvaluator.EvaluateFunction += EvaluateFunction;
 
@@ -35,12 +31,15 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console
             };
         }
 
-        private void AddCommandsFrom(object commandsProvider)
+        private void AddCommandsFrom(object commandsProvider, List<Command> commandsList)
         {
             var type = commandsProvider.GetType();
-            var equivalencyId = Guid.NewGuid();
+            var typeName = (type
+                .GetCustomAttributes(typeof(NameAttribute), false)
+                .SingleOrDefault() as NameAttribute)?.Name ?? type.Name;
 
-            var typeAliases = GetAliases(type);
+            if(!typeName.Contains("."))
+                typeName = (type.Namespace + "." + typeName).ToLower();
 
             var commandMethods = commandsProvider
                 .GetType()
@@ -49,24 +48,14 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console
             
             foreach(var method in commandMethods) {
                 var methodAliases = GetAliases(method);
+                
+                foreach (var methodAlias in methodAliases) {
+                    var commandFullName = $"{typeName}.{methodAlias}";
+                    if (commandsList.Any(c => c == commandFullName))
+                        throw new Exception($"Duplicate command: {commandFullName}");
 
-                var command = new MethodCommand(method, commandsProvider, equivalencyId);
-                foreach (var typeAlias in typeAliases) {
-                    foreach (var methodAlias in methodAliases) {
-                        var fullName = $"{typeAlias}.{methodAlias}";
-                        if (commandsByFullName.ContainsKey(fullName))
-                            throw new Exception($"Duplicate command: {fullName}");
-
-                        commandsByFullName.Add(fullName, command);
-
-                        if (!commandFullNamesBySimpleName.ContainsKey(methodAlias))
-                            commandFullNamesBySimpleName.Add(methodAlias, new List<string>());
-                        commandFullNamesBySimpleName[methodAlias].Add(fullName);
-
-                        if (!commandsBySimpleName.ContainsKey(methodAlias))
-                            commandsBySimpleName.Add(methodAlias, new List<Command>());
-                        commandsBySimpleName[methodAlias].Add(command);
-                    }
+                    var command = new MethodCommand(commandFullName, method, commandsProvider);
+                    commandsList.Add(command);
                 }
             }
         }
@@ -93,19 +82,16 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console
         private Command GetCommand(ref string name)
         {
             name = name.ToLower().Trim('.');
-            if(!name.Contains(".")) {
-                if(!commandFullNamesBySimpleName.ContainsKey(name))
-                    throw new CommandExecutionException($"Unknown command: {name}");
-                var commands = commandsBySimpleName[name];
-                if(commands.Count > 1 && commands.Select(c => c.EquivalencyId).Distinct().Count() > 1)
-                    throw new CommandExecutionException($"Ambiguous command '{name}', possible matches: {string.Join(",", commandFullNamesBySimpleName[name].ToArray())}");
-                return commands[0];
-            }
-
-            if(!commandsByFullName.ContainsKey(name))
+            var name2 = name; //can't use ref param inside anonymous method (I didn't know that!)
+            var matchingCommands = commands.Where(c => c == name2).ToArray();
+            
+            if(matchingCommands.Length == 0)
                 throw new CommandExecutionException($"Unknown command: {name}");
 
-            return commandsByFullName[name];
+            if(matchingCommands.Length > 1)
+                    throw new CommandExecutionException($"Ambiguous command '{name}', possible matches: {string.Join(",", matchingCommands.Select(c => c.FullName))}");
+
+            return matchingCommands[0];
         }
 
         public object ExecuteCommand(string commandLine)

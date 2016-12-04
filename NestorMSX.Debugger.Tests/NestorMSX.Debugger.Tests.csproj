@@ -60,6 +60,7 @@
     <Compile Include="ExpressionEvaluatorTests.cs" />
     <Compile Include="InstructionExtractorTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TokenWithNameTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
