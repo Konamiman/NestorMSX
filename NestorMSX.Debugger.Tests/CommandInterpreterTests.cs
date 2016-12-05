@@ -50,16 +50,48 @@ namespace NestorMSX.Debugger.Tests
             public void TheVoid()
             {
             }
+
+            [Alias("rwprop")]
+            public int ReadAndWriteProperty { get; set; }
+
+            [Alias("roprop")]
+            public int ReadOnlyProperty => 34;
+
+            [Alias("roprop_priv")]
+            public int ReadAndWritePropertyButPrivateSetter { get; private set; }
+
+            public int WriteOnlyPropertyValue;
+            [Alias("woprop")]
+            public int WriteOnlyProperty
+            {
+                set { WriteOnlyPropertyValue = value; }
+            }
+
+            public int PrivateGetterPropertyValue;
+            [Alias("woprop_priv")]
+            public int ReadAndWritePropertyButPrivateGetter
+            {
+                private get
+                {
+                    return PrivateGetterPropertyValue;
+                }
+                set
+                {
+                    PrivateGetterPropertyValue = value;
+                }
+            }
         }
 
         private CommandInterpreter Sut;
+        private ClassWithCommands CommandsObject;
 
         [SetUp]
         public void Setup()
         {
+            CommandsObject = new ClassWithCommands();
             Sut = new CommandInterpreter(
                 new EvaluantExpressionEvaluatorWrapper(),
-                new object[] { new ClassWithCommands() });
+                new object[] { CommandsObject });
         }
 
         private void AssertThrows(TestDelegate action, params string[] messageParts)

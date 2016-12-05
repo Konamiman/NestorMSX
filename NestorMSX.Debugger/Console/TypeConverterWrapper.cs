@@ -19,6 +19,11 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console
             if (value.GetType() == targetType)
                 return value;
 
+            if (value is decimal && targetType == typeof(int))
+                return (int)(decimal)value;
+            if (value is int && targetType == typeof(decimal))
+                return (decimal)(int)value;
+
             try {
                 if (converter.CanConvertFrom(value.GetType()))
                     return converter.ConvertFrom(value);

@@ -44,6 +44,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CommandInterpreterTests.AssignmentStyle.cs">
+      <DependentUpon>CommandInterpreterTests.cs</DependentUpon>
+    </Compile>
     <Compile Include="CommandInterpreterTests.CommandStyle.cs">
       <DependentUpon>CommandInterpreterTests.cs</DependentUpon>
     </Compile>

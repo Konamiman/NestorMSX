@@ -49,5 +49,12 @@ namespace NestorMSX.Debugger.Tests
             var result = Sut.ExecuteCommand("thevoid");
             Assert.IsNull(result);
         }
+
+        [Test]
+        public void CanGetValueOfPropertyWithSingleWord()
+        {
+            var result = Sut.ExecuteCommand("nestormsx.debugger.tests.somecommands.roprop");
+            Assert.AreEqual(CommandsObject.ReadOnlyProperty, result);
+        }
     }
 }

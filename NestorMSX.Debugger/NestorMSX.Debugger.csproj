@@ -74,8 +74,10 @@
     <Compile Include="Console\NameAttribute.cs" />
     <Compile Include="Console\IgnoreAttribute.cs" />
     <Compile Include="Console\MethodCommand.cs" />
+    <Compile Include="Console\PropertyVariable.cs" />
     <Compile Include="Console\TokenWithName.cs" />
     <Compile Include="Console\TypeConverterWrapper.cs" />
+    <Compile Include="Console\Variable.cs" />
     <Compile Include="InstructionExtraction\InstructionExtractor.cs" />
     <Compile Include="InstructionExtraction\InstructionExtractor.DBinstructions.cs">
       <AutoGen>True</AutoGen>
