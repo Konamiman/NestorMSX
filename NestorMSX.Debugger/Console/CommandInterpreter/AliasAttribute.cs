@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace Konamiman.NestorMSX.Z80Debugger.Console
+namespace Konamiman.NestorMSX.Z80Debugger.Console.CommandInterpreter
 {
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Property, AllowMultiple = false)]
     public class AliasAttribute : Attribute

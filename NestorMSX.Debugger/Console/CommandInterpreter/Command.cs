@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Konamiman.NestorMSX.Z80Debugger.Console
+﻿namespace Konamiman.NestorMSX.Z80Debugger.Console.CommandInterpreter
 {
     public abstract class Command : TokenWithName
     {

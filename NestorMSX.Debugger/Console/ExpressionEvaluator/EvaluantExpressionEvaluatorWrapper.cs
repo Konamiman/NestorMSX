@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 using Evaluant.Calculator;
+using Konamiman.NestorMSX.Z80Debugger.Console.CommandInterpreter;
 
 namespace Konamiman.NestorMSX.Z80Debugger.Console.ExpressionEvaluator
 {

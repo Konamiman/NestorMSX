@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 
-namespace Konamiman.NestorMSX.Z80Debugger.Console
+namespace Konamiman.NestorMSX.Z80Debugger.Console.CommandInterpreter
 {
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
     public class NameAttribute : Attribute

@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 
-namespace Konamiman.NestorMSX.Z80Debugger.Console
+namespace Konamiman.NestorMSX.Z80Debugger.Console.CommandInterpreter
 {
     public class MethodCommand : Command
     {

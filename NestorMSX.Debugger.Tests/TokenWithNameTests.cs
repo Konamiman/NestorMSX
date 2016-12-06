@@ -1,4 +1,5 @@
 ﻿using Konamiman.NestorMSX.Z80Debugger.Console;
+using Konamiman.NestorMSX.Z80Debugger.Console.CommandInterpreter;
 using NUnit.Framework;
 
 namespace NestorMSX.Debugger.Tests

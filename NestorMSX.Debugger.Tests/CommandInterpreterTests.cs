@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Konamiman.NestorMSX.Z80Debugger.Console;
+using Konamiman.NestorMSX.Z80Debugger.Console.CommandInterpreter;
 using Konamiman.NestorMSX.Z80Debugger.Console.ExpressionEvaluator;
 using NUnit.Framework;
 

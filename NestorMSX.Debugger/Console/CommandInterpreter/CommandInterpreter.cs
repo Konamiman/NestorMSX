@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using Konamiman.NestorMSX.Z80Debugger.Console.ExpressionEvaluator;
 
-namespace Konamiman.NestorMSX.Z80Debugger.Console
+namespace Konamiman.NestorMSX.Z80Debugger.Console.CommandInterpreter
 {
     public class CommandInterpreter
     {

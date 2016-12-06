@@ -37,19 +37,30 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="Z80dotNet, Version=1.0.5.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Z80dotNet.1.0.5.0\lib\net40-Client\Z80dotNet.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Console\AliasAttribute.cs" />
-    <Compile Include="Console\CommandArgument.cs" />
-    <Compile Include="Console\CommandExecutionException.cs" />
-    <Compile Include="Console\CommandParameter.cs" />
-    <Compile Include="Console\CommandInterpreter.cs" />
+    <Compile Include="Console\CommandInterpreter\AliasAttribute.cs" />
+    <Compile Include="Console\CommandInterpreter\CommandArgument.cs" />
+    <Compile Include="Console\CommandInterpreter\CommandExecutionException.cs" />
+    <Compile Include="Console\CommandInterpreter\CommandParameter.cs" />
+    <Compile Include="Console\CommandInterpreter\CommandInterpreter.cs" />
+    <Compile Include="Console\ConsoleTestForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Console\ConsoleTestForm.Designer.cs">
+      <DependentUpon>ConsoleTestForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Console\ExpressionEvaluator\EvaluantExpressionEvaluatorWrapper.cs" />
     <Compile Include="Console\ExpressionEvaluator\Evaluant\Domain\BinaryExpression.cs" />
     <Compile Include="Console\ExpressionEvaluator\Evaluant\Domain\EvaluationVisitor.cs" />
@@ -70,14 +81,14 @@
     <Compile Include="Console\ExpressionEvaluator\EvaluateFunctionEventArgs.cs" />
     <Compile Include="Console\ExpressionEvaluator\EvaluateNameEventArgs.cs" />
     <Compile Include="Console\ExpressionEvaluator\IExpressionEvaluator.cs" />
-    <Compile Include="Console\Command.cs" />
-    <Compile Include="Console\NameAttribute.cs" />
-    <Compile Include="Console\IgnoreAttribute.cs" />
-    <Compile Include="Console\MethodCommand.cs" />
-    <Compile Include="Console\PropertyVariable.cs" />
-    <Compile Include="Console\TokenWithName.cs" />
-    <Compile Include="Console\TypeConverterWrapper.cs" />
-    <Compile Include="Console\Variable.cs" />
+    <Compile Include="Console\CommandInterpreter\Command.cs" />
+    <Compile Include="Console\CommandInterpreter\NameAttribute.cs" />
+    <Compile Include="Console\CommandInterpreter\IgnoreAttribute.cs" />
+    <Compile Include="Console\CommandInterpreter\MethodCommand.cs" />
+    <Compile Include="Console\CommandInterpreter\PropertyVariable.cs" />
+    <Compile Include="Console\CommandInterpreter\TokenWithName.cs" />
+    <Compile Include="Console\CommandInterpreter\TypeConverterWrapper.cs" />
+    <Compile Include="Console\CommandInterpreter\Variable.cs" />
     <Compile Include="InstructionExtraction\InstructionExtractor.cs" />
     <Compile Include="InstructionExtraction\InstructionExtractor.DBinstructions.cs">
       <AutoGen>True</AutoGen>
@@ -112,6 +123,7 @@
     <Compile Include="InstructionExtraction\Operand.cs" />
     <Compile Include="InstructionExtraction\OperandType.cs" />
     <Compile Include="InstructionExtraction\IInstructionExtractor.cs" />
+    <Compile Include="Plugin\DebuggerPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -128,6 +140,7 @@
     <None Include="InstructionExtraction\LinqPad\GetEDInstructions.linq" />
     <None Include="InstructionExtraction\LinqPad\GetSingleByteInstructions.linq" />
     <None Include="InstructionExtraction\LinqPad\PurgeInstructionTemplatesSource.linq" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Console\ExpressionEvaluator\Evaluant.Antlr.dll" />
@@ -162,6 +175,12 @@
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Console\ConsoleTestForm.resx">
+      <DependentUpon>ConsoleTestForm.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

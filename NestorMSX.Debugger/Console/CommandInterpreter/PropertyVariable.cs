@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
+﻿using System.ComponentModel;
 using System.Reflection;
-using System.Text;
 
-namespace Konamiman.NestorMSX.Z80Debugger.Console
+namespace Konamiman.NestorMSX.Z80Debugger.Console.CommandInterpreter
 {
     public class PropertyVariable : Variable
     {
