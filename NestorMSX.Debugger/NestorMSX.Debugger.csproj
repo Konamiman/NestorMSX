@@ -50,6 +50,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Console\CommandExecutionRequestedEventArgs.cs" />
     <Compile Include="Console\CommandInterpreter\AliasAttribute.cs" />
     <Compile Include="Console\CommandInterpreter\CommandArgument.cs" />
     <Compile Include="Console\CommandInterpreter\CommandExecutionException.cs" />
@@ -60,6 +61,12 @@
     </Compile>
     <Compile Include="Console\ConsoleTestForm.Designer.cs">
       <DependentUpon>ConsoleTestForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Console\ConsoleWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Console\ConsoleWindow.Designer.cs">
+      <DependentUpon>ConsoleWindow.cs</DependentUpon>
     </Compile>
     <Compile Include="Console\ExpressionEvaluator\EvaluantExpressionEvaluatorWrapper.cs" />
     <Compile Include="Console\ExpressionEvaluator\Evaluant\Domain\BinaryExpression.cs" />
@@ -89,6 +96,7 @@
     <Compile Include="Console\CommandInterpreter\TokenWithName.cs" />
     <Compile Include="Console\CommandInterpreter\TypeConverterWrapper.cs" />
     <Compile Include="Console\CommandInterpreter\Variable.cs" />
+    <Compile Include="Console\IConsoleWindow.cs" />
     <Compile Include="InstructionExtraction\InstructionExtractor.cs" />
     <Compile Include="InstructionExtraction\InstructionExtractor.DBinstructions.cs">
       <AutoGen>True</AutoGen>
@@ -178,6 +186,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Console\ConsoleTestForm.resx">
       <DependentUpon>ConsoleTestForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Console\ConsoleWindow.resx">
+      <DependentUpon>ConsoleWindow.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />
