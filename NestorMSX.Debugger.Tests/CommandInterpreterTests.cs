@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using Konamiman.NestorMSX.Z80Debugger.Console;
 using Konamiman.NestorMSX.Z80Debugger.Console.CommandInterpreter;
 using Konamiman.NestorMSX.Z80Debugger.Console.ExpressionEvaluator;
 using NUnit.Framework;
@@ -79,6 +78,43 @@ namespace NestorMSX.Debugger.Tests
                 set
                 {
                     PrivateGetterPropertyValue = value;
+                }
+            }
+
+            public string TryGetVariableValue_Name => "oktryget";
+            public string TryGetVariableValue_Value => "ok value TryGet";
+            public string TryGetVariableValue_NameThatThrows => "ithrowtryget";
+            public string TryGetVariableValue_MessageThrown => "I was thrown by TryGet!";
+            public bool TryGetVariableValue(string name, out object value)
+            {
+                if(name == TryGetVariableValue_NameThatThrows)
+                    throw new Exception(TryGetVariableValue_MessageThrown);
+
+                if(name == TryGetVariableValue_Name) {
+                    value = TryGetVariableValue_Value;
+                    return true;
+                }
+                else {
+                    value = null;
+                    return false;
+                }
+            }
+
+            public string TrySetVariableValue_Name => "oktryset";
+            public object TrySetVariableValue_Value { get; set; }
+            public string TrySetVariableValue_NameThatThrows => "ithrowtryset";
+            public string TrySetVariableValue_MessageThrown => "I was thrown by TrySet!";
+            public bool TrySetVariableValue(string name, object value)
+            {
+                if(name == TrySetVariableValue_NameThatThrows)
+                    throw new Exception(TrySetVariableValue_MessageThrown);
+
+                if(name == TrySetVariableValue_Name) {
+                    TrySetVariableValue_Value = value;
+                    return true;
+                }
+                else {
+                    return false;
                 }
             }
         }

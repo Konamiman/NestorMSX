@@ -56,5 +56,12 @@ namespace NestorMSX.Debugger.Tests
             var result = Sut.ExecuteCommand("nestormsx.debugger.tests.somecommands.roprop");
             Assert.AreEqual(CommandsObject.ReadOnlyProperty, result);
         }
+
+        [Test]
+        public void CanGetUnknownVariableValueViaFallbackMethod()
+        {
+            var value = Sut.ExecuteCommand(CommandsObject.TryGetVariableValue_Name);
+            Assert.AreEqual(CommandsObject.TryGetVariableValue_Value, value);
+        }
     }
 }

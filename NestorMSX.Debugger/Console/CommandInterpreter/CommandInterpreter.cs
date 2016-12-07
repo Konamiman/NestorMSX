@@ -13,6 +13,8 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console.CommandInterpreter
         private readonly Command[] commands;
         private readonly Variable[] variables;
         private readonly Tuple<string, Func<string, object>>[] commandExecutors;
+        private readonly Tuple<object, MethodInfo>[] getUnknownVariableValueHandlers;
+        private readonly Tuple<object, MethodInfo>[] setUnknownVariableValueHandlers;
 
         public CommandInterpreter(IExpressionEvaluator expressionEvaluator, object[] commandsProviders)
         {
@@ -20,11 +22,16 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console.CommandInterpreter
             
             var commandsList = new List<Command>();
             var propertiesList = new List<Variable>();
-            foreach(var obj in commandsProviders)
+            var getUnknownVariableValueHandlersList = new List<Tuple<object, MethodInfo>>();
+            var setUnknownVariableValueHandlersList = new List<Tuple<object, MethodInfo>>();
+            foreach (var obj in commandsProviders) {
                 AddCommandsFrom(obj, commandsList, propertiesList);
+                AddUnknownVariableHandlersFrom(obj, getUnknownVariableValueHandlersList, setUnknownVariableValueHandlersList);
+            }
             commands = commandsList.ToArray();
             variables = propertiesList.ToArray();
-            
+            getUnknownVariableValueHandlers = getUnknownVariableValueHandlersList.ToArray();
+            setUnknownVariableValueHandlers = setUnknownVariableValueHandlersList.ToArray();
             expressionEvaluator.EvaluateFunction += EvaluateFunction;
             expressionEvaluator.EvaluateName += EvaluateName;
 
@@ -34,6 +41,17 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console.CommandInterpreter
                 new Tuple<string, Func<string, object>>("^[A-Za-z_][A-Za-z_0-9.]*(?> +)[^=].*$", ExecuteCommandStyle),
                 new Tuple<string, Func<string, object>>("^[A-Za-z_][A-Za-z_0-9.]* *=.+$", ExecuteAssignmentStyle),
             };
+        }
+
+        private void AddUnknownVariableHandlersFrom(object commandsProvider, List<Tuple<object, MethodInfo>> getUnknownVariableValueHandlersList, List<Tuple<object, MethodInfo>> setUnknownVariableValueHandlersList)
+        {
+            var getMethod = commandsProvider.GetType().GetMethod("TryGetVariableValue", new[] { typeof(string), typeof(object).MakeByRefType() });
+            if(getMethod!=null && getMethod.GetParameters()[1].IsOut && getMethod.ReturnType == typeof(bool))
+                getUnknownVariableValueHandlersList.Add(new Tuple<object, MethodInfo>(commandsProvider, getMethod));
+
+            var setMethod = commandsProvider.GetType().GetMethod("TrySetVariableValue", new[] { typeof(string), typeof(object) });
+            if(setMethod!=null && setMethod.ReturnType == typeof(bool))
+                setUnknownVariableValueHandlersList.Add(new Tuple<object, MethodInfo>(commandsProvider, setMethod));
         }
 
         private void AddCommandsFrom(object commandsProvider, List<Command> commandsList, List<Variable> propertiesList)
@@ -104,10 +122,29 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console.CommandInterpreter
 
         private void EvaluateName(object sender, EvaluateNameEventArgs args)
         {
-            var name = args.Name;
-            var variable = GetVariable(ref name);
-            var value = variable.GetValue();
-            args.Result = value;
+            args.Result = GetVariableValue(args.Name, "Unknown variable");
+        }
+
+        private object GetVariableValue(string name, string errorMessage)
+        {
+            string name2 = name;
+            var variable = GetVariable(ref name2);
+            if(variable != null) {
+                return variable.GetValue();
+            }
+
+            var parameters = new object[] {name2, null};
+            foreach(var handler in getUnknownVariableValueHandlers) {
+                try {
+                    if((bool)handler.Item2.Invoke(handler.Item1, parameters))
+                        return parameters[1];
+                }
+                catch (TargetInvocationException ex) {
+                    throw new CommandExecutionException($"Error obtaining the value of variable '{name2}': {ex.InnerException.Message}", ex);
+                }
+            }
+
+            throw new CommandExecutionException($"{errorMessage}: '{name2}'" );
         }
 
         private Command GetCommand(ref string name, bool throwIfNotFound = true)
@@ -135,7 +172,8 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console.CommandInterpreter
             var matchingVariables = variables.Where(v => v == name2).ToArray();
 
             if(matchingVariables.Length == 0) {
-                throw new CommandExecutionException($"Unknown variable: {name}");
+                name = name2;
+                return null;
             }
 
             if (matchingVariables.Length > 1) {
@@ -168,11 +206,7 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console.CommandInterpreter
             if(command != null)
                 return command.Execute(commandLine, CommandArgument.NoArguments);
 
-            var variable = GetVariable(ref commandLine);
-            if (variable != null)
-                return variable.GetValue();
-
-            throw new CommandExecutionException($"Can't find command or variable named '{commandLine}'");
+            return GetVariableValue(commandLine, "Unknown command or variable");
         }
 
         private object ExecuteCommandStyle(string commandLine)
@@ -208,11 +242,32 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console.CommandInterpreter
         {
             var indexOfEquals = commandLine.IndexOf("=");
             var variableName = commandLine.Substring(0, indexOfEquals).Trim();
-            var variable = GetVariable(ref variableName);
             var expression = commandLine.Substring(indexOfEquals + 1);
             var value = expressionEvaluator.Evaluate(expression);
-            variable.SetValue(value);
+            SetVariableValue(variableName, value);
             return value;
+        }
+
+        private void SetVariableValue(string name, object value)
+        {
+            string name2 = name;
+            var variable = GetVariable(ref name2);
+            if(variable != null) {
+                variable.SetValue(value);
+                return;
+            }
+
+            foreach(var handler in setUnknownVariableValueHandlers) {
+                try {
+                    if((bool)handler.Item2.Invoke(handler.Item1, new object[] {name, value}))
+                        return;
+                }
+                catch (TargetInvocationException ex) {
+                    throw new CommandExecutionException($"Error setting the value of variable '{name2}': {ex.InnerException.Message}", ex);
+                }
+            }
+
+            throw new CommandExecutionException($"Unknown variable: '{name2}'" );
         }
     }
 }

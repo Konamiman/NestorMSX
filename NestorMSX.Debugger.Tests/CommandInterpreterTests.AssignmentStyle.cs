@@ -27,5 +27,13 @@ namespace NestorMSX.Debugger.Tests
             Sut.ExecuteCommand("woprop_priv = 5678");
             Assert.AreEqual(5678, CommandsObject.PrivateGetterPropertyValue);
         }
+
+        [Test]
+        public void CanSetUnknownVariableValueViaFallbackMethod()
+        {
+            var value = "foobar";
+            Sut.ExecuteCommand($"{CommandsObject.TrySetVariableValue_Name}=\"{value}\"");
+            Assert.AreEqual(CommandsObject.TrySetVariableValue_Value, value);
+        }
     }
 }

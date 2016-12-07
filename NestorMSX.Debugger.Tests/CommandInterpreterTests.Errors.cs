@@ -142,5 +142,19 @@ namespace NestorMSX.Debugger.Tests
             TestDelegate runCommand = () => Sut.ExecuteCommand("throws");
             AssertThrows(runCommand, "Exception thrown", "Throws", "Booo!");
         }
+
+        [Test]
+        public void GettingUnknownVariableValueViaFallbackMethodThatthrowsGetsProperErrorMessage()
+        {
+            AssertThrows(() => Sut.ExecuteCommand(
+                CommandsObject.TryGetVariableValue_NameThatThrows), "Error", CommandsObject.TryGetVariableValue_MessageThrown);
+        }
+
+        [Test]
+        public void SettingUnknownVariableValueViaFallbackMethodThatthrowsGetsProperErrorMessage()
+        {
+            AssertThrows(() => Sut.ExecuteCommand(
+                $"{CommandsObject.TrySetVariableValue_NameThatThrows}=\"foo\""), "Error", CommandsObject.TrySetVariableValue_MessageThrown);
+        }
     }
 }
