@@ -25,8 +25,7 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console.CommandInterpreter
             var getUnknownVariableValueHandlersList = new List<Tuple<object, MethodInfo>>();
             var setUnknownVariableValueHandlersList = new List<Tuple<object, MethodInfo>>();
             foreach (var obj in commandsProviders) {
-                AddCommandsFrom(obj, commandsList, propertiesList);
-                AddUnknownVariableHandlersFrom(obj, getUnknownVariableValueHandlersList, setUnknownVariableValueHandlersList);
+                AddCommandsAndPropertiesFrom(obj, commandsList, propertiesList, getUnknownVariableValueHandlersList, setUnknownVariableValueHandlersList);
             }
             commands = commandsList.ToArray();
             variables = propertiesList.ToArray();
@@ -54,9 +53,26 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console.CommandInterpreter
                 setUnknownVariableValueHandlersList.Add(new Tuple<object, MethodInfo>(commandsProvider, setMethod));
         }
 
-        private void AddCommandsFrom(object commandsProvider, List<Command> commandsList, List<Variable> propertiesList)
+        private void AddCommandsAndPropertiesFrom(
+            object commandsProvider,
+            List<Command> commandsList,
+            List<Variable> propertiesList, List<Tuple<object, MethodInfo>> getUnknownVariableValueHandlersList, 
+            List<Tuple<object, MethodInfo>> setUnknownVariableValueHandlersList)
         {
-            var type = commandsProvider.GetType();
+            Type type;
+            BindingFlags bindingFlags;
+            if(commandsProvider is Type) {
+                type = (Type)commandsProvider;
+                commandsProvider = null;
+                bindingFlags = BindingFlags.Public | BindingFlags.Static;
+            }
+            else {
+                type = commandsProvider.GetType();
+                bindingFlags = BindingFlags.Public | BindingFlags.Instance;
+            }
+
+            // command methods
+
             var typeName = (type
                 .GetCustomAttributes(typeof(NameAttribute), false)
                 .SingleOrDefault() as NameAttribute)?.Name ?? type.Name;
@@ -64,9 +80,8 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console.CommandInterpreter
             if(!typeName.Contains("."))
                 typeName = (type.Namespace + "." + typeName).ToLower();
 
-            var commandMethods = commandsProvider
-                .GetType()
-                .GetMethods()
+            var commandMethods = type
+                .GetMethods(bindingFlags)
                 .Where(m => m.GetCustomAttributes(typeof(IgnoreAttribute), false).Length == 0);
             
             foreach(var method in commandMethods) {
@@ -82,9 +97,10 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console.CommandInterpreter
                 }
             }
 
-            var propertyVariables = commandsProvider
-                .GetType()
-                .GetProperties()
+            // variable properties
+
+            var propertyVariables = type
+                .GetProperties(bindingFlags)
                 .Where(p => p.GetCustomAttributes(typeof(IgnoreAttribute), false).Length == 0);
 
             foreach(var property in propertyVariables) {
@@ -99,6 +115,16 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console.CommandInterpreter
                     propertiesList.Add(variable);
                 }
             }
+
+            // variable fallbacks
+
+            var getFallback = type.GetMethod("TryGetVariableValue", new[] { typeof(string), typeof(object).MakeByRefType() });
+            if(getFallback!=null && getFallback.GetParameters()[1].IsOut && getFallback.ReturnType == typeof(bool))
+                getUnknownVariableValueHandlersList.Add(new Tuple<object, MethodInfo>(commandsProvider, getFallback));
+
+            var setFallback = type.GetMethod("TrySetVariableValue", new[] { typeof(string), typeof(object) });
+            if(setFallback!=null && setFallback.ReturnType == typeof(bool))
+                setUnknownVariableValueHandlersList.Add(new Tuple<object, MethodInfo>(commandsProvider, setFallback));
         }
 
         private string[] GetAliases(MemberInfo member)

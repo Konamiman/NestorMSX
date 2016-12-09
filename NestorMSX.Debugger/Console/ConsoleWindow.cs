@@ -12,7 +12,7 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console
             txtCommand.Text = "";
             txtResults.Text = "";
 
-            this.Size = new Size(800, 600);
+            //this.Size = new Size(800, 600);
         }
 
         public string Title
