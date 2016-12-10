@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 
 namespace Konamiman.NestorMSX.Z80Debugger.Console.CommandInterpreter
 {
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Enum, AllowMultiple = false)]
     public class NameAttribute : Attribute
     {
         public string Name { get; }

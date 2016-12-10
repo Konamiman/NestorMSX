@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
@@ -25,7 +26,10 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console.CommandInterpreter
             var getUnknownVariableValueHandlersList = new List<Tuple<object, MethodInfo>>();
             var setUnknownVariableValueHandlersList = new List<Tuple<object, MethodInfo>>();
             foreach (var obj in commandsProviders) {
-                AddCommandsAndPropertiesFrom(obj, commandsList, propertiesList, getUnknownVariableValueHandlersList, setUnknownVariableValueHandlersList);
+                if ((obj as Type)?.IsEnum == true)
+                    AddEnumValuesFrom((Type) obj, propertiesList);
+                else
+                    AddCommandsAndPropertiesFrom(obj, commandsList, propertiesList, getUnknownVariableValueHandlersList, setUnknownVariableValueHandlersList);
             }
             commands = commandsList.ToArray();
             variables = propertiesList.ToArray();
@@ -40,6 +44,17 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console.CommandInterpreter
                 new Tuple<string, Func<string, object>>("^[A-Za-z_][A-Za-z_0-9.]*(?> +)[^=].*$", ExecuteCommandStyle),
                 new Tuple<string, Func<string, object>>("^[A-Za-z_][A-Za-z_0-9.]* *=.+$", ExecuteAssignmentStyle),
             };
+        }
+
+        private void AddEnumValuesFrom(Type type, List<Variable> propertiesList)
+        {
+            var typeName = GetTypeName(type);
+            var names = Enum.GetNames(type);
+            var values = Enum.GetValues(type).Cast<object>().Select(v => (int)v).ToArray();
+            for(int i=0; i<names.Length; i++) {
+                var fullName = $"{typeName}.{names[i]}";
+                propertiesList.Add(new ConstantValueVariable(fullName, values[i]));
+            }
         }
 
         private void AddUnknownVariableHandlersFrom(object commandsProvider, List<Tuple<object, MethodInfo>> getUnknownVariableValueHandlersList, List<Tuple<object, MethodInfo>> setUnknownVariableValueHandlersList)
@@ -73,12 +88,7 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console.CommandInterpreter
 
             // command methods
 
-            var typeName = (type
-                .GetCustomAttributes(typeof(NameAttribute), false)
-                .SingleOrDefault() as NameAttribute)?.Name ?? type.Name;
-
-            if(!typeName.Contains("."))
-                typeName = (type.Namespace + "." + typeName).ToLower();
+            var typeName = GetTypeName(type);
 
             var commandMethods = type
                 .GetMethods(bindingFlags)
@@ -125,6 +135,17 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console.CommandInterpreter
             var setFallback = type.GetMethod("TrySetVariableValue", new[] { typeof(string), typeof(object) });
             if(setFallback!=null && setFallback.ReturnType == typeof(bool))
                 setUnknownVariableValueHandlersList.Add(new Tuple<object, MethodInfo>(commandsProvider, setFallback));
+        }
+
+        private static string GetTypeName(Type type)
+        {
+            var typeName = (type
+                .GetCustomAttributes(typeof(NameAttribute), false)
+                .SingleOrDefault() as NameAttribute)?.Name ?? type.Name;
+
+            if (!typeName.Contains("."))
+                typeName = (type.Namespace + "." + typeName).ToLower();
+            return typeName;
         }
 
         private string[] GetAliases(MemberInfo member)

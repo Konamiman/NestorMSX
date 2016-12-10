@@ -23,6 +23,8 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console.CommandInterpreter
                 return (int)(decimal)value;
             if (value is int && targetType == typeof(decimal))
                 return (decimal)(int)value;
+            if (value is int && targetType.IsEnum)
+                return Enum.ToObject(targetType, (int) value);
 
             try {
                 if (converter.CanConvertFrom(value.GetType()))

@@ -51,6 +51,7 @@
       <DependentUpon>CommandInterpreterTests.cs</DependentUpon>
     </Compile>
     <Compile Include="CommandInterpreterTests.cs" />
+    <Compile Include="CommandInterpreterTests.EnumAsConstants.cs" />
     <Compile Include="CommandInterpreterTests.Errors.cs">
       <DependentUpon>CommandInterpreterTests.cs</DependentUpon>
     </Compile>
