@@ -57,6 +57,7 @@
     <Compile Include="Console\CommandInterpreter\CommandParameter.cs" />
     <Compile Include="Console\CommandInterpreter\CommandInterpreter.cs" />
     <Compile Include="Console\CommandInterpreter\ConstantValueVariable.cs" />
+    <Compile Include="Console\CommandInterpreter\RawExpressionattribute.cs" />
     <Compile Include="Console\ConsoleTestForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -98,6 +99,7 @@
     <Compile Include="Console\CommandInterpreter\TypeConverterWrapper.cs" />
     <Compile Include="Console\CommandInterpreter\Variable.cs" />
     <Compile Include="Console\IConsoleWindow.cs" />
+    <Compile Include="ExtensionMethods.cs" />
     <Compile Include="InstructionExtraction\InstructionExtractor.cs" />
     <Compile Include="InstructionExtraction\InstructionExtractor.DBinstructions.cs">
       <AutoGen>True</AutoGen>

@@ -57,17 +57,6 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console.CommandInterpreter
             }
         }
 
-        private void AddUnknownVariableHandlersFrom(object commandsProvider, List<Tuple<object, MethodInfo>> getUnknownVariableValueHandlersList, List<Tuple<object, MethodInfo>> setUnknownVariableValueHandlersList)
-        {
-            var getMethod = commandsProvider.GetType().GetMethod("TryGetVariableValue", new[] { typeof(string), typeof(object).MakeByRefType() });
-            if(getMethod!=null && getMethod.GetParameters()[1].IsOut && getMethod.ReturnType == typeof(bool))
-                getUnknownVariableValueHandlersList.Add(new Tuple<object, MethodInfo>(commandsProvider, getMethod));
-
-            var setMethod = commandsProvider.GetType().GetMethod("TrySetVariableValue", new[] { typeof(string), typeof(object) });
-            if(setMethod!=null && setMethod.ReturnType == typeof(bool))
-                setUnknownVariableValueHandlersList.Add(new Tuple<object, MethodInfo>(commandsProvider, setMethod));
-        }
-
         private void AddCommandsAndPropertiesFrom(
             object commandsProvider,
             List<Command> commandsList,
@@ -111,7 +100,8 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console.CommandInterpreter
 
             var propertyVariables = type
                 .GetProperties(bindingFlags)
-                .Where(p => p.GetCustomAttributes(typeof(IgnoreAttribute), false).Length == 0);
+                .Where(p => p.GetCustomAttributes(typeof(IgnoreAttribute), false).Length == 0)
+                .ToArray();
 
             foreach(var property in propertyVariables) {
                 var propertyAliases = GetAliases(property);
@@ -135,6 +125,12 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console.CommandInterpreter
             var setFallback = type.GetMethod("TrySetVariableValue", new[] { typeof(string), typeof(object) });
             if(setFallback!=null && setFallback.ReturnType == typeof(bool))
                 setUnknownVariableValueHandlersList.Add(new Tuple<object, MethodInfo>(commandsProvider, setFallback));
+
+            // expression evaluation property
+
+            var expressionEvaluatorProperty =
+                propertyVariables.SingleOrDefault(p => p.Name == "EvaluateExpression" && p.PropertyType == typeof(Func<string, object>) && p.GetSetMethod()?.IsPublic == true);
+            expressionEvaluatorProperty?.SetValue(commandsProvider, (Func<string, object>)expressionEvaluator.Evaluate, null);
         }
 
         private static string GetTypeName(Type type)
@@ -265,16 +261,21 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console.CommandInterpreter
             var command = GetCommand(ref commandName);
 
             var arguments = new List<CommandArgument>();
+            var parameterIndex = 0;
             foreach(var token in tokens.Skip(1)) {
                 if(Regex.IsMatch(token, "^([A-Za-z_][A-Za-z_0-9]*)=")) {
                     var indexOfEquals = token.IndexOf("=");
                     var argName = token.Substring(0, indexOfEquals).ToLower();
-                    var argValue = expressionEvaluator.Evaluate(token.Substring(indexOfEquals + 1));
-                    arguments.Add(new CommandArgument(argName, argValue));
+                    var argValue = token.Substring(indexOfEquals + 1);
+                    var skipEvaluation = command.Parameters.Any(p => p.Name.Equals(argName, StringComparison.InvariantCultureIgnoreCase) && p.IsRawExpression);
+                    arguments.Add(new CommandArgument(argName, skipEvaluation ? argValue : expressionEvaluator.Evaluate(argValue)));
                 }
                 else {
-                    arguments.Add(new CommandArgument(null, expressionEvaluator.Evaluate(token)));
+                    var skipEvaluation = command.Parameters[parameterIndex].IsRawExpression;
+                    var value = skipEvaluation ? token : expressionEvaluator.Evaluate(token);
+                    arguments.Add(new CommandArgument(null, value));
                 }
+                parameterIndex++;
             }
 
             return command.Execute(commandName, arguments.ToArray());

@@ -52,5 +52,14 @@ namespace NestorMSX.Debugger.Tests
             var result = Sut.ExecuteCommand("concat 10 sum(2,4,1) 30 num5=sum(7,1,1)");
             Assert.AreEqual("(10,13,30,1,15,3)", result);
         }
+
+        [Test]
+        [TestCase("withraw 1+2 3+4")]
+        [TestCase("withraw 1+2 raw=3+4")]
+        public void CanAcceptRawExpressionsWithAttribute(string command)
+        {
+            var result = Sut.ExecuteCommand(command);
+            Assert.AreEqual(result, "calculated: 3, raw: 3+4, calculated2: 7");
+        }
     }
 }

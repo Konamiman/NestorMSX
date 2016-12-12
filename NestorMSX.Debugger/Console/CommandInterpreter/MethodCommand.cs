@@ -22,7 +22,11 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console.CommandInterpreter
             var methodParameters = method.GetParameters();
             this.Parameters =
                 methodParameters
-                    .Select(p => new CommandParameter(p.Name, !p.IsOptional, p.DefaultValue))
+                    .Select(p => new CommandParameter(
+                        p.Name,
+                        !p.IsOptional, 
+                        p.DefaultValue,
+                        p.HasAttribute<RawExpressionAttribute>() && p.ParameterType == typeof(string)))
                     .ToArray();
 
             converters = new Dictionary<CommandParameter, TypeConverterWrapper>();

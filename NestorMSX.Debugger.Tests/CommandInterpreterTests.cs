@@ -117,6 +117,13 @@ namespace NestorMSX.Debugger.Tests
                     return false;
                 }
             }
+
+            public string WithRawExpression(int calculated, [RawExpression]string raw)
+            {
+                return $"calculated: {calculated}, raw: {raw}, calculated2: {EvaluateExpression(raw)}";
+            }
+
+            public Func<string, object> EvaluateExpression { get; set; }
         }
 
         private CommandInterpreter Sut;
