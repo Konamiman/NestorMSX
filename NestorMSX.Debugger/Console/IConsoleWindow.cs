@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Konamiman.NestorMSX.Z80Debugger.Console
 {
@@ -10,5 +7,11 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console
         string Title { get; set; }
 
         event EventHandler<CommandExecutionRequestedEventArgs> CommandExecutionRequested;
+
+        void Clear();
+
+        Func<object, string> ResultsFormatter { get; set; }
+
+        void Print(string text);
     }
 }

@@ -1,18 +1,34 @@
 ﻿using System;
-using System.Drawing;
 using System.Windows.Forms;
+using Konamiman.NestorMSX.Z80Debugger.Console.CommandInterpreter;
 
 namespace Konamiman.NestorMSX.Z80Debugger.Console
 {
     public partial class ConsoleWindow : Form, IConsoleWindow
     {
+        private readonly Func<object, string> defaultResultsFormatter = o => o?.ToString();
+        private Func<object, string> _resultsFormatter;
+
         public ConsoleWindow()
         {
             InitializeComponent();
-            txtCommand.Text = "";
-            txtResults.Text = "";
+            cmdControl.Command += CmdControlOnCommand;
+            cmdControl.SetWholeThingFont(new System.Drawing.Font("Courier New", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0))));
 
-            //this.Size = new Size(800, 600);
+            ResultsFormatter = null;
+        }
+
+        private void CmdControlOnCommand(object sender, CommandEventArgs e)
+        {
+            if(e.Command.Equals("cls", StringComparison.InvariantCultureIgnoreCase)) {
+                Clear();
+                e.Cancel = true;
+                return;
+            }
+
+            var args = new CommandExecutionRequestedEventArgs(e.Command);
+            CommandExecutionRequested?.Invoke(this, args);
+            e.Message = ResultsFormatter(args.Result);
         }
 
         public string Title
@@ -24,21 +40,21 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console
 
         public event EventHandler<CommandExecutionRequestedEventArgs> CommandExecutionRequested;
 
-        private void txtCommand_KeyPress(object sender, KeyPressEventArgs e)
+        [Alias("cls")]
+        public void Clear()
         {
-            if (e.KeyChar != (char) Keys.Return)
-                return;
+            cmdControl.ClearMessages();
+        }
 
-            if (CommandExecutionRequested == null)
-                return;
+        public Func<object, string> ResultsFormatter
+        {
+            get { return _resultsFormatter; }
+            set { _resultsFormatter = value ?? defaultResultsFormatter; }
+        }
 
-            txtResults.Text += $"> {txtCommand.Text.Trim()}\r\n";
-            var args = new CommandExecutionRequestedEventArgs(txtCommand.Text);
-            CommandExecutionRequested(this, args);
-            txtCommand.Text = "";
-            txtResults.Text += (args.Result?.ToString() ?? "null") + "\r\n";
-
-            txtCommand.Focus();
+        public void Print(string text)
+        {
+            cmdControl.AddMessage(text);
         }
     }
 }

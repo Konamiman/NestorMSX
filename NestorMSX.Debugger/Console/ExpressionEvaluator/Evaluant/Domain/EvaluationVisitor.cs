@@ -171,6 +171,9 @@ namespace Evaluant.Calculator.Domain
             // Calls external implementation
             OnEvaluateFunction(function.Identifier, args);
 
+            result = args.Result;
+            return; //!!!
+
             // If an external implementation was found get the result back
             if (args.Result != null)
             {

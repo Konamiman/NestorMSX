@@ -58,6 +58,8 @@
     <Compile Include="Console\CommandInterpreter\CommandInterpreter.cs" />
     <Compile Include="Console\CommandInterpreter\ConstantValueVariable.cs" />
     <Compile Include="Console\CommandInterpreter\RawExpressionattribute.cs" />
+    <Compile Include="Console\CommandProviders\EmulatorCommandsProvider.cs" />
+    <Compile Include="Console\CommandProviders\UtilsCommandsProvider.cs" />
     <Compile Include="Console\ConsoleTestForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -99,6 +101,12 @@
     <Compile Include="Console\CommandInterpreter\TypeConverterWrapper.cs" />
     <Compile Include="Console\CommandInterpreter\Variable.cs" />
     <Compile Include="Console\IConsoleWindow.cs" />
+    <Compile Include="Console\Prompt.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Console\Prompt.designer.cs">
+      <DependentUpon>Prompt.cs</DependentUpon>
+    </Compile>
     <Compile Include="ExtensionMethods.cs" />
     <Compile Include="InstructionExtraction\InstructionExtractor.cs" />
     <Compile Include="InstructionExtraction\InstructionExtractor.DBinstructions.cs">
@@ -192,6 +200,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Console\ConsoleWindow.resx">
       <DependentUpon>ConsoleWindow.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Console\Prompt.resx">
+      <DependentUpon>Prompt.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />

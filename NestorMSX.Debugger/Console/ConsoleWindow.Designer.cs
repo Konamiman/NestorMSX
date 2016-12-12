@@ -27,55 +27,36 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.txtCommand = new System.Windows.Forms.TextBox();
-            this.txtResults = new System.Windows.Forms.TextBox();
+            this.cmdControl = new Konamiman.NestorMSX.Z80Debugger.Console.CommandPromptControl();
             this.SuspendLayout();
             // 
-            // txtCommand
+            // cmdControl
             // 
-            this.txtCommand.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtCommand.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(192)))));
-            this.txtCommand.Font = new System.Drawing.Font("Courier New", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtCommand.ForeColor = System.Drawing.Color.White;
-            this.txtCommand.Location = new System.Drawing.Point(0, 3);
-            this.txtCommand.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
-            this.txtCommand.Name = "txtCommand";
-            this.txtCommand.Size = new System.Drawing.Size(1966, 53);
-            this.txtCommand.TabIndex = 0;
-            this.txtCommand.Text = "Some text";
-            this.txtCommand.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtCommand_KeyPress);
-            // 
-            // txtResults
-            // 
-            this.txtResults.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtResults.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(192)))));
-            this.txtResults.Font = new System.Drawing.Font("Courier New", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtResults.ForeColor = System.Drawing.Color.White;
-            this.txtResults.Location = new System.Drawing.Point(0, 63);
-            this.txtResults.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
-            this.txtResults.Multiline = true;
-            this.txtResults.Name = "txtResults";
-            this.txtResults.ReadOnly = true;
-            this.txtResults.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txtResults.Size = new System.Drawing.Size(1966, 844);
-            this.txtResults.TabIndex = 1;
-            this.txtResults.Text = "Some results text";
+            this.cmdControl.AutoSize = true;
+            this.cmdControl.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(192)))));
+            this.cmdControl.Delimiters = new char[] {
+        ' '};
+            this.cmdControl.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.cmdControl.ForeColor = System.Drawing.Color.White;
+            this.cmdControl.Location = new System.Drawing.Point(0, 0);
+            this.cmdControl.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.cmdControl.MessageColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
+            this.cmdControl.MinimumSize = new System.Drawing.Size(0, 26);
+            this.cmdControl.Name = "cmdControl";
+            this.cmdControl.PromptColor = System.Drawing.Color.White;
+            this.cmdControl.Size = new System.Drawing.Size(649, 429);
+            this.cmdControl.TabIndex = 0;
             // 
             // ConsoleWindow
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.ClientSize = new System.Drawing.Size(1968, 912);
-            this.Controls.Add(this.txtResults);
-            this.Controls.Add(this.txtCommand);
-            this.Font = new System.Drawing.Font("Courier New", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.ClientSize = new System.Drawing.Size(649, 417);
+            this.Controls.Add(this.cmdControl);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "ConsoleWindow";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Show;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "NestorMSX Debugger - Console";
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -84,7 +65,6 @@
 
         #endregion
 
-        private System.Windows.Forms.TextBox txtCommand;
-        private System.Windows.Forms.TextBox txtResults;
+        private CommandPromptControl cmdControl;
     }
 }

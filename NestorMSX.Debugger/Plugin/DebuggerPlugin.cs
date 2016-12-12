@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Windows.Forms;
 using Konamiman.NestorMSX.Menus;
 using Konamiman.NestorMSX.Z80Debugger.Console;
 using Konamiman.NestorMSX.Z80Debugger.Console.CommandInterpreter;
+using Konamiman.NestorMSX.Z80Debugger.Console.CommandProviders;
 using Konamiman.NestorMSX.Z80Debugger.Console.ExpressionEvaluator;
 using Konamiman.Z80dotNet;
 
@@ -23,14 +25,39 @@ namespace Konamiman.NestorMSX.Z80Debugger.Plugin
             var menuEntry = new MenuEntry("Show console", ShowConsole);
             context.SetMenuEntry(this, menuEntry);
 
-            commandInterpreter = new CommandInterpreter(new EvaluantExpressionEvaluatorWrapper(), new object[0]);
+            commandInterpreter = new CommandInterpreter(
+                new EvaluantExpressionEvaluatorWrapper(), 
+                new object[]
+                {
+                    new EmulatorCommandsProvider(context),
+                    typeof(UtilsCommandsProvider)
+                });
         }
 
+        private ConsoleWindow console;
         private void ShowConsole()
         {
-            var console = new ConsoleWindow();
+            console = new ConsoleWindow();
             console.CommandExecutionRequested += Console_CommandExecutionRequested;
+            console.ResultsFormatter = ResultsFormatter;
             console.Show(hostForm);
+        }
+
+        private string ResultsFormatter(object arg)
+        {
+            if(arg is byte) {
+                return $"{arg} - &H{arg:X2} - &B{Convert.ToString((byte)arg, 2).PadLeft(8,'0')} - \"{Convert.ToChar((byte)arg)}\"";
+            }
+
+            if(arg is ushort) {
+                return $"{arg} - &H{arg:X4} - &B{Convert.ToString((ushort)arg, 4).PadLeft(4,'0')}";
+            }
+
+            if(arg is short) {
+                return $"{arg} - &H{arg:X4} - &B{Convert.ToString((short)arg, 4).PadLeft(4,'0')}";
+            }
+
+            return arg?.ToString();
         }
 
         private void Console_CommandExecutionRequested(object sender, CommandExecutionRequestedEventArgs e)
