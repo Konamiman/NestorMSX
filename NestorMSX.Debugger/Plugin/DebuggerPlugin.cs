@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using Konamiman.NestorMSX.Menus;
@@ -25,14 +26,38 @@ namespace Konamiman.NestorMSX.Z80Debugger.Plugin
             var menuEntry = new MenuEntry("Show console", ShowConsole);
             context.SetMenuEntry(this, menuEntry);
 
+            var commandProviders = new object[]
+            {
+                new EmulatorCommandsProvider(context),
+                typeof(UtilsCommandsProvider)
+            };
+
+            var messagePrinters = commandProviders.OfType<IAsyncMessagePrinter>();
+            foreach(var printer in messagePrinters) {
+                printer.PrintMessageRequest += OnPrintMessageRequest;
+            }
+
             commandInterpreter = new CommandInterpreter(
                 new EvaluantExpressionEvaluatorWrapper(), 
-                new object[]
-                {
-                    new EmulatorCommandsProvider(context),
-                    typeof(UtilsCommandsProvider)
-                });
+                commandProviders);
         }
+
+        private void OnPrintMessageRequest(object sender, PrintMessageRequestEventArgs args)
+        {
+            if (hostForm.InvokeRequired)
+                hostForm.Invoke(new Action(() => { PrintInConsole(args.Message); }));
+            else
+                PrintInConsole(args.Message);
+        }
+
+        private void PrintInConsole(object message)
+        {
+            var formFocused = hostForm.Focused;
+            console?.Print(ResultsFormatter(message));
+            if (formFocused) hostForm.Focus();
+        }
+
+        
 
         private ConsoleWindow console;
         private void ShowConsole()

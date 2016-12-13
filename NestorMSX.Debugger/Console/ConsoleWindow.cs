@@ -43,7 +43,7 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console
         [Alias("cls")]
         public void Clear()
         {
-            cmdControl.ClearMessages();
+            Do(() => cmdControl.ClearMessages());
         }
 
         public Func<object, string> ResultsFormatter
@@ -54,7 +54,19 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console
 
         public void Print(string text)
         {
-            cmdControl.AddMessage(text);
+            Do(() => cmdControl.AddMessage(text));
+        }
+
+        private void Do(Action action, bool alwaysInvoke = false)
+        {
+            try {
+                if (this.InvokeRequired || alwaysInvoke)
+                    this.Invoke(action);
+                else
+                    action();
+            }
+            catch (ObjectDisposedException) {
+            }
         }
     }
 }
