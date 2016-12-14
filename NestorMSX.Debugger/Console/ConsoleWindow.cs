@@ -15,6 +15,7 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console
             cmdControl.Command += CmdControlOnCommand;
             cmdControl.SetWholeThingFont(new System.Drawing.Font("Courier New", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0))));
 
+            cmdControl.TheParent = this;
             ResultsFormatter = null;
         }
 

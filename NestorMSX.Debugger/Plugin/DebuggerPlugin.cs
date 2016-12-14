@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 using Konamiman.NestorMSX.Menus;
 using Konamiman.NestorMSX.Z80Debugger.Console;
@@ -70,19 +69,27 @@ namespace Konamiman.NestorMSX.Z80Debugger.Plugin
 
         private string ResultsFormatter(object arg)
         {
-            if(arg is byte) {
-                return $"{arg} - &H{arg:X2} - &B{Convert.ToString((byte)arg, 2).PadLeft(8,'0')} - \"{Convert.ToChar((byte)arg)}\"";
+            int value;
+            try {
+                value = (int) Convert.ChangeType(arg, typeof(int));
+            }
+            catch {
+                return arg?.ToString();
             }
 
-            if(arg is ushort) {
-                return $"{arg} - &H{arg:X4} - &B{Convert.ToString((ushort)arg, 4).PadLeft(4,'0')}";
+            if((value >= -128 && value <= 31) || value == 127) {
+                return $"{value} - &H{$"{value:X2}".Right(2)} - &B{$"{Convert.ToString(value, 2).PadLeft(8,'0')}".Right(8)}";
             }
 
-            if(arg is short) {
-                return $"{arg} - &H{arg:X4} - &B{Convert.ToString((short)arg, 4).PadLeft(4,'0')}";
+            if(value >= 32 && value <= 255) {
+                return $"{value} - &H{$"{value:X2}".Right(2)} - &B{$"{Convert.ToString(value, 2).PadLeft(8,'0')}".Right(8)} - \"{Convert.ToChar((byte)value)}\"";
             }
 
-            return arg?.ToString();
+            if(value >= -32768 && value <= 32767) {
+                return $"{value} - &H{$"{value:X4}".Right(4)} - &B{$"{Convert.ToString(value, 2).PadLeft(16,'0')}".Right(16)}";
+            }
+
+            return $"{value} - &H{value:X8} - &B{Convert.ToString(value, 2).PadLeft(8,'0')}";
         }
 
         private void Console_CommandExecutionRequested(object sender, CommandExecutionRequestedEventArgs e)

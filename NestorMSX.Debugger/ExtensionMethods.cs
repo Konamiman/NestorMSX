@@ -9,5 +9,10 @@ namespace Konamiman.NestorMSX.Z80Debugger
         {
             return parameter.GetCustomAttributes(typeof(T), false).Length > 0;
         }
+
+        public static string Right(this string value, int length)
+        {
+            return value.Substring(value.Length - length, length);
+        }
     }
 }

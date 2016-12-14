@@ -112,7 +112,7 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console
         [Description("Adds a message to the message RichTextBox")]
         public void AddMessage(string msg)
         {
-            rtbMessages.Focus();
+            FocusResults();
             int prevLength = rtbMessages.Text.Length;
 
             if (rtbMessages.Lines.Length > 0)
@@ -129,7 +129,7 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console
             rtbMessages.SelectionColor = rtbMessages.ForeColor;
             rtbMessages.ScrollToCaret();
             
-            txtInput.Focus();
+            FocusInput();
         }
 
         /// <summary>
@@ -139,7 +139,7 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console
         /// <param name="command">The command entered</param>
         private void AddCommand(string prompt, Color color, string command)
         {
-            rtbMessages.Focus();
+            FocusResults();
 
             int prevLength = rtbMessages.Text.Length;
 
@@ -153,7 +153,7 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console
             rtbMessages.SelectionStart = rtbMessages.Text.Length;
             rtbMessages.ScrollToCaret();
 
-            txtInput.Focus();
+            FocusInput();
         }
 
         [Description("Clear all messages from RichTextBox")]
@@ -522,7 +522,7 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console
         private void rtbMessages_Click(object sender, EventArgs e)
         {
             if (rtbMessages.SelectionLength == 0)
-                txtInput.Focus();
+                FocusInput();
         }
 
         private void CommandPrompt_Resize(object sender, EventArgs e)
@@ -535,10 +535,10 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console
                         * txtInput.PreferredHeight + panelBottom.Height;
                 }
 
-                rtbMessages.Focus();
+                FocusResults();
                 AdjustMessagesPanelSize();
                 rtbMessages.ScrollToCaret();
-                txtInput.Focus();
+                FocusInput();
             }
         }
 
@@ -562,6 +562,20 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console
                 toolTipCommand.Hide(txtInput);
         }
         #endregion
+        
+        public Form TheParent { get; set; }
+
+        private void FocusResults()
+        {
+            if(TheParent?.Focused == true || txtInput.Focused)
+                rtbMessages.Focus();
+        }
+
+        private void FocusInput()
+        {
+            if(TheParent?.Focused == true || rtbMessages.Focused)
+                txtInput.Focus();
+        }
     }
 
     public class CommandEventArgs : EventArgs

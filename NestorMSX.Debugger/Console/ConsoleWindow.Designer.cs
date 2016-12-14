@@ -44,8 +44,9 @@
             this.cmdControl.MinimumSize = new System.Drawing.Size(0, 26);
             this.cmdControl.Name = "cmdControl";
             this.cmdControl.PromptColor = System.Drawing.Color.White;
-            this.cmdControl.Size = new System.Drawing.Size(649, 429);
+            this.cmdControl.Size = new System.Drawing.Size(649, 425);
             this.cmdControl.TabIndex = 0;
+            this.cmdControl.TheParent = null;
             // 
             // ConsoleWindow
             // 
