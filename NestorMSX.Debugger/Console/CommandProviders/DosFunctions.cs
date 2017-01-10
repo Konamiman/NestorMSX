@@ -466,21 +466,28 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console.CommandProviders
         /// </summary>
         public static readonly byte REDIR = 0x70;
 
-        private static string NameOf(byte functionCode)
+        public static string NameOf(byte functionCode)
         {
             return functionNamesByCode.ContainsKey(functionCode) ?
                 functionNamesByCode[functionCode] :
                 $"{functionCode:X2}h";
         }
 
-        private static byte CodeOf(string functionName)
+        public static byte CodeOf(string functionName)
         {
             if (functionName.StartsWith("_")) functionName = functionName.Substring(1);
-            if(!functionNamesByCode.ContainsValue(functionName)) 
+            var pair = functionNamesByCode.SingleOrDefault(n => n.Value.Equals(functionName, StringComparison.InvariantCultureIgnoreCase));
+            if(pair.Value == null)
                 throw new ArgumentException($"No DOS function exists with name {functionName}");
-            var pair = functionNamesByCode.Single(n => n.Value == functionName);
             return pair.Key;
         }
+
+        public static bool CodeExists(byte functionCode) => functionNamesByCode.ContainsKey(functionCode);
+
+        public static bool NameExists(string functionName) =>
+                functionNamesByCode.SingleOrDefault(
+                    n => n.Value.Equals(functionName, StringComparison.InvariantCultureIgnoreCase)
+                ).Value != null;
 
         private static Dictionary<byte, string> functionNamesByCode = new Dictionary<byte, string>()
         {

@@ -82,6 +82,8 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console.CommandInterpreter
             }
             catch (TargetInvocationException ex)
             {
+                if (ex.InnerException is CommandExecutionException)
+                    return "*** " + ex.InnerException.Message;
                 throw new CommandExecutionException($"Exception thrown by method '{hostingObject.GetType().Name}.{method.Name}': {ex.InnerException.Message}", ex.InnerException);
             }
         }

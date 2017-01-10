@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Text;
+using Konamiman.NestorMSX.Hardware;
 using Konamiman.NestorMSX.Memories;
 using Konamiman.NestorMSX.Misc;
 using Konamiman.NestorMSX.Z80Debugger.Console.CommandInterpreter;
@@ -19,6 +20,8 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console.CommandProviders
 
         private ushort oldpc;
         private MappedRam mappedRam;
+        private IZ80Processor cpu;
+        private IExternallyControlledSlotsSystem slotsSystem;
 
         private Dictionary<int, string> dosCallNames = new Dictionary<int, string>()
         {
@@ -119,6 +122,9 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console.CommandProviders
         public EmulatorCommandsProvider(PluginContext pluginContext)
         {
             this.pluginContext = pluginContext;
+            this.cpu = pluginContext.Cpu;
+            this.slotsSystem = pluginContext.SlotsSystem;
+
             return; //WIP
             var cpu = pluginContext.Cpu;
             var r = cpu.Registers;
@@ -160,7 +166,7 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console.CommandProviders
             PrintMessageRequest?.Invoke(this, new PrintMessageRequestEventArgs(value));
         }
 
-        
+        public Func<string, object> EvaluateExpression { get; set; }
 
         public event EventHandler<PrintMessageRequestEventArgs> PrintMessageRequest;
     }
