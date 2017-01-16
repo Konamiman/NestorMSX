@@ -55,6 +55,21 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console.CommandProviders
             return $"{mappedRam.GetBlockInBank(0)} {mappedRam.GetBlockInBank(1)} {mappedRam.GetBlockInBank(2)} {mappedRam.GetBlockInBank(3)}";
         }
 
+        public byte SlotIn(int p)
+        {
+            return slotsSystem.GetCurrentSlot(p);
+        }
+
+        public string SslotIn(int p)
+        {
+            return slotsSystem.GetCurrentSlot(p).ToString();
+        }
+
+        public int Segmin(int p)
+        {
+            return mappedRam.GetBlockInBank(p);
+        }
+
         private static readonly StringBuilder sbBytes = new StringBuilder();
         private static readonly StringBuilder sbChars = new StringBuilder();
         private static readonly StringBuilder sbResult = new StringBuilder();

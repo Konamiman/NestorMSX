@@ -73,6 +73,9 @@ namespace Konamiman.NestorMSX.Z80Debugger.Plugin
 
         private string ResultsFormatter(object arg)
         {
+            if (arg is string)
+                return (string) arg;
+
             int value;
             try {
                 value = (int) Convert.ChangeType(arg, typeof(int));
