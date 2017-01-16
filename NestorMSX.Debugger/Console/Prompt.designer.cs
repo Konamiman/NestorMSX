@@ -53,10 +53,10 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console
             // 
             this.txtInput.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.txtInput.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.txtInput.Location = new System.Drawing.Point(18, 0);
+            this.txtInput.Location = new System.Drawing.Point(31, 0);
             this.txtInput.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.txtInput.Name = "txtInput";
-            this.txtInput.Size = new System.Drawing.Size(282, 19);
+            this.txtInput.Size = new System.Drawing.Size(269, 31);
             this.txtInput.TabIndex = 1;
             this.txtInput.TextChanged += new System.EventHandler(this.txtInput_TextChanged);
             this.txtInput.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtInput_KeyDown);
@@ -70,7 +70,7 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console
             this.lblPrompt.Location = new System.Drawing.Point(0, 0);
             this.lblPrompt.Margin = new System.Windows.Forms.Padding(0);
             this.lblPrompt.Name = "lblPrompt";
-            this.lblPrompt.Size = new System.Drawing.Size(18, 20);
+            this.lblPrompt.Size = new System.Drawing.Size(31, 32);
             this.lblPrompt.TabIndex = 0;
             this.lblPrompt.Text = ">";
             // 

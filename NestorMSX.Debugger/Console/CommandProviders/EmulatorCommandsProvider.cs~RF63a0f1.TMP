@@ -15,7 +15,6 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console.CommandProviders
     public partial class EmulatorCommandsProvider : IAsyncMessagePrinter
     {
         private readonly PluginContext pluginContext;
-        private readonly IZ80Registers regs;
 
         private readonly byte[] ldirBytes = {0xED, 0xB0};
 
@@ -33,7 +32,6 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console.CommandProviders
             this.pluginContext = pluginContext;
             this.cpu = pluginContext.Cpu;
             this.slotsSystem = pluginContext.SlotsSystem;
-            this.regs = cpu.Registers;
 
             return; //WIP
             //var cpu = pluginContext.Cpu;

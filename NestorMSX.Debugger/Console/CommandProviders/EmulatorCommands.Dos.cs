@@ -123,12 +123,20 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console.CommandProviders
             if (dosTracingIsPaused)
                 return;
 
-            var r = cpu.Registers;
-            mappedRam = mappedRam ?? pluginContext.SlotsSystem.GetSlotContents(new SlotNumber(3,2)) as MappedRam;
+            var r = regs;
             if(r.PC == 5 && mappedRam.GetBlockInBank(0) == 3
                 && ((dosTracingState == DosTracingState.OnInclusive && dosTracingIncluded.Contains(r.C))
                     || (dosTracingState == DosTracingState.OnExclusive && !dosTracingExcluded.Contains(r.C)))) {
                 Print($"DOS call: {r.C:X2}h - {DosFunctions.NameOf(r.C)}");
+                if(r.C == DosFunctions.CodeOf("WRITE")) { 
+                    Print($"  FH={r.B}, buffer=0x{r.DE:X2}, count={r.HL}");
+                    //if (r.B == 5 && r.HL == 4062)
+                    //    r.HL = 4091;
+                }
+                //if (r.C == DosFunctions.CodeOf("CLOSE"))
+                //{
+                //    Print($"  FH={r.B}");
+                //}
             }
         }
     }

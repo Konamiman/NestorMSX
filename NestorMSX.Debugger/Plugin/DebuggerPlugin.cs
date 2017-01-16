@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 using Konamiman.NestorMSX.Menus;
+using Konamiman.NestorMSX.Misc;
 using Konamiman.NestorMSX.Z80Debugger.Console;
 using Konamiman.NestorMSX.Z80Debugger.Console.CommandInterpreter;
 using Konamiman.NestorMSX.Z80Debugger.Console.CommandProviders;
@@ -39,6 +40,9 @@ namespace Konamiman.NestorMSX.Z80Debugger.Plugin
             commandInterpreter = new CommandInterpreter(
                 new EvaluantExpressionEvaluatorWrapper(), 
                 commandProviders);
+
+            if(pluginConfig.GetValueOrDefault<bool>("autoShowConsole"))
+                ShowConsole();
         }
 
         private void OnPrintMessageRequest(object sender, PrintMessageRequestEventArgs args)

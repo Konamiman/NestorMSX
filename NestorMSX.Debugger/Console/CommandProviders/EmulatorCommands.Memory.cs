@@ -50,6 +50,11 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console.CommandProviders
             return $"{slotsSystem.GetCurrentSlot(0)} {slotsSystem.GetCurrentSlot(1)} {slotsSystem.GetCurrentSlot(2)} {slotsSystem.GetCurrentSlot(3)}";
         }
 
+        public string Segms()
+        {
+            return $"{mappedRam.GetBlockInBank(0)} {mappedRam.GetBlockInBank(1)} {mappedRam.GetBlockInBank(2)} {mappedRam.GetBlockInBank(3)}";
+        }
+
         private static readonly StringBuilder sbBytes = new StringBuilder();
         private static readonly StringBuilder sbChars = new StringBuilder();
         private static readonly StringBuilder sbResult = new StringBuilder();
