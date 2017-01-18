@@ -42,6 +42,11 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console.CommandInterpreter
             return nameParts.Equals(other.nameParts);
         }
 
+        public bool EqualsExactly(TokenWithName other)
+        {
+            return this.FullName == other.FullName;
+        }
+
         public override bool Equals(object obj)
         {
             if (!HasValidName)

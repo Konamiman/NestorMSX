@@ -87,7 +87,7 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console.CommandInterpreter
                 
                 foreach (var methodAlias in methodAliases) {
                     var commandFullName = $"{typeName}.{methodAlias}";
-                    if (commandsList.Any(c => c == commandFullName))
+                    if (commandsList.Any(c => c.FullName == commandFullName))
                         throw new Exception($"Duplicate command: {commandFullName}");
 
                     var command = new MethodCommand(commandFullName, method, commandsProvider);
@@ -201,8 +201,11 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console.CommandInterpreter
                     return null;
             }
 
-            if(matchingCommands.Length > 1)
+            if(matchingCommands.Length > 1) { 
+                if(matchingCommands.All(c => c is MethodCommand) &&
+                    matchingCommands.Cast<MethodCommand>().Select(c => c.MethodHash).Distinct().Count() > 1)
                 throw new CommandExecutionException($"Ambiguous command '{name}', possible matches: {string.Join(",", matchingCommands.Select(c => c.FullName))}");
+            }
 
             name = matchingCommands[0].FullName;
             return matchingCommands[0];

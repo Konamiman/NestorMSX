@@ -87,5 +87,7 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console.CommandInterpreter
                 throw new CommandExecutionException($"Exception thrown by method '{hostingObject.GetType().Name}.{method.Name}': {ex.InnerException.Message}", ex.InnerException);
             }
         }
+
+        public int MethodHash => method.GetHashCode();
     }
 }

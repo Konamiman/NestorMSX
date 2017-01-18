@@ -68,6 +68,9 @@
     <Compile Include="Console\CommandProviders\EmulatorCommands.Memory.cs">
       <DependentUpon>EmulatorCommandsProvider.cs</DependentUpon>
     </Compile>
+    <Compile Include="Console\CommandProviders\EmulatorCommands.Trace.cs">
+      <DependentUpon>EmulatorCommandsProvider.cs</DependentUpon>
+    </Compile>
     <Compile Include="Console\CommandProviders\EmulatorCommandsProvider.cs" />
     <Compile Include="Console\CommandProviders\UtilsCommandsProvider.cs" />
     <Compile Include="Console\ConsoleTestForm.cs">
