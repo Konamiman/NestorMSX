@@ -25,9 +25,9 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console.CommandProviders
 
         private static readonly char[] comma = {','};
 
-        public string TraceDos([RawExpression]string include=null, [RawExpression]string exclude=null)
+        public string TraceDos([RawExpression]string @in=null, [RawExpression]string ex=null)
         {
-            if(include.IsEmpty() && exclude.IsEmpty()) {
+            if(@in.IsEmpty() && ex.IsEmpty()) {
                 StringBuilder sb = new StringBuilder();
                 byte[] functionCodes;
                 if(dosTracingState == DosTracingState.Off)
@@ -49,17 +49,17 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console.CommandProviders
                 return sb.ToString();
             }
 
-            if(include.HasValue() && exclude.HasValue())
+            if(@in.HasValue() && ex.HasValue())
                 throw new CommandExecutionException("Can't specify both include and exclude lists");
 
-            if(include.IsCommandCI("off")) {
+            if(@in.IsCommandCI("off")) {
                 if(dosTracingState != DosTracingState.Off) {
                     dosTracingState = DosTracingState.Off;
                     cpu.BeforeInstructionFetch -= BeforeInstructionFetchForDosCall;
                 }
                 return "DOS tracing disabled";
             }
-            else if(include.IsCommandCI("pause")) {
+            else if(@in.IsCommandCI("pause")) {
                 if(dosTracingState == DosTracingState.Off)
                     return "DOS tracing is OFF, no action taken";
                 else if(dosTracingIsPaused)
@@ -67,7 +67,7 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console.CommandProviders
                 dosTracingIsPaused = true;
                 return "ok";
             }
-            else if(include.IsCommandCI("resume")) {
+            else if(@in.IsCommandCI("resume")) {
                 if(dosTracingState == DosTracingState.Off)
                     return "DOS tracing is OFF, no action taken";
                 else if(!dosTracingIsPaused)
@@ -76,7 +76,7 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console.CommandProviders
                 return "ok";
             }
 
-            var functionCodesAsStrings = (include ?? exclude).Split(comma, StringSplitOptions.RemoveEmptyEntries);
+            var functionCodesAsStrings = (@in ?? ex).Split(comma, StringSplitOptions.RemoveEmptyEntries);
             var functionCodesAsBytes = new List<byte>();
 
             foreach(var codeAsString in functionCodesAsStrings) {
@@ -105,7 +105,7 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console.CommandProviders
                 cpu.BeforeInstructionFetch += BeforeInstructionFetchForDosCall;
             }
 
-            if(include == null) {
+            if(@in == null) {
                 dosTracingExcluded = functionCodesAsBytes.ToArray();
                 dosTracingState = DosTracingState.OnExclusive;
             }
@@ -117,6 +117,8 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console.CommandProviders
             dosTracingIsPaused = false;
             return "ok";
         }
+
+        private static readonly string[] AttributeLetters = {"*","*","A","D","V","S","H","R"};
 
         private void BeforeInstructionFetchForDosCall(object sender, BeforeInstructionFetchEventArgs beforeInstructionFetchEventArgs)
         {
@@ -130,14 +132,124 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console.CommandProviders
                 Print($"DOS call: {r.C:X2}h - {DosFunctions.NameOf(r.C)}");
                 if(r.C == DosFunctions.CodeOf("WRITE")) { 
                     Print($"  FH={r.B}, buffer=0x{r.DE:X2}, count={r.HL}");
-                    //if (r.B == 5 && r.HL == 4062)
-                    //    r.HL = 4091;
                 }
-                //if (r.C == DosFunctions.CodeOf("CLOSE"))
-                //{
-                //    Print($"  FH={r.B}");
-                //}
+                if (r.C == DosFunctions.CodeOf("EXPLAIN"))
+                {
+                    Print($"  Error={r.B:X2}");
+                }
+                if (r.C == DosFunctions.CodeOf("ALLOC"))
+                {
+                    Print($"  Drive={r.E}");
+                }
+                if (r.C == DosFunctions.CodeOf("IOCTL"))
+                {
+                    Print($"  B={r.B}, A={r.A}");
+                }
+                if (r.C == DosFunctions.CodeOf("GENV"))
+                {
+                    Print($"  HL = {ExtractString(r.HL)}");
+                }
+                if (r.C == DosFunctions.CodeOf("CHDIR"))
+                {
+                    Print($"  DE = {ExtractString(r.DE)}");
+                }
+                if (r.C == DosFunctions.CodeOf("FFIRST") || r.C == DosFunctions.CodeOf("FNEW"))
+                {
+                    var firstByte = cpu.Memory[r.DE];
+                    if (firstByte == 0xFF)
+                    {
+                        Print($"  DE = FIB: {ExtractString(r.DE+1)}");
+                        Print($"  HL = {ExtractString(r.HL)}");
+                    }
+                    else
+                    {
+                        Print($"  DE = {ExtractString(r.DE)}");
+                    }
+
+                    var attrsString = AttrsString(regs.B);
+                    Print($"  B = {attrsString}");
+                    Print($"  IX = {r.IX:X4}h ");
+                    if(r.C == DosFunctions.CodeOf("FNEW"))
+                        Print($"  IX.name = {ExtractString(r.IX+1)} ");
+                    SetPostDosHook();
+                }
+                if (r.C == DosFunctions.CodeOf("FNEXT"))
+                {
+                    Print($"  IX = {r.IX:X4}h ");
+                }
+                if (r.C == DosFunctions.CodeOf("WPATH"))
+                {
+                    SetPostDosHook();
+                }
+                if (r.C == DosFunctions.CodeOf("GETCD"))
+                {
+                    SetPostDosHook();
+                }
             }
+        }
+
+        private static string AttrsString(byte attrsByte)
+        {
+            var attrsString = "";
+            for (int i = 7; i >= 0; i--)
+            {
+                attrsString = ((attrsByte & 1) == 1 ? AttributeLetters[i] : "-") + attrsString;
+                attrsByte >>= 1;
+            }
+            return attrsString;
+        }
+
+        private void SetPostDosHook()
+        {
+            lastDosFunctionHooked = regs.C;
+            postDosFunctionCallSp = regs.SP + 2;
+            cpu.BeforeInstructionExecution += PostDosFunctionCall;
+        }
+
+        private int postDosFunctionCallSp;
+        private byte lastDosFunctionHooked;
+        private void PostDosFunctionCall(object sender, BeforeInstructionExecutionEventArgs beforeInstructionExecutionEventArgs)
+        {
+            if (regs.SP != postDosFunctionCallSp)
+                return;
+
+            cpu.BeforeInstructionExecution -= PostDosFunctionCall;
+
+            if (lastDosFunctionHooked == DosFunctions.CodeOf("WPATH"))
+            {
+                Print($"  DE = {ExtractString(regs.DE)}");
+                Print($"  HL = {ExtractString(regs.HL)}");
+            }
+            if (lastDosFunctionHooked == DosFunctions.CodeOf("GETCD"))
+            {
+                Print($"  DE = {ExtractString(regs.DE)}");
+            }
+            if (lastDosFunctionHooked == DosFunctions.CodeOf("FFIRST") ||
+                lastDosFunctionHooked == DosFunctions.CodeOf("FNEXT"))
+            {
+                if (regs.A != 0)
+                {
+                    Print($"  Error = {DosErrors.NameOf(regs.A)}");
+                }
+                else
+                {
+                    Print($"  Found: {ExtractString(regs.IX + 1)}");
+                    Print($"  Attrs: {AttrsString(cpu.Memory[regs.IX + 14])}");
+                }
+            }
+        }
+        
+        private string ExtractString(int address)
+        {
+            var bytes = new List<byte>();
+            byte theByte;
+            while (((theByte = cpu.Memory[address]) != 0) && bytes.Count < 256)
+            {
+                bytes.Add(theByte);
+                address++;
+            }
+
+            return Encoding.ASCII.GetString(bytes.ToArray());
         }
     }
 }

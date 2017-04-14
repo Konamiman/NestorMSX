@@ -58,6 +58,7 @@
     <Compile Include="Console\CommandInterpreter\CommandInterpreter.cs" />
     <Compile Include="Console\CommandInterpreter\ConstantValueVariable.cs" />
     <Compile Include="Console\CommandInterpreter\RawExpressionAttribute.cs" />
+    <Compile Include="Console\CommandProviders\DosErrors.cs" />
     <Compile Include="Console\CommandProviders\DosFunctions.cs" />
     <Compile Include="Console\CommandProviders\EmulatorCommands.Cpu.cs">
       <DependentUpon>EmulatorCommandsProvider.cs</DependentUpon>

@@ -18,6 +18,7 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console.CommandProviders
         private readonly IZ80Registers regs;
 
         private readonly byte[] ldirBytes = {0xED, 0xB0};
+        private readonly byte[] breakpBytes = { 0xED, 0x00 };
 
         private MappedRam _mappedRam;
 
@@ -35,21 +36,13 @@ namespace Konamiman.NestorMSX.Z80Debugger.Console.CommandProviders
             this.slotsSystem = pluginContext.SlotsSystem;
             this.regs = cpu.Registers;
 
-            return; //WIP
-            //var cpu = pluginContext.Cpu;
-            //var r = cpu.Registers;
-
-            //cpu.BeforeInstructionExecution += (sender, args) => {
-            //    if(args.Opcode.SequenceEqual(ldirBytes) 
-            //        && cpu.Registers.PC != oldpc
-            //        && cpu.Registers.BC >= 100
-            //        //&& cpu.Registers.PC != 0x0CFF
-            //        && cpu.Registers.DE.ToUShort() >= 0xC000)
-            //    {
-            //        oldpc = cpu.Registers.PC;
-            //        Print($"At {r.PC:X4}: LDIR from {r.HL:X4} to {r.DE:X4}, {r.BC} bytes");
-            //    }
-            //};
+            cpu.BeforeInstructionExecution += (sender, args) =>
+            {
+                if (args.Opcode.SequenceEqual(breakpBytes))
+                {
+                    Print($"BREAKP: PC={regs.PC:X4}h, DE={regs.DE:X4}h, {ExtractString(regs.DE)}");
+                }
+            };
 
             //cpu.BeforeInstructionFetch += (sender, args) => {
             //    mappedRam = mappedRam ?? pluginContext.SlotsSystem.GetSlotContents(new SlotNumber(3,2)) as MappedRam;
