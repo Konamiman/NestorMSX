@@ -14,6 +14,7 @@ namespace Konamiman.NestorMSX.BuiltInPlugins.SlotlessPlugins
     [NestorMSXPlugin("Filesystem integration")]
     public class FileSystemPlugin
     {
+        private const byte _NODIR = 0xD6;
         private const byte _NOFIL = 0xD7;
 
         private static FileSystemPlugin Instance;
@@ -39,7 +40,10 @@ namespace Konamiman.NestorMSX.BuiltInPlugins.SlotlessPlugins
 
         private void ALLOC()
         {
-            regs.A = 0xD5;
+            regs.HL = 0;
+            regs.DE = 0;
+            regs.C = 1;
+            regs.A = 0;
         }
 
         private FileSystemInfo[] fsinfos;
@@ -47,9 +51,19 @@ namespace Konamiman.NestorMSX.BuiltInPlugins.SlotlessPlugins
         private void FFIRST()
         {
             var searchPath = ExtractString(regs.IY, 63);
-            var fullSearchPath = Path.Combine(currentFullDir, searchPath);
-            var directory = Path.GetDirectoryName(fullSearchPath);
-            var fileName = Path.GetFileName(fullSearchPath);
+            string fullSearchPath, directory, fileName;
+            if (searchPath != "")
+            {
+                fullSearchPath = Path.Combine(basePath, searchPath);
+                directory = Path.GetDirectoryName(fullSearchPath);
+                fileName = Path.GetFileName(fullSearchPath);
+            }
+            else
+            {
+                fullSearchPath = basePath;
+                directory = basePath;
+                fileName = "*.*";
+            }
 
             DirectoryInfo di = new DirectoryInfo(directory);
             fsinfos = di.GetFileSystemInfos(fileName)
@@ -99,7 +113,17 @@ namespace Konamiman.NestorMSX.BuiltInPlugins.SlotlessPlugins
 
         private void CHDIR()
         {
-            regs.A = 0xD5;
+            var msxFullDirPath = ExtractString(regs.HL, 63);
+            var myFullDirPath = Path.Combine(basePath, msxFullDirPath);
+            if (!Directory.Exists(myFullDirPath))
+            {
+                regs.A = _NODIR;
+                return;
+            }
+
+            currentRelativeDir = msxFullDirPath;
+            currentFullDir = myFullDirPath;
+            regs.A = 0;
         }
 
         private void GETCD()
